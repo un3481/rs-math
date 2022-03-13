@@ -66,7 +66,11 @@ pub fn ln(
 ) -> Result<Decimal, Error> {
     let (exp, rem) = dec_by2(0, x);
     let lnx = ln_series(i, rem)?;
-    (lnx + (dec!(exp) * consts::LN_OF_TWO))
+    Ok(
+        lnx + (
+            dec!(exp) * consts::LN_OF_TWO
+        )
+    )
 }
 
 //##########################################################################################################################

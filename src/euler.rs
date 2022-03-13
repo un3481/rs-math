@@ -25,19 +25,19 @@ pub fn euler_series(
 
 pub fn ln_series(
     i: usize,
-    x: Decimal
+    value: Decimal
 ) -> Result<Decimal, Error> {
     Ok(
         (1..=i).par_iter()
             .map(|n| (n, [
                 || (1..=n).par_iter()
-                    .map(|_| x - consts::EULER)
+                    .map(|_| value - consts::EULER)
                     .reduce(|| dec!(1), |u, d| u * d),
                 || (1..=n).par_iter()
                     .map(|_| consts::EULER)
                     .reduce(|| dec!(n), |u, d| u * d)
-            ]))
-            .map(|(n, t)| (n, t.par_iter().map(|f| f()).collect()))
+            ].par_iter()))
+            .map(|(n, t)| (n, t.map(|f| f()).collect()))
             .map(|(n, t)| (if let 0=n%2 {-1} else {1}, t))
             .map(|(s, t)| (t[0] / t[1]) * dec!(s))
             .reduce(|| dec!(1), |u, d| u + d)
@@ -62,13 +62,35 @@ fn dec_by2(
 
 pub fn ln(
     i: usize,
-    x: Decimal
+    value: Decimal
 ) -> Result<Decimal, Error> {
-    let (exp, rem) = dec_by2(0, x);
+    let (exp, rem) = dec_by2(0, value);
     Ok(
         ln_series(i, rem)? + (
             dec!(exp) * consts::LN_OF_TWO
         )
+    )
+}
+
+//##########################################################################################################################
+
+pub fn power_series(
+    i: usize,
+    value: Decimal
+) -> Result<Decimal, Error> {
+    Ok(
+        (1..=i).par_iter()
+            .map(|n| [
+                || (1..n).par_iter()
+                    .map(|_| value)
+                    .reduce(|| dec!(1), |u, d| u * d),
+                || (2..n).par_iter()
+                    .map(|x| dec!(x))
+                    .reduce(|| dec!(1), |u, d| u * d)
+            ].par_iter())
+            .map(|t| t.map(|f| f()).collect())
+            .map(|t| t[0] / t[1])
+            .reduce(|| dec!(0), |u, d| u + d)
     )
 }
 

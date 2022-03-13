@@ -5,7 +5,11 @@ use rayon::prelude::*;
 
 //##########################################################################################################################
 
-const fn euler(
+const STD_ITER: usize = 99;
+
+//##########################################################################################################################
+
+const fn euler_series(
     i: usize
 ) -> Result<Decimal, Error> {
     Ok(
@@ -19,18 +23,19 @@ const fn euler(
     )
 }
 
-const EULER: Decimal = euler(99).unwrap();
+const EULER: Decimal = euler_series(STD_ITER).unwrap();
 
 //##########################################################################################################################
 
-const fn ln2(
-    i: usize
+const fn ln_series(
+    i: usize,
+    x: Decimal
 ) -> Result<Decimal, Error> {
     Ok(
         (1..=i).par_iter()
             .map(|n| (n, [
                 || (1..=n).par_iter()
-                    .map(|_| dec!(2) - EULER)
+                    .map(|_| x - EULER)
                     .reduce(|| dec!(1), |u, d| u * d),
                 || (1..=n).par_iter()
                     .map(|_| EULER)
@@ -43,11 +48,11 @@ const fn ln2(
     )
 }
 
-const LN_OF_TWO: Decimal = ln2(99).unwrap();
+const LN_OF_TWO: Decimal = ln_series(STD_ITER, dec!(2)).unwrap();
 
 //##########################################################################################################################
 
-fn decompose_input_by2(
+const fn decompose_input_by2(
     x: Decimal
 ) -> Result<(Decimal, isize), Error> {
     let (mut acc, mut cnt) = (dec!(0) + x, 0);

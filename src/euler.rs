@@ -1,8 +1,10 @@
 
+// Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
+// Modules
 mod consts;
 
 //##########################################################################################################################
@@ -17,6 +19,28 @@ pub fn euler_series(
                 .reduce(|| dec!(1), |u, d| u * d)
             )
             .map(|x| dec!(1) / x)
+            .reduce(|| dec!(0), |u, d| u + d)
+    )
+}
+
+//##########################################################################################################################
+
+pub fn power_series(
+    terms: usize,
+    value: Decimal
+) -> Result<Decimal, Error> {
+    Ok(
+        (1..=terms).par_iter()
+            .map(|n| [
+                || (1..n).par_iter()
+                    .map(|_| value)
+                    .reduce(|| dec!(1), |u, d| u * d),
+                || (2..n).par_iter()
+                    .map(|x| dec!(x))
+                    .reduce(|| dec!(1), |u, d| u * d)
+            ].par_iter())
+            .map(|t| t.map(|f| f()).collect())
+            .map(|t| t[0] / t[1])
             .reduce(|| dec!(0), |u, d| u + d)
     )
 }
@@ -69,28 +93,6 @@ pub fn ln(
         ln_series(terms, rem)? + (
             dec!(exp) * consts::LN_OF_TWO
         )
-    )
-}
-
-//##########################################################################################################################
-
-pub fn power_series(
-    terms: usize,
-    value: Decimal
-) -> Result<Decimal, Error> {
-    Ok(
-        (1..=terms).par_iter()
-            .map(|n| [
-                || (1..n).par_iter()
-                    .map(|_| value)
-                    .reduce(|| dec!(1), |u, d| u * d),
-                || (2..n).par_iter()
-                    .map(|x| dec!(x))
-                    .reduce(|| dec!(1), |u, d| u * d)
-            ].par_iter())
-            .map(|t| t.map(|f| f()).collect())
-            .map(|t| t[0] / t[1])
-            .reduce(|| dec!(0), |u, d| u + d)
     )
 }
 

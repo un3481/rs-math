@@ -3,9 +3,11 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
+mod consts;
+
 //##########################################################################################################################
 
-fn euler_series(
+pub fn euler_series(
     i: usize
 ) -> Result<Decimal, Error> {
     Ok(
@@ -21,7 +23,7 @@ fn euler_series(
 
 //##########################################################################################################################
 
-fn ln_series(
+pub fn ln_series(
     i: usize,
     x: Decimal
 ) -> Result<Decimal, Error> {
@@ -29,10 +31,10 @@ fn ln_series(
         (1..=i).par_iter()
             .map(|n| (n, [
                 || (1..=n).par_iter()
-                    .map(|_| x - EULER)
+                    .map(|_| x - consts::EULER)
                     .reduce(|| dec!(1), |u, d| u * d),
                 || (1..=n).par_iter()
-                    .map(|_| EULER)
+                    .map(|_| consts::EULER)
                     .reduce(|| dec!(n), |u, d| u * d)
             ]))
             .map(|(n, t)| (n, t.par_iter().map(|f| f()).collect()))
@@ -47,14 +49,12 @@ fn ln_series(
 fn dec_by2(
     cnt: isize,
     value: Decimal
-) -> Result<(isize, Decimal), Error> {
-    Ok(
-        match true {
-            (value > 4) => dec_by2(cnt + 1, value / 2),
-            (value < 2) => dec_by2(cnt - 1, value * 2),
-            _ => (cnt, value),
-        }
-    )
+) -> (isize, Decimal) {
+    match true {
+        (value > 4) => dec_by2(cnt + 1, value / 2),
+        (value < 2) => dec_by2(cnt - 1, value * 2),
+        _ => (cnt, value),
+    }
 }
 
 //##########################################################################################################################

@@ -1,5 +1,7 @@
 
-fn euler(i: usize = 99) -> Result<f64, Error> {
+fn euler(
+    i: usize = 99
+) -> Result<f64, Error> {
     Ok(
         (1..i).par_iter()
             .map(|n| (2..n).par_iter()

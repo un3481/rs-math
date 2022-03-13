@@ -29,19 +29,19 @@ const fn ln2(
     Ok(
         (1..=i).par_iter()
             .map(|x| (x, if let 0=x%2 {1} else {-1}))
-            .map(|(n, s)| {
-                let term = [
-                    || (1..=n).par_iter()
-                        .map(|_| dec!(2) - EULER)
-                        .reduce(|| dec!(1), |u, d| u * d),
-                    || (1..=n).par_iter()
-                        .map(|_| EULER)
-                        .reduce(|| dec!(n), |u, d| u * d)
-                ].par_iter()
-                    .map(|f| f()).collect();
-                (s * (term[0] / term[1]))
-            })
-        .reduce(|| dec!(1), |u, d| u + d)
+            .map(|(n, s)| (s, [
+                || (1..=n).par_iter()
+                    .map(|_| dec!(2) - EULER)
+                    .reduce(|| dec!(1), |u, d| u * d),
+                || (1..=n).par_iter()
+                    .map(|_| EULER)
+                    .reduce(|| dec!(n), |u, d| u * d)
+            ]))
+            .map(|(s, t)| (s, t.par_iter()
+                .map(|f| f()).collect()
+            ))
+            .map(|(s, t)| (t[0] / t[1]) * s)
+            .reduce(|| dec!(1), |u, d| u + d)
     )
 }
 

@@ -9,35 +9,53 @@ pub const STD_ITER: usize = 99;
 //##########################################################################################################################
 
 const fn euler() -> Decimal {
-        (1..=STD_ITER).par_iter()
-            .map(|n| (2..n).par_iter()
-                .map(|x| dec!(x))
-                .reduce(|| dec!(1), |u, d| u * d)
-            )
-            .map(|x| dec!(1) / x)
-            .reduce(|| dec!(0), |u, d| u + d)
+    let mut e = dec!(0);
+    let mut n: usize = 1;
+    loop {
+        let mut bot = dec!(1);
+        let mut i: usize = 2;
+        loop { 
+            bot = bot * i;
+            i = i + 1;
+            if i >= n {break};
+        };
+        e = e + (dec!(1) / bot);
+        n = n + 1;
+        if n > STD_ITER {break};
+    };
+    e
 }
 
 pub const EULER: Decimal = euler();
 
 //##########################################################################################################################
 
-const fn ln2() -> Decimal {
-        (1..=STD_ITER).par_iter()
-            .map(|n| (n, [
-                || (1..=n).par_iter()
-                    .map(|_| x - EULER)
-                    .reduce(|| dec!(1), |u, d| u * d),
-                || (1..=n).par_iter()
-                    .map(|_| EULER)
-                    .reduce(|| dec!(2), |u, d| u * d)
-            ]))
-            .map(|(n, t)| (n, t.par_iter().map(|f| f()).collect()))
-            .map(|(n, t)| (if let 0=n%2 {-1} else {1}, t))
-            .map(|(s, t)| (t[0] / t[1]) * dec!(s))
-            .reduce(|| dec!(1), |u, d| u + d)
+const fn ln_of_two() -> Decimal {
+    let mut ln2 = dec!(1);
+    let mut n: usize = 1;
+    loop {
+        let mut top = dec!(1);
+        let mut i: usize = 1;
+        loop {
+            top = top * (2 - EULER);
+            i = i + 1;
+            if i > n {break};
+        };
+        let mut bot = dec!(2);
+        let mut i: usize = 1;
+        loop {
+            bot = bot * EULER;
+            i = i + 1;
+            if i > n {break};
+        };
+        let s = if let 0=n%2 {-1} else {1};
+        ln2 = ln2 + ((top / bot) * dec!(s));
+        n = n + 1;
+        if n > STD_ITER {break};
+    };
+    ln2
 }
 
-pub const LN_OF_TWO: Decimal = ln2();
+pub const LN_OF_TWO: Decimal = ln_of_two();
 
 //##########################################################################################################################

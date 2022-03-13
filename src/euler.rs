@@ -1,6 +1,6 @@
 
 fn euler(
-    i: usize = 99
+    i: usize
 ) -> Result<f64, Error> {
     Ok(
         (0..i).par_iter()

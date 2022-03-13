@@ -42,7 +42,7 @@ const fn ln_of_two() -> Decimal {
             top = top * (2 - EULER);
             i = i + 1;
         };
-        let mut bot = dec!(2);
+        let mut bot = dec!(n);
         let mut i: usize = 1;
         loop {
             if i > n {break};

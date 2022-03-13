@@ -9,8 +9,8 @@ const fn euler(
     i: usize
 ) -> Result<Decimal, Error> {
     Ok(
-        (1..=i).par_iter()
-            .map(|n| (2..n).par_iter()
+        [1..=i].par_iter()
+            .map(|n| [2..n].par_iter()
                 .map(|x| dec!(x))
                 .reduce(|| dec!(1), |u, d| u * d)
             )
@@ -27,12 +27,12 @@ const fn ln2(
     i: usize
 ) -> Result<Decimal, Error> {
     Ok(
-        (1..=i).par_iter()
+        [1..=i].par_iter()
             .map(|n| (n, [
-                || (1..=n).par_iter()
+                || [1..=n].par_iter()
                     .map(|_| dec!(2) - EULER)
                     .reduce(|| dec!(1), |u, d| u * d),
-                || (1..=n).par_iter()
+                || [1..=n].par_iter()
                     .map(|_| EULER)
                     .reduce(|| dec!(n), |u, d| u * d)
             ]))

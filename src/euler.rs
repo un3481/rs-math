@@ -9,7 +9,7 @@ const fn euler(
     i: usize
 ) -> Result<Decimal, Error> {
     Ok(
-        (0..i).par_iter()
+        (1..=i).par_iter()
             .map(|n| (2..n).par_iter()
                 .map(|x| dec!(x))
                 .reduce(|| dec!(1), |u, d| u * d)
@@ -19,6 +19,30 @@ const fn euler(
     )
 }
 
-const EULER: Decimal = euler(64).unwrap();
+const EULER: Decimal = euler(99).unwrap();
+
+//##########################################################################################################################
+
+const fn ln2(
+    i: usize
+) -> Result<Decimal, Error> {
+    Ok(
+        (1..=i).par_iter()
+            .map(|x| (x, if let 0=x%2 {1} else {-1}))
+            .map(|(n, s)| {
+                let term = [
+                    || (1..=n).par_iter().map(|_| 2 - EULER)
+                        .reduce(|| dec!(1), |u, d| u * d),
+                    || (1..=n).par_iter().map(|_| EULER)
+                        .reduce(|| dec!(n), |u, d| u * d)
+                ].par_iter()
+                    .map(|f| f()).collect();
+                (s * (term[0] / term[1]))
+            })
+        .reduce(|| dec!(1), |u, d| u + d)
+    )
+}
+
+const LN_OF_TWO: Decimal = ln2(99).unwrap();
 
 //##########################################################################################################################

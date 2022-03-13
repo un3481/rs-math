@@ -28,8 +28,7 @@ const fn ln2(
 ) -> Result<Decimal, Error> {
     Ok(
         (1..=i).par_iter()
-            .map(|x| (if let 0=x%2 {-1} else {1}, x))
-            .map(|(s, n)| (s, [
+            .map(|n| (n, [
                 || (1..=n).par_iter()
                     .map(|_| dec!(2) - EULER)
                     .reduce(|| dec!(1), |u, d| u * d),
@@ -37,10 +36,9 @@ const fn ln2(
                     .map(|_| EULER)
                     .reduce(|| dec!(n), |u, d| u * d)
             ]))
-            .map(|(s, t)| (s, t.par_iter()
-                .map(|f| f()).collect()
-            ))
-            .map(|(s, t)| (t[0] / t[1]) * s)
+            .map(|(n, t)| (n, t.par_iter().map(|f| f()).collect()))
+            .map(|(n, t)| (if let 0=n%2 {-1} else {1}, t))
+            .map(|(s, t)| (t[0] / t[1]) * dec!(s))
             .reduce(|| dec!(1), |u, d| u + d)
     )
 }

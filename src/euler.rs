@@ -47,13 +47,13 @@ pub fn ln_series(
 //##########################################################################################################################
 
 fn dec_by2(
-    cnt: isize,
-    value: Decimal
+    exp: isize,
+    x: Decimal
 ) -> (isize, Decimal) {
     match true {
-        (value > 4) => dec_by2(cnt + 1, value / 2),
-        (value < 2) => dec_by2(cnt - 1, value * 2),
-        _ => (cnt, value),
+        (value > 4) => dec_by2(exp + 1, x / dec!(2)),
+        (value < 2) => dec_by2(exp - 1, x * dec!(2)),
+        _ => (exp, x),
     }
 }
 
@@ -63,9 +63,9 @@ pub fn ln(
     i: usize,
     x: Decimal
 ) -> Result<Decimal, Error> {
-    let (cnt, value) = dec_by2(0, x);
-    let lnx = ln_series(i, value)?;
-    (lnx + (dec!(cnt) * consts::LN_OF_TWO))
+    let (exp, rem) = dec_by2(0, x);
+    let lnx = ln_series(i, rem)?;
+    (lnx + (dec!(exp) * consts::LN_OF_TWO))
 }
 
 //##########################################################################################################################

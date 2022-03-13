@@ -5,11 +5,7 @@ use rayon::prelude::*;
 
 //##########################################################################################################################
 
-const STD_ITER: usize = 99;
-
-//##########################################################################################################################
-
-const fn euler_series(
+fn euler_series(
     i: usize
 ) -> Result<Decimal, Error> {
     Ok(
@@ -23,11 +19,9 @@ const fn euler_series(
     )
 }
 
-const EULER: Decimal = euler_series(STD_ITER).unwrap();
-
 //##########################################################################################################################
 
-const fn ln_series(
+fn ln_series(
     i: usize,
     x: Decimal
 ) -> Result<Decimal, Error> {
@@ -48,11 +42,9 @@ const fn ln_series(
     )
 }
 
-const LN_OF_TWO: Decimal = ln_series(STD_ITER, dec!(2)).unwrap();
-
 //##########################################################################################################################
 
-const fn dec_by2(
+fn dec_by2(
     cnt: isize,
     value: Decimal
 ) -> Result<(isize, Decimal), Error> {

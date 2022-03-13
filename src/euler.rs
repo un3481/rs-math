@@ -1,7 +1,7 @@
 
 fn euler() -> Result<f64, Error> {
     Ok(
-        (1..99).par_iter()
+        (3..100).par_iter()
             .map(|n| (2..n).par_iter()
                 .map(|x| dec!(x))
                 .reduce(|| dec!(1), |u, d| u * d)

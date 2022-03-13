@@ -6,22 +6,7 @@ use rayon::prelude::*;
 
 // Modules
 mod consts;
-
-//##########################################################################################################################
-
-pub fn euler_series(
-    terms: usize
-) -> Result<Decimal, Error> {
-    Ok(
-        (1..=terms).par_iter()
-            .map(|n| (2..n).par_iter()
-                .map(|x| dec!(x))
-                .reduce(|| dec!(1), |u, d| u * d)
-            )
-            .map(|x| dec!(1) / x)
-            .reduce(|| dec!(0), |u, d| u + d)
-    )
-}
+mod basic;
 
 //##########################################################################################################################
 
@@ -30,19 +15,23 @@ pub fn power_series(
     value: Decimal
 ) -> Result<Decimal, Error> {
     Ok(
-        (1..=terms).par_iter()
+        (0..terms).par_iter()
             .map(|n| [
-                || (1..n).par_iter()
-                    .map(|_| value)
-                    .reduce(|| dec!(1), |u, d| u * d),
-                || (2..n).par_iter()
-                    .map(|x| dec!(x))
-                    .reduce(|| dec!(1), |u, d| u * d)
+                || basic::pow(value, n).unwrap(),
+                || basic::fac(n).unwrap()
             ].par_iter())
             .map(|t| t.map(|f| f()).collect())
             .map(|t| t[0] / t[1])
             .reduce(|| dec!(0), |u, d| u + d)
     )
+}
+
+//##########################################################################################################################
+
+pub fn euler(
+    terms: usize
+) -> Result<Decimal, Error> {
+    Ok(power_series(terms, dec!(1)))
 }
 
 //##########################################################################################################################

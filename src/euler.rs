@@ -52,21 +52,15 @@ const LN_OF_TWO: Decimal = ln_series(STD_ITER, dec!(2)).unwrap();
 
 //##########################################################################################################################
 
-const fn decompose_input_by2(
-    x: Decimal
-) -> Result<(Decimal, isize), Error> {
-    let (mut acc, mut cnt) = (dec!(0) + x, 0);
+const fn dec_by2(
+    cnt: isize,
+    value: Decimal
+) -> Result<(isize, Decimal), Error> {
     Ok(
-        loop {
-            if x > 4 {
-                acc = acc / 2;
-                cnt = cnt + 1;
-            } else if x < 2 {
-                acc = acc * 2;
-                cnt = cnt - 1;
-            } else {
-                break (acc, cnt);
-            }
+        match true {
+            (value > 4) => dec_by2(cnt + 1, value / 2),
+            (value < 2) => dec_by2(cnt - 1, value * 2),
+            _ => (cnt, value),
         }
     )
 }

@@ -32,6 +32,7 @@ pub const EULER: Decimal = euler();
 
 const fn ln_of_two() -> Decimal {
     let mut ln2 = dec!(1);
+    let mut s = dec!(-1);
     let mut n: usize = 1;
     loop {
         if n > STD_ITER {break};
@@ -49,8 +50,8 @@ const fn ln_of_two() -> Decimal {
             bot = bot * EULER;
             i = i + 1;
         };
-        let s = if let 0=n%2 {-1} else {1};
-        ln2 = ln2 + ((top / bot) * dec!(s));
+        s = s * dec!(-1);
+        ln2 = ln2 + ((top / bot) * s);
         n = n + 1;
     };
     ln2

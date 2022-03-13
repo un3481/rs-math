@@ -43,12 +43,8 @@ pub fn ln_series(
     Ok(
         (1..=terms).par_iter()
             .map(|n| (n, [
-                || (1..=n).par_iter()
-                    .map(|_| value - consts::EULER)
-                    .reduce(|| dec!(1), |u, d| u * d),
-                || (1..=n).par_iter()
-                    .map(|_| consts::EULER)
-                    .reduce(|| dec!(n), |u, d| u * d)
+                || basic::pow(value - consts::EULER, n).unwrap(),
+                || basic::pow(consts::EULER, n).unwrap() * dec!(n)
             ].par_iter()))
             .map(|(n, t)| (n, t.map(|f| f()).collect()))
             .map(|(n, t)| (if let 0=n%2 {-1} else {1}, t))

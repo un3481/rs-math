@@ -50,9 +50,10 @@ fn dec_by2(
     exp: isize,
     x: Decimal
 ) -> (isize, Decimal) {
+    let (d2, d4) = (dec!(2), dec!(4));
     match true {
-        (value > 4) => dec_by2(exp + 1, x / dec!(2)),
-        (value < 2) => dec_by2(exp - 1, x * dec!(2)),
+        (x > d4) => dec_by2(exp + 1, x / d2),
+        (x < d2) => dec_by2(exp - 1, x * d2),
         _ => (exp, x),
     }
 }

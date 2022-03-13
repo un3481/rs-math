@@ -9,18 +9,18 @@ pub const STD_ITER: usize = 99;
 //##########################################################################################################################
 
 const fn euler(
-    i: usize
+    terms: usize
 ) -> Decimal {
     let mut e = dec!(0);
     let mut n: usize = 1;
     loop {
-        if n > i {break};
+        if n > terms {break};
         let mut bot = dec!(1);
-        let mut f: usize = 2;
+        let mut i: usize = 2;
         loop {
-            if f >= n {break};
+            if i >= n {break};
             bot = bot * dec!(i);
-            f = f + 1;
+            i = i + 1;
         };
         e = e + (dec!(1) / bot);
         n = n + 1;
@@ -33,26 +33,26 @@ pub const EULER: Decimal = euler(STD_ITER);
 //##########################################################################################################################
 
 const fn ln_of_two(
-    i: usize
+    terms: usize
 ) -> Decimal {
     let mut ln2 = dec!(1);
     let mut s = dec!(-1);
     let mut n: usize = 1;
     loop {
-        if n > i {break};
+        if n > terms {break};
         let mut top = dec!(1);
-        let mut f: usize = 1;
+        let mut i: usize = 1;
         loop {
-            if f > n {break};
+            if i > n {break};
             top = top * (2 - EULER);
-            f = f + 1;
+            i = i + 1;
         };
         let mut bot = dec!(n);
-        let mut f: usize = 1;
+        let mut i: usize = 1;
         loop {
-            if f > n {break};
+            if i > n {break};
             bot = bot * EULER;
-            f = f + 1;
+            i = i + 1;
         };
         s = s * dec!(-1);
         ln2 = ln2 + ((top / bot) * s);

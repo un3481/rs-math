@@ -50,7 +50,7 @@ const LN_OF_TWO: Decimal = ln2(99).unwrap();
 fn decompose_input_by2(
     x: Decimal
 ) -> Result<(Decimal, isize), Error> {
-    let (mut acc, mut cnt) = (dec!(0) + x, 0)
+    let (mut acc, mut cnt) = (dec!(0) + x, 0);
     Ok(
         loop {
             if x > 4 {

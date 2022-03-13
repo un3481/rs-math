@@ -17,7 +17,7 @@ const fn euler() -> Decimal {
         let mut i: usize = 2;
         loop {
             if i >= n {break};
-            bot = bot * i;
+            bot = bot * dec!(i);
             i = i + 1;
         };
         e = e + (dec!(1) / bot);

@@ -28,7 +28,7 @@ const fn ln2(
 ) -> Result<Decimal, Error> {
     Ok(
         (1..=i).par_iter()
-            .map(|x| (x, if let 0=x%2 {1} else {-1}))
+            .map(|x| (x, if let 0=x%2 -1 else 1))
             .map(|(n, s)| (s, [
                 || (1..=n).par_iter()
                     .map(|_| dec!(2) - EULER)

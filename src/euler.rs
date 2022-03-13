@@ -8,10 +8,10 @@ mod consts;
 //##########################################################################################################################
 
 pub fn euler_series(
-    i: usize
+    terms: usize
 ) -> Result<Decimal, Error> {
     Ok(
-        (1..=i).par_iter()
+        (1..=terms).par_iter()
             .map(|n| (2..n).par_iter()
                 .map(|x| dec!(x))
                 .reduce(|| dec!(1), |u, d| u * d)
@@ -24,11 +24,11 @@ pub fn euler_series(
 //##########################################################################################################################
 
 pub fn ln_series(
-    i: usize,
+    terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
     Ok(
-        (1..=i).par_iter()
+        (1..=terms).par_iter()
             .map(|n| (n, [
                 || (1..=n).par_iter()
                     .map(|_| value - consts::EULER)
@@ -61,12 +61,12 @@ fn dec_by2(
 //##########################################################################################################################
 
 pub fn ln(
-    i: usize,
+    terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
     let (exp, rem) = dec_by2(0, value);
     Ok(
-        ln_series(i, rem)? + (
+        ln_series(terms, rem)? + (
             dec!(exp) * consts::LN_OF_TWO
         )
     )
@@ -75,11 +75,11 @@ pub fn ln(
 //##########################################################################################################################
 
 pub fn power_series(
-    i: usize,
+    terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
     Ok(
-        (1..=i).par_iter()
+        (1..=terms).par_iter()
             .map(|n| [
                 || (1..n).par_iter()
                     .map(|_| value)

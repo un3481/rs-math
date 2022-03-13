@@ -9,6 +9,6 @@ fn euler(
                 .reduce(|| dec!(1), |u, d| u * d)
             )
             .map(|x| dec!(1) / x)
-            .reduce(|| dec!(2), |u, d| u + d)
+            .reduce(|| dec!(0), |u, d| u + d)
     )
 }

@@ -31,9 +31,11 @@ const fn ln2(
             .map(|x| (x, if let 0=x%2 {1} else {-1}))
             .map(|(n, s)| {
                 let term = [
-                    || (1..=n).par_iter().map(|_| 2 - EULER)
+                    || (1..=n).par_iter()
+                        .map(|_| dec!(2) - EULER)
                         .reduce(|| dec!(1), |u, d| u * d),
-                    || (1..=n).par_iter().map(|_| EULER)
+                    || (1..=n).par_iter()
+                        .map(|_| EULER)
                         .reduce(|| dec!(n), |u, d| u * d)
                 ].par_iter()
                     .map(|f| f()).collect();

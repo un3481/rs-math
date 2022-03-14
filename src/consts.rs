@@ -82,3 +82,39 @@ const fn ln_of_two(
 pub const LN_OF_TWO: Decimal = ln_of_two(STD_ITER);
 
 //##########################################################################################################################
+
+const fn pi(
+    terms: usize
+) -> Decimal {
+    let mut term1 = dec!(0);
+    let s: i8 = -1;
+    let mut n: usize = 1;
+    loop {
+        if n > terms {break};
+        let top = pow(dec!(1) / dec!(5), (2 * n) - 1);
+        let bot = dec!((2 * n) - 1);
+        s = s * -1;
+        term1 = term1 + ((top / bot) * dec!(s));
+        n = n + 1;
+    };
+    let mut term2 = dec!(0);
+    let s: i8 = -1;
+    let mut n: usize = 1;
+    loop {
+        if n > terms {break};
+        let top = pow(dec!(1) / dec!(239), (2 * n) - 1);
+        let bot = dec!((2 * n) - 1);
+        s = s * -1;
+        term2 = term2 + ((top / bot) * dec!(s));
+        n = n + 1;
+    };
+    (
+        dec!(4) * (
+            (dec!(4) * term1) - term2
+        )
+    )
+}
+
+pub const PI: Decimal = pi(STD_ITER);
+
+//##########################################################################################################################

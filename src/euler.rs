@@ -60,15 +60,24 @@ pub fn ln_series(
 //##########################################################################################################################
 
 fn ln_prepare(
-    exp: isize,
-    x: Decimal
-) -> (isize, Decimal) {
-    let (d2, d4) = (dec!(2), dec!(4));
-    match true {
-        (x > d4) => ln_prepare(exp + 1, x / d2),
-        (x < d2) => ln_prepare(exp - 1, x * d2),
-        _ => (exp, x),
-    }
+    value: Decimal
+) -> (Decimal, Decimal) {
+    let mut rem = dec!(0) + value;
+    let mut exp = dec!(0);
+    loop {
+        match true {
+            (rem > dec!(4)) => {
+                rem = rem / dec!(2);
+                exp = exp + LN_OF_TWO;
+            },
+            (rem < dec!(2)) => {
+                rem = rem * dec!(2);
+                exp = exp - LN_OF_TWO;
+            },
+            _ => {break},
+        }
+    };
+    (exp, rem)
 }
 
 //##########################################################################################################################
@@ -77,11 +86,9 @@ pub fn ln(
     terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
-    let (exp, rem) = ln_prepare(0, value);
+    let (exp, rem) = ln_prepare(value);
     Ok(
-        ln_series(terms, rem)? + (
-            dec!(exp) * LN_OF_TWO
-        )
+        ln_series(terms, rem)? + exp
     )
 }
 

@@ -5,8 +5,11 @@ use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-mod consts;
-mod basic;
+use crate::basic;
+use crate::constants::{
+    EULER,
+    LN_OF_TWO
+};
 
 //##########################################################################################################################
 
@@ -31,7 +34,7 @@ pub fn power_series(
 pub fn euler(
     terms: usize
 ) -> Result<Decimal, Error> {
-    Ok(power_series(terms, dec!(1)))
+    power_series(terms, dec!(1))
 }
 
 //##########################################################################################################################
@@ -44,8 +47,8 @@ pub fn ln_series(
         dec!(1) + (
             (1..=terms).par_iter()
                 .map(|n| (if let 0=n%2 {-1} else {1}, [
-                    || basic::pow(value - consts::EULER, n).unwrap(),
-                    || basic::pow(consts::EULER, n).unwrap() * dec!(n)
+                    || basic::pow(value - EULER, n).unwrap(),
+                    || basic::pow(EULER, n).unwrap() * dec!(n)
                 ].par_iter()))
                 .map(|(s, t)| (s, t.map(|f| f()).collect()))
                 .map(|(s, t)| (t[0] / t[1]) * dec!(s))
@@ -77,7 +80,7 @@ pub fn ln(
     let (exp, rem) = ln_prepare(0, value);
     Ok(
         ln_series(terms, rem)? + (
-            dec!(exp) * consts::LN_OF_TWO
+            dec!(exp) * LN_OF_TWO
         )
     )
 }

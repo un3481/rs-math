@@ -62,8 +62,8 @@ fn ln_prepare(
 ) -> (isize, Decimal) {
     let (d2, d4) = (dec!(2), dec!(4));
     match true {
-        (x > d4) => dec_by2(exp + 1, x / d2),
-        (x < d2) => dec_by2(exp - 1, x * d2),
+        (x > d4) => ln_prepare(exp + 1, x / d2),
+        (x < d2) => ln_prepare(exp - 1, x * d2),
         _ => (exp, x),
     }
 }

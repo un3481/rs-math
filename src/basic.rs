@@ -4,6 +4,9 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
+// Modules
+mod consts;
+
 //##########################################################################################################################
 
 pub fn pow(
@@ -47,8 +50,20 @@ pub fn sqrt_series(
     Ok(
         (1..=terms).par_iter()
             .map(|n| [
-                || basic::pow(value, n - 1).unwrap(),
-                || basic::pow(value, n - 1).unwrap() * dec!(n)
+                || (
+                    value * [
+                        || basic::fac(2 * (n - 1)).unwrap(),
+                        || basic::pow(dec!(1) - value, n - 1).unwrap()
+                    ].par_iter().map(|f| f())
+                    .reduce(|| dec!(1), |u, d| u * d)
+                ),
+                || (
+                    basic::pow([
+                        || basic::fac(n - 1).unwrap(),
+                        || basic::pow(dec!(2), n - 1).unwrap()
+                    ].par_iter().map(|f| f())
+                    .reduce(|| dec!(1), |u, d| u * d), 2)
+                )
             ].par_iter())
             .map(|t| t.map(|f| f()).collect())
             .map(|t| t[0] / t[1])

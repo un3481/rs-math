@@ -102,7 +102,7 @@ pub fn sqrt(
 ) -> Result<Decimal, Error> {
     Ok(
         match true {
-            (value < dec!(0)) => None,
+            (value < dec!(0)) => panic!("tried to calc sqrt of negative number"),
             (value == dec!(0)) => dec!(0),
             _ => {
                 let (ratio, rem) = sqrt_prepare(value);

@@ -53,8 +53,9 @@ const fn euler(
     let mut n: usize = 1;
     loop {
         if n > terms {break e};
+        let top = dec!(1);
         let bot = fac(n);
-        e = e + (dec!(1) / bot);
+        e = e + (top / bot);
         n = n + 1;
     }
 }

@@ -8,24 +8,55 @@ pub const STD_ITER: usize = 99;
 
 //##########################################################################################################################
 
+const fn pow(
+    value: Decimal,
+    exp: usize
+) -> Result<Decimal, Error> {
+    let mut acc = dec!(1);
+    let mut i: usize = 1;
+    match exp {
+        0 => dec!(1),
+        _ => match value {
+            dec!(1) => dec!(1),
+            _ => loop {
+                if i > exp {break acc};
+                acc = acc * value;
+                i = i + 1;
+            },
+        },
+    }
+}
+
+//##########################################################################################################################
+
+const fn fac(
+    value: usize,
+) -> Result<Decimal, Error> {
+    let mut acc = dec!(1);
+    let mut i: usize = 1;
+    match value {
+        0 => dec!(1),
+        _ => loop {
+            if i > value {break acc};
+            acc = acc * dec!(i);
+            i = i + 1;
+        },
+    }
+}
+
+//##########################################################################################################################
+
 const fn euler(
     terms: usize
 ) -> Decimal {
     let mut e = dec!(0);
     let mut n: usize = 1;
     loop {
-        if n > terms {break};
-        let mut bot = dec!(1);
-        let mut i: usize = 2;
-        loop {
-            if i >= n {break};
-            bot = bot * dec!(i);
-            i = i + 1;
-        };
+        if n > terms {break e};
+        let bot = fac(n);
         e = e + (dec!(1) / bot);
         n = n + 1;
-    };
-    e
+    }
 }
 
 pub const EULER: Decimal = euler(STD_ITER);
@@ -39,26 +70,13 @@ const fn ln_of_two(
     let mut s = dec!(-1);
     let mut n: usize = 1;
     loop {
-        if n > terms {break};
-        let mut top = dec!(1);
-        let mut i: usize = 1;
-        loop {
-            if i > n {break};
-            top = top * (2 - EULER);
-            i = i + 1;
-        };
-        let mut bot = dec!(n);
-        let mut i: usize = 1;
-        loop {
-            if i > n {break};
-            bot = bot * EULER;
-            i = i + 1;
-        };
+        if n > terms {break ln2};
+        let top = pow(2 - EULER, n);
+        let bot = pow(EULER, n) * dec!(n);
         s = s * dec!(-1);
         ln2 = ln2 + ((top / bot) * s);
         n = n + 1;
-    };
-    ln2
+    }
 }
 
 pub const LN_OF_TWO: Decimal = ln_of_two(STD_ITER);

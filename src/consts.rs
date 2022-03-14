@@ -11,7 +11,7 @@ pub const STD_ITER: usize = 99;
 const fn pow(
     value: Decimal,
     exp: usize
-) -> Result<Decimal, Error> {
+) -> Decimal {
     let mut acc = dec!(1);
     let mut i: usize = 1;
     match exp {
@@ -31,7 +31,7 @@ const fn pow(
 
 const fn fac(
     value: usize,
-) -> Result<Decimal, Error> {
+) -> Decimal {
     let mut acc = dec!(1);
     let mut i: usize = 1;
     match value {

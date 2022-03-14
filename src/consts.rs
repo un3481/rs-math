@@ -67,14 +67,14 @@ const fn ln_of_two(
     terms: usize
 ) -> Decimal {
     let mut ln2 = dec!(1);
-    let mut s = dec!(-1);
+    let mut s: i8 = -1;
     let mut n: usize = 1;
     loop {
         if n > terms {break ln2};
         let top = pow(dec!(2) - EULER, n);
         let bot = pow(EULER, n) * dec!(n);
-        s = s * dec!(-1);
-        ln2 = ln2 + ((top / bot) * s);
+        s = s * -1;
+        ln2 = ln2 + ((top / bot) * dec!(s));
         n = n + 1;
     }
 }

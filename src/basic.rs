@@ -78,22 +78,22 @@ pub fn sqrt_series(
 fn sqrt_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
-    let mut acc = dec!(0) + value;
+    let mut rem = dec!(0) + value;
     let mut ratio = dec!(1);
     loop {
         match true {
-            (value > dec!(1.5)) => {
-                acc = acc / dec!(1.5);
+            (rem > dec!(1.5)) => {
+                rem = rem / dec!(1.5);
                 ratio = ratio * SQRT_OF_THREE_HALFS;
             },
-            (value < dec!(0.5)) => {
-                acc = acc * dec!(1.5);
+            (rem < dec!(0.5)) => {
+                rem = rem * dec!(1.5);
                 ratio = ratio / SQRT_OF_THREE_HALFS;
             },
             _ => {break},
         }
     };
-    (ratio, acc)
+    (ratio, rem)
 }
 
 //##########################################################################################################################

@@ -42,12 +42,11 @@ pub fn ln_series(
 ) -> Result<Decimal, Error> {
     Ok(
         (1..=terms).par_iter()
-            .map(|n| (n, [
+            .map(|n| (if let 0=n%2 {-1} else {1}, [
                 || basic::pow(value - consts::EULER, n).unwrap(),
                 || basic::pow(consts::EULER, n).unwrap() * dec!(n)
             ].par_iter()))
-            .map(|(n, t)| (n, t.map(|f| f()).collect()))
-            .map(|(n, t)| (if let 0=n%2 {-1} else {1}, t))
+            .map(|(s, t)| (s, t.map(|f| f()).collect()))
             .map(|(s, t)| (t[0] / t[1]) * dec!(s))
             .reduce(|| dec!(1), |u, d| u + d)
     )

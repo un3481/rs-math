@@ -39,7 +39,7 @@ pub fn euler(
 
 //##########################################################################################################################
 
-pub fn ln_series(
+fn ln_series(
     terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
@@ -86,9 +86,14 @@ pub fn ln(
     terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
-    let (exp, rem) = ln_prepare(value);
     Ok(
-        ln_series(terms, rem)? + exp
+        match true {
+            (value <= dec!(0)) => panic!("cannot calc ln(x) for x <= 0"),
+            _ => {
+                let (exp, rem) = ln_prepare(value);
+                ln_series(terms, rem)? + exp
+            },
+        }
     )
 }
 

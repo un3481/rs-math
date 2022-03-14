@@ -5,7 +5,9 @@ use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-mod consts;
+use crate::constants::{
+    SQRT_OF_THREE_HALFS
+};
 
 //##########################################################################################################################
 
@@ -82,11 +84,11 @@ fn sqrt_prepare(
         match true {
             (value > dec!(1.5)) => {
                 acc = acc / dec!(1.5);
-                ratio = ratio * consts::SQRT_OF_THREE_HALFS;
+                ratio = ratio * SQRT_OF_THREE_HALFS;
             },
             (value < dec!(0.5)) => {
                 acc = acc * dec!(1.5);
-                ratio = ratio / consts::SQRT_OF_THREE_HALFS;
+                ratio = ratio / SQRT_OF_THREE_HALFS;
             },
             _ => {break},
         }
@@ -102,7 +104,7 @@ pub fn sqrt(
 ) -> Result<Decimal, Error> {
     Ok(
         match true {
-            (value < dec!(0)) => panic!("tried to calc sqrt of negative number"),
+            (value < dec!(0)) => panic!("cannot calc sqrt(x) for x < 0"),
             (value == dec!(0)) => dec!(0),
             _ => {
                 let (ratio, rem) = sqrt_prepare(value);

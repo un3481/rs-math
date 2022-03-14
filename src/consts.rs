@@ -49,11 +49,12 @@ const fn fac(
 const fn euler(
     terms: usize
 ) -> Decimal {
+    let param = dec!(1);
     let mut e = dec!(0);
     let mut n: usize = 1;
     loop {
         if n > terms {break e};
-        let top = dec!(1);
+        let top = pow(param, n);
         let bot = fac(n);
         e = e + (top / bot);
         n = n + 1;
@@ -67,15 +68,16 @@ pub const EULER: Decimal = euler(STD_ITER);
 const fn ln_of_two(
     terms: usize
 ) -> Decimal {
-    let mut ln2 = dec!(1);
+    let param = dec!(2);
+    let mut ln = dec!(1);
     let mut s: i8 = -1;
     let mut n: usize = 1;
     loop {
-        if n > terms {break ln2};
-        let top = pow(dec!(2) - EULER, n);
+        if n > terms {break ln};
+        let top = pow(param - EULER, n);
         let bot = pow(EULER, n) * dec!(n);
         s = s * -1;
-        ln2 = ln2 + ((top / bot) * dec!(s));
+        ln = ln + ((top / bot) * dec!(s));
         n = n + 1;
     }
 }
@@ -117,5 +119,30 @@ const fn pi(
 }
 
 pub const PI: Decimal = pi(STD_ITER);
+
+//##########################################################################################################################
+
+const fn sqrt_of_three_halfs(
+    terms: usize
+) -> Decimal {
+    let param = dec!(1.5);
+    let mut sqrt = dec!(0);
+    let mut n: usize = 1;
+    loop {
+        if n > terms {break sqrt};
+        let top = param * (
+            fac(2 * (n - 1)) *
+            pow(dec!(1) - param, n - 1)
+        );
+        let bot = pow((
+            fac(n - 1) *
+            pow(dec!(2), n - 1)
+        ), 2);
+        sqrt = sqrt + (top / bot);
+        n = n + 1;
+    }
+}
+
+pub const SQRT_OF_THREE_HALFS: Decimal = sqrt_of_three_halfs(STD_ITER);
 
 //##########################################################################################################################

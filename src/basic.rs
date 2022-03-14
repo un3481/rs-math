@@ -76,7 +76,7 @@ pub fn sqrt_series(
 fn sqrt_prepare(
     rsn: Decimal,
     x: Decimal
-) -> (isize, Decimal) {
+) -> (Decimal, Decimal) {
     let (d05, d15) = (dec!(0.5), dec!(1.5));
     let sqrt15 = consts::SQRT_OF_THREE_HALFS;
     match true {

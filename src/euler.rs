@@ -41,20 +41,22 @@ pub fn ln_series(
     value: Decimal
 ) -> Result<Decimal, Error> {
     Ok(
-        (1..=terms).par_iter()
-            .map(|n| (if let 0=n%2 {-1} else {1}, [
-                || basic::pow(value - consts::EULER, n).unwrap(),
-                || basic::pow(consts::EULER, n).unwrap() * dec!(n)
-            ].par_iter()))
-            .map(|(s, t)| (s, t.map(|f| f()).collect()))
-            .map(|(s, t)| (t[0] / t[1]) * dec!(s))
-            .reduce(|| dec!(1), |u, d| u + d)
+        dec!(1) + (
+            (1..=terms).par_iter()
+                .map(|n| (if let 0=n%2 {-1} else {1}, [
+                    || basic::pow(value - consts::EULER, n).unwrap(),
+                    || basic::pow(consts::EULER, n).unwrap() * dec!(n)
+                ].par_iter()))
+                .map(|(s, t)| (s, t.map(|f| f()).collect()))
+                .map(|(s, t)| (t[0] / t[1]) * dec!(s))
+                .reduce(|| dec!(0), |u, d| u + d)
+        )
     )
 }
 
 //##########################################################################################################################
 
-fn dec_by2(
+fn ln_prepare(
     exp: isize,
     x: Decimal
 ) -> (isize, Decimal) {
@@ -72,7 +74,7 @@ pub fn ln(
     terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
-    let (exp, rem) = dec_by2(0, value);
+    let (exp, rem) = ln_prepare(0, value);
     Ok(
         ln_series(terms, rem)? + (
             dec!(exp) * consts::LN_OF_TWO

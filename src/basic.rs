@@ -74,20 +74,25 @@ pub fn sqrt_series(
 //##########################################################################################################################
 
 fn sqrt_prepare(
-    ratio: Decimal,
     value: Decimal
 ) -> (Decimal, Decimal) {
-    match true {
-        (value > dec!(1.5)) => sqrt_prepare(
-            ratio * consts::SQRT_OF_THREE_HALFS,
-            value / dec!(1.5)
-        ),
-        (value < dec!(0.5)) => sqrt_prepare(
-            ratio / consts::SQRT_OF_THREE_HALFS,
-            value * dec!(1.5)
-        ),
-        _ => (ratio, value),
-    }
+    fn prepare(
+        ratio: Decimal,
+        value: Decimal
+    ) -> (Decimal, Decimal) {
+        match true {
+            (value > dec!(1.5)) => prepare(
+                ratio * consts::SQRT_OF_THREE_HALFS,
+                value / dec!(1.5)
+            ),
+            (value < dec!(0.5)) => prepare(
+                ratio / consts::SQRT_OF_THREE_HALFS,
+                value * dec!(1.5)
+            ),
+            _ => (ratio, value),
+        }
+    };
+    prepare(dec!(1), value)
 }
 
 //##########################################################################################################################
@@ -101,8 +106,8 @@ pub fn sqrt(
             (value < dec!(0)) => decimal::NAN,
             (value == dec!(0)) => dec!(0),
             _ => {
-                let (rsn, rem) = sqrt_prepare(dec!(1), value);
-                sqrt_series(terms, rem)? * rsn
+                let (ratio, rem) = sqrt_prepare(value);
+                sqrt_series(terms, rem)? * ratio
             },
         }
     )

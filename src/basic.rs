@@ -80,8 +80,8 @@ fn sqrt_prepare(
     let (d05, d15) = (dec!(0.5), dec!(1.5));
     let sqrt15 = consts::SQRT_OF_THREE_HALFS;
     match true {
-        (x > d15) => dec_by2(rsn * sqrt15, x / d15),
-        (x < d05) => dec_by2(rsn / sqrt15, x * d15),
+        (x > d15) => sqrt_prepare(rsn * sqrt15, x / d15),
+        (x < d05) => sqrt_prepare(rsn / sqrt15, x * d15),
         _ => (rsn, x),
     }
 }

@@ -88,7 +88,7 @@ const fn pi(
     terms: usize
 ) -> Decimal {
     let mut term1 = dec!(0);
-    let s: i8 = -1;
+    let mut s: i8 = -1;
     let mut n: usize = 1;
     loop {
         if n > terms {break};
@@ -99,7 +99,7 @@ const fn pi(
         n = n + 1;
     };
     let mut term2 = dec!(0);
-    let s: i8 = -1;
+    let mut s: i8 = -1;
     let mut n: usize = 1;
     loop {
         if n > terms {break};

@@ -76,23 +76,22 @@ pub fn sqrt_series(
 fn sqrt_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
-    fn prepare(
-        ratio: Decimal,
-        value: Decimal
-    ) -> (Decimal, Decimal) {
+    let mut acc = dec!(0) + value;
+    let mut ratio = dec!(1);
+    loop {
         match true {
-            (value > dec!(1.5)) => prepare(
-                ratio * consts::SQRT_OF_THREE_HALFS,
-                value / dec!(1.5)
-            ),
-            (value < dec!(0.5)) => prepare(
-                ratio / consts::SQRT_OF_THREE_HALFS,
-                value * dec!(1.5)
-            ),
-            _ => (ratio, value),
+            (value > dec!(1.5)) => {
+                acc = acc / dec!(1.5);
+                ratio = ratio * consts::SQRT_OF_THREE_HALFS;
+            },
+            (value < dec!(0.5)) => {
+                acc = acc * dec!(1.5);
+                ratio = ratio / consts::SQRT_OF_THREE_HALFS;
+            },
+            _ => {break},
         }
     };
-    prepare(dec!(1), value)
+    (ratio, acc)
 }
 
 //##########################################################################################################################

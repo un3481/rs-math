@@ -27,12 +27,13 @@ pub fn pow(
 
 pub fn fac(
     value: usize,
-) -> Result<usize, Error> {
+) -> Result<Decimal, Error> {
     Ok(
         match value {
-            0 => 1,
+            0 => dec!(1),
             value => (1..=value).par_iter()
-                .reduce(|| 1, |u, d| u * d),
+                .map(|x| dec!(x))
+                .reduce(|| dec!(1), |u, d| u * d),
         }
     )
 }

@@ -45,7 +45,7 @@ pub fn fac(
 
 //##########################################################################################################################
 
-pub fn sqrt_series(
+fn sqrt_series(
     terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {

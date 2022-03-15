@@ -20,6 +20,7 @@ pub fn pow(
             0 => dec!(1),
             1 => value,
             _ => match value {
+                dec!(0) => dec!(0),
                 dec!(1) => dec!(1),
                 _ => (1..=exp).par_iter()
                     .map(|_| value)

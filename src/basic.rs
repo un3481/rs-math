@@ -18,6 +18,7 @@ pub fn pow(
     Ok(
         match exp {
             0 => dec!(1),
+            1 => value,
             _ => match value {
                 dec!(1) => dec!(1),
                 _ => (1..=exp).par_iter()
@@ -36,6 +37,7 @@ pub fn fac(
     Ok(
         match value {
             0 => dec!(1),
+            1 => dec!(1),
             _ => (1..=value).par_iter()
                 .map(|x| dec!(x))
                 .reduce(|| dec!(1), |u, d| u * d),

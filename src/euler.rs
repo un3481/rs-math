@@ -97,6 +97,7 @@ pub fn ln(
     Ok(
         match true {
             (value <= dec!(0)) => panic!("cannot calc ln(x) for x <= 0"),
+            EULER => dec!(1),
             _ => {
                 let (exp, rem) = ln_prepare(value);
                 ln_series(terms, rem)? + exp

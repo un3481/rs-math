@@ -17,7 +17,9 @@ const fn pow(
     let mut i: usize = 1;
     match exp {
         0 => dec!(1),
+        1 => value,
         _ => match value {
+            dec!(0) => dec!(0),
             dec!(1) => dec!(1),
             _ => loop {
                 if i > exp {break acc};
@@ -37,6 +39,7 @@ const fn fac(
     let mut i: usize = 1;
     match value {
         0 => dec!(1),
+        1 => dec!(1),
         _ => loop {
             if i > value {break acc};
             acc = acc * dec!(i);

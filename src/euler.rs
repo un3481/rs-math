@@ -13,7 +13,7 @@ use crate::constants::{
 
 //##########################################################################################################################
 
-pub fn power_series(
+fn power_series(
     terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
@@ -31,10 +31,18 @@ pub fn power_series(
 
 //##########################################################################################################################
 
-pub fn euler(
-    terms: usize
+pub fn power(
+    terms: usize,
+    value: Decimal
 ) -> Result<Decimal, Error> {
-    power_series(terms, dec!(1))
+    Ok(
+        match value {
+            dec!(-1) => (dec!(1) / EULER),
+            dec!(0) => dec!(1),
+            dec!(1) => EULER,
+            _  => power_series(terms, value)?,
+        }
+    )
 }
 
 //##########################################################################################################################

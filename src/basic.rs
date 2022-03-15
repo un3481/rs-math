@@ -106,6 +106,7 @@ pub fn sqrt(
         match true {
             (value < dec!(0)) => panic!("cannot calc sqrt(x) for x < 0"),
             (value == dec!(0)) => dec!(0),
+            (value == dec!(1)) => dec!(1),
             _ => {
                 let (ratio, rem) = sqrt_prepare(value);
                 sqrt_series(terms, rem)? * ratio

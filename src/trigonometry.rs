@@ -19,17 +19,17 @@ fn trig_prepare(
     const PI2 = dec!(2) * PI;
     let mut rem = dec!(0) + value;
     rem = match true {
-        rem > PI => rem - (
+        (rem > PI) => rem - (
             (rem / PI2).floor() * PI2
         ),
-        rem < PINEG => rem - (
+        (rem < PINEG) => rem - (
             (rem / PI2).floor() * PI2
         ),
         _ => rem,
     };
     match true {
-        rem > PI => rem - PI2,
-        rem < PINEG => rem + PI2,
+        (rem > PI) => rem - PI2,
+        (rem < PINEG) => rem + PI2,
         _ => rem,
     }
 }

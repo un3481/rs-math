@@ -13,11 +13,11 @@ fn mobius(
         panic!("cannot calc mobius(x) for x <= 0");
     };
     let d0 = dec!(0);
-    let acc: usize = 0 + value;
-    let p: usize = 0;
+    let mut acc: usize = 0 + value;
+    let mut primes: usize = 0;
     // Check 2
     if let 0=acc%2 {
-        p = p + 1;
+        primes = primes + 1;
         acc = acc / 2;
         if let 0=acc%2 {return Ok(d0)};
     };
@@ -26,7 +26,7 @@ fn mobius(
     loop {
         if (i * i) > n {break};
         if let 0=acc%i {
-            p = p + 1;
+            primes = primes + 1;
             acc = acc / i;
             if let 0=acc%i {return Ok(d0)};
         };
@@ -35,7 +35,7 @@ fn mobius(
     // Return Even or Odd
     Ok(
         dec!(
-            if let 0=p%2 {1} else {-1}
+            if let 0=primes%2 {1} else {-1}
         )
     )
 }

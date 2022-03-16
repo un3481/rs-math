@@ -79,7 +79,7 @@ const fn ln_of_two(
         if n > terms {break ln};
         let top = pow(param - EULER, n);
         let bot = pow(EULER, n) * dec!(n);
-        let sig = pow(dec!(-1), n);
+        let sig = pow(dec!(-1), n + 1);
         ln = ln + ((top / bot) * sig);
         n = n + 1;
     }
@@ -98,7 +98,7 @@ const fn pi(
         if n > terms {break};
         let top = pow(dec!(1) / dec!(5), (2 * n) - 1);
         let bot = dec!((2 * n) - 1);
-        let sig = pow(dec!(-1), n - 1);
+        let sig = pow(dec!(-1), n + 1);
         term1 = term1 + ((top / bot) * sig);
         n = n + 1;
     };
@@ -108,7 +108,7 @@ const fn pi(
         if n > terms {break};
         let top = pow(dec!(1) / dec!(239), (2 * n) - 1);
         let bot = dec!((2 * n) - 1);
-        let sig = pow(dec!(-1), n - 1);
+        let sig = pow(dec!(-1), n + 1);
         term2 = term2 + ((top / bot) * sig);
         n = n + 1;
     };

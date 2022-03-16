@@ -27,10 +27,33 @@ fn cos_series(
 
 //##########################################################################################################################
 
+fn trig_prepare(
+    value: Decimal
+) -> Decimal {
+    let pi2 = dec!(2) * PI;
+    let mut rem = dec!(0) + value;
+    match true {
+        (rem > dec!(PI)) => {
+            rem = rem - (
+                (rem / pi2).floor() * pi2
+            );
+        },
+        (rem < dec!(-PI)) => {
+            rem = rem - (
+                (rem / pi2).floor() * pi2
+            );
+        },
+        _ => {break rem},
+    }
+}
+
+//##########################################################################################################################
+
 pub fn cos(
     terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
+    let rem = trig_prepare(value);
     Ok(
     
     )

@@ -7,7 +7,7 @@ use rayon::prelude::*;
 //##########################################################################################################################
 
 fn mobius(
-    n: isize
+    n: usize
 ) -> Decimal {
     let acc: usize = 0 + n;
     let p: usize = 0;
@@ -30,7 +30,7 @@ fn mobius(
     };
     // Return Even or Odd
     dec!(
-        if let 0=p%2 {-1} else {1}
+        if let 0=p%2 {1} else {-1}
     )
 }
 

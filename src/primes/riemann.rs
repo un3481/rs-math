@@ -7,9 +7,9 @@ use rayon::prelude::*;
 //##########################################################################################################################
 
 fn mobius(
-    n: usize
+    value: usize
 ) -> Decimal {
-    let acc: usize = 0 + n;
+    let acc: usize = 0 + value;
     let p: usize = 0;
     // Check 2
     if let 0=acc%2 {

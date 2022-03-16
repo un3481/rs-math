@@ -56,7 +56,16 @@ pub fn cos(
     value: Decimal
 ) -> Result<Decimal, Error> {
     let rem = trig_prepare(value);
-    Ok(cos_series(terms, rem)?)
+    Ok(
+        match rem {
+            PI * dec!(1) => dec!(-1),
+            PI / dec!(2) => dec!(0),
+            dec!(0) => dec!(1),
+            PI / dec!(-2) => dec!(0),
+            PI * dec!(-1) => dec!(-1),
+            _ => cos_series(terms, rem)?,
+        }
+    )
 }
 
 //##########################################################################################################################
@@ -85,7 +94,16 @@ pub fn sin(
     value: Decimal
 ) -> Result<Decimal, Error> {
     let rem = trig_prepare(value);
-    Ok(sin_series(terms, rem)?)
+    Ok(
+        match rem {
+            PI * dec!(1) => dec!(0),
+            PI / dec!(2) => dec!(1),
+            dec!(0) => dec!(0),
+            PI / dec!(-2) => dec!(-1),
+            PI * dec!(-1) => dec!(0),
+            _ => sin_series(terms, rem)?,
+        }
+    )
 }
 
 //##########################################################################################################################

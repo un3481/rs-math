@@ -74,14 +74,13 @@ const fn ln_of_two(
 ) -> Decimal {
     let param = dec!(2);
     let mut ln = dec!(1);
-    let mut s: i8 = -1;
     let mut n: usize = 1;
     loop {
         if n > terms {break ln};
         let top = pow(param - EULER, n);
         let bot = pow(EULER, n) * dec!(n);
-        s = s * -1;
-        ln = ln + ((top / bot) * dec!(s));
+        let sig = pow(dec!(-1), n);
+        ln = ln + ((top / bot) * sig);
         n = n + 1;
     }
 }
@@ -94,25 +93,23 @@ const fn pi(
     terms: usize
 ) -> Decimal {
     let mut term1 = dec!(0);
-    let mut s: i8 = -1;
     let mut n: usize = 1;
     loop {
         if n > terms {break};
         let top = pow(dec!(1) / dec!(5), (2 * n) - 1);
         let bot = dec!((2 * n) - 1);
-        s = s * -1;
-        term1 = term1 + ((top / bot) * dec!(s));
+        let sig = pow(dec!(-1), n - 1);
+        term1 = term1 + ((top / bot) * sig);
         n = n + 1;
     };
     let mut term2 = dec!(0);
-    let mut s: i8 = -1;
     let mut n: usize = 1;
     loop {
         if n > terms {break};
         let top = pow(dec!(1) / dec!(239), (2 * n) - 1);
         let bot = dec!((2 * n) - 1);
-        s = s * -1;
-        term2 = term2 + ((top / bot) * dec!(s));
+        let sig = pow(dec!(-1), n - 1);
+        term2 = term2 + ((top / bot) * sig);
         n = n + 1;
     };
     (

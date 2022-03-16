@@ -43,8 +43,8 @@ fn cos_series(
                 || basic::fac(2 * n).unwrap(),
                 || basic::pow(dec!(-1), n).unwrap()
             ].par_iter()))
-            .map(|v| v.map(|f| f()).collect())
-            .map(|v| (v[0] / v[1]) * v[2])
+            .map(|t| t.map(|f| f()).collect())
+            .map(|t| (t[0] / t[1]) * t[2])
             .reduce(|| dec!(0), |u, d| u + d)
     )
 }
@@ -72,8 +72,8 @@ fn sin_series(
                 || basic::fac((2 * n) + 1).unwrap(),
                 || basic::pow(dec!(-1), n).unwrap()
             ].par_iter()))
-            .map(|v| v.map(|f| f()).collect())
-            .map(|v| (v[0] / v[1]) * v[2])
+            .map(|t| t.map(|f| f()).collect())
+            .map(|t| (t[0] / t[1]) * t[2])
             .reduce(|| dec!(0), |u, d| u + d)
     )
 }

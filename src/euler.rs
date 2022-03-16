@@ -54,12 +54,13 @@ fn ln_series(
     Ok(
         dec!(1) + (
             (1..=terms).par_iter()
-                .map(|n| (if let 0=n%2 {-1} else {1}, [
+                .map(|n| ([
                     || basic::pow(value - EULER, n).unwrap(),
-                    || basic::pow(EULER, n).unwrap() * dec!(n)
-                ].par_iter()))
-                .map(|(s, t)| (s, t.map(|f| f()).collect()))
-                .map(|(s, t)| (t[0] / t[1]) * dec!(s))
+                    || basic::pow(EULER, n).unwrap() * dec!(n),
+                    || basic::pow(dec!(-1), n + 1).unwrap()
+                ].par_iter())
+                .map(|v| v.map(|f| f()).collect())
+                .map(|v| (v[0] / v[1]) * v[2])
                 .reduce(|| dec!(0), |u, d| u + d)
         )
     )

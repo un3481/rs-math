@@ -8,14 +8,18 @@ use rayon::prelude::*;
 
 fn mobius(
     value: usize
-) -> Decimal {
+) -> Result<Decimal, Error> {
+    if value <= 0 {
+        panic!("cannot calc mobius(x) for x <= 0");
+    };
+    let d0 = dec!(0);
     let acc: usize = 0 + value;
     let p: usize = 0;
     // Check 2
     if let 0=acc%2 {
         p = p + 1;
         acc = acc / 2;
-        if let 0=acc%2 {return dec!(0)};
+        if let 0=acc%2 {return Ok(d0)};
     };
     // Check All Primes
     let i: usize = 3;
@@ -24,13 +28,15 @@ fn mobius(
         if let 0=acc%i {
             p = p + 1;
             acc = acc / i;
-            if let 0=acc%i {return dec!(0)};
+            if let 0=acc%i {return Ok(d0)};
         };
         i = i + 2;
     };
     // Return Even or Odd
-    dec!(
-        if let 0=p%2 {1} else {-1}
+    Ok(
+        dec!(
+            if let 0=p%2 {1} else {-1}
+        )
     )
 }
 

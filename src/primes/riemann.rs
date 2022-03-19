@@ -17,7 +17,7 @@ fn mobius(
     if value <= 0 {
         panic!("cannot calc mobius(x) for x <= 0");
     };
-    let mut acc: usize = 0 + value;
+    let mut acc: usize = value;
     let mut primes: usize = 0;
     // Check 2
     if let 0=acc%2 {

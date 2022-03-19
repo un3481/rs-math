@@ -12,14 +12,22 @@ use crate::constants::{
 
 //##########################################################################################################################
 
+// Constants
+const D0 = dec!(0);
+const D1 = dec!(1);
+const D2 = dec!(2);
+const D1NEG = dec!(-1);
+const PI2 = PI * D2;
+const PIHALF = PI / D2;
+const PINEG = PI * D1NEG;
+const PIHNEG = PINEG / D2;
+
+//##########################################################################################################################
+
 fn trig_prepare(
     value: Decimal
 ) -> Decimal {
-    const D2 = dec!(2);
-    const D1NEG = dec!(-1);
-    const PINEG = D1NEG * PI;
-    const PI2 = D2 * PI;
-    let mut rem = value.copy();
+    let mut rem = value;
     rem = match true {
         (rem > PI) => rem - (
             (rem / PI2).floor() * PI2
@@ -47,11 +55,11 @@ fn cos_series(
             .map(|n| [
                 || basic::pow(value, 2 * n).unwrap(),
                 || basic::fac(2 * n).unwrap(),
-                || basic::pow(dec!(-1), n).unwrap()
+                || basic::pow(D1NEG, n).unwrap()
             ].par_iter()))
             .map(|t| t.map(|f| f()).collect())
             .map(|t| (t[0] / t[1]) * t[2])
-            .reduce(|| dec!(0), |u, d| u + d)
+            .reduce(|| D0, |u, d| u + d)
     )
 }
 
@@ -61,13 +69,6 @@ pub fn cos(
     terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
-    const D0 = dec!(0);
-    const D1 = dec!(1);
-    const D2 = dec!(2);
-    const D1NEG = dec!(-1);
-    const PIHALF = PI / D2;
-    const PINEG = D1NEG * PI;
-    const PIHNEG = PINEG / D2;
     let rem = trig_prepare(value);
     Ok(
         match rem {
@@ -92,11 +93,11 @@ fn sin_series(
             .map(|n| [
                 || basic::pow(value, (2 * n) + 1).unwrap(),
                 || basic::fac((2 * n) + 1).unwrap(),
-                || basic::pow(dec!(-1), n).unwrap()
+                || basic::pow(D1NEG, n).unwrap()
             ].par_iter()))
             .map(|t| t.map(|f| f()).collect())
             .map(|t| (t[0] / t[1]) * t[2])
-            .reduce(|| dec!(0), |u, d| u + d)
+            .reduce(|| D0, |u, d| u + d)
     )
 }
 
@@ -106,13 +107,6 @@ pub fn sin(
     terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
-    const D0 = dec!(0);
-    const D1 = dec!(1);
-    const D2 = dec!(2);
-    const D1NEG = dec!(-1);
-    const PIHALF = PI / D2;
-    const PINEG = D1NEG * PI;
-    const PIHNEG = PINEG / D2;
     let rem = trig_prepare(value);
     Ok(
         match rem {

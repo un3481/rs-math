@@ -5,7 +5,19 @@ use rust_decimal::prelude::*;
 
 //##########################################################################################################################
 
+// Standard Iterations
 pub const STD_ITER: usize = 99;
+
+// Private Constants
+const D0 = dec!(0);
+const D1 = dec!(1);
+const D2 = dec!(2);
+const D4 = dec!(4);
+const D1NEG = dec!(-1);
+const D1DIV5 = D1 / dec!(5);
+const D1DIV239 = D1 / dec!(239);
+const D3DIV2 = dec!(1.5);
+const D1M3DIV2 = D1 - D3DIV2;
 
 //##########################################################################################################################
 
@@ -13,9 +25,7 @@ const fn pow(
     value: Decimal,
     exp: usize
 ) -> Decimal {
-    const D0 = dec!(0);
-    const D1 = dec!(1);
-    let mut acc = D1.copy();
+    let mut acc = D1;
     let mut i: usize = 1;
     match exp {
         0 => D1,
@@ -37,8 +47,7 @@ const fn pow(
 const fn fac(
     value: usize,
 ) -> Decimal {
-    const D1 = dec!(1);
-    let mut acc = D1.copy();
+    let mut acc = D1;
     let mut i: usize = 1;
     match value {
         0 => D1,
@@ -56,9 +65,7 @@ const fn fac(
 const fn euler(
     terms: usize
 ) -> Decimal {
-    const D0 = dec!(0);
-    const D1 = dec!(1);
-    let mut e = D0.copy();
+    let mut e = D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break e};
@@ -76,10 +83,7 @@ pub const EULER: Decimal = euler(STD_ITER);
 const fn ln_of_two(
     terms: usize
 ) -> Decimal {
-    const D1 = dec!(1);
-    const D2 = dec!(2);
-    const D1NEG = dec!(-1);
-    let mut ln = D1.copy();
+    let mut ln = D1;
     let mut n: usize = 1;
     loop {
         if n > terms {break ln};
@@ -98,13 +102,7 @@ pub const LN_OF_TWO: Decimal = ln_of_two(STD_ITER);
 const fn pi(
     terms: usize
 ) -> Decimal {
-    const D0 = dec!(0);
-    const D1 = dec!(1);
-    const D4 = dec!(4);
-    const D1NEG = dec!(-1);
-    const D1DIV5 = D1 / dec!(5);
-    const D1DIV239 = D1 / dec!(239);
-    let mut term1 = D0.copy();
+    let mut term1 = D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break};
@@ -114,7 +112,7 @@ const fn pi(
         term1 = term1 + ((top / bot) * sig);
         n = n + 1;
     };
-    let mut term2 = D0.copy();
+    let mut term2 = D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break};
@@ -138,12 +136,7 @@ pub const PI: Decimal = pi(STD_ITER);
 const fn sqrt_of_three_halfs(
     terms: usize
 ) -> Decimal {
-    const D0 = dec!(0);
-    const D1 = dec!(1);
-    const D2 = dec!(2);
-    const D3DIV2 = dec!(1.5);
-    const D1M3DIV2 = D1 - D3DIV2;
-    let mut sqrt = D0.copy();
+    let mut sqrt = D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break sqrt};

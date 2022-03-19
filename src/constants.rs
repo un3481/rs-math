@@ -8,7 +8,9 @@ use rust_decimal::prelude::*;
 // Standard Iterations
 pub const STD_ITER: usize = 99;
 
-// Private Constants
+//##########################################################################################################################
+
+// Constants
 const D0 = dec!(0);
 const D1 = dec!(1);
 const D2 = dec!(2);

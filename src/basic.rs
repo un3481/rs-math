@@ -81,7 +81,7 @@ fn sqrt_series(
             ].par_iter())
             .map(|t| t.map(|f| f()).collect())
             .map(|t| t[0] / t[1])
-            .reduce(|| dec!(0), |u, d| u + d)
+            .reduce(|| D0, |u, d| u + d)
     )
 }
 

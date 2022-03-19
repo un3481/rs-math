@@ -35,11 +35,15 @@ pub fn power(
     terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
+    const D0 = dec!(0);
+    const D1 = dec!(1);
+    const D1NEG = dec!(-1);
+    const EULERINV = D1 / EULER;
     Ok(
         match value {
-            dec!(-1) => (dec!(1) / EULER),
-            dec!(0) => dec!(1),
-            dec!(1) => EULER,
+            D1NEG => EULERINV,
+            D0 => D1,
+            D1 => EULER,
             _  => power_series(terms, value)?,
         }
     )
@@ -95,10 +99,15 @@ pub fn ln(
     terms: usize,
     value: Decimal
 ) -> Result<Decimal, Error> {
+    const D0 = dec!(0);
+    const D1 = dec!(1);
+    if value <= D0 {
+        panic!("cannot calc ln(x) for x <= 0");
+    };
     Ok(
-        match true {
-            (value <= dec!(0)) => panic!("cannot calc ln(x) for x <= 0"),
-            EULER => dec!(1),
+        match  {
+            D1 => D0,
+            EULER => D1,
             _ => {
                 let (exp, rem) = ln_prepare(value);
                 ln_series(terms, rem)? + exp

@@ -6,20 +6,24 @@ use rayon::prelude::*;
 
 //##########################################################################################################################
 
+// Constants
+const D0 = dec!(0);
+
+//##########################################################################################################################
+
 fn mobius(
     value: usize
 ) -> Result<Decimal, Error> {
     if value <= 0 {
         panic!("cannot calc mobius(x) for x <= 0");
     };
-    let d0 = dec!(0);
     let mut acc: usize = 0 + value;
     let mut primes: usize = 0;
     // Check 2
     if let 0=acc%2 {
         primes = primes + 1;
         acc = acc / 2;
-        if let 0=acc%2 {return Ok(d0)};
+        if let 0=acc%2 {return Ok(D0)};
     };
     // Check All Primes
     let i: usize = 3;
@@ -28,7 +32,7 @@ fn mobius(
         if let 0=acc%i {
             primes = primes + 1;
             acc = acc / i;
-            if let 0=acc%i {return Ok(d0)};
+            if let 0=acc%i {return Ok(D0)};
         };
         i = i + 2;
     };

@@ -64,7 +64,7 @@ fn ln_series(
     Ok(
         D1 + (
             (1..=terms).par_iter()
-                .map(|n| ([
+                .map(|n| [
                     || basic::pow(value - EULER, n).unwrap(),
                     || basic::pow(EULER, n).unwrap() * dec!(n),
                     || basic::pow(D1NEG, n + 1).unwrap()

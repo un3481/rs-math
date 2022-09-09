@@ -31,7 +31,7 @@ pub fn pow(
             _ => match value {
                 D0 => D0,
                 D1 => D1,
-                _ => (1..=exp).par_iter()
+                _ => (1..=exp).iter()
                     .map(|_| value)
                     .reduce(|| D1, |u, d| u * d),
             },
@@ -48,7 +48,7 @@ pub fn fac(
         match value {
             0 => D1,
             1 => D1,
-            _ => (1..=value).par_iter()
+            _ => (1..=value).iter()
                 .map(|x| dec!(x))
                 .reduce(|| D1, |u, d| u * d),
         }
@@ -68,14 +68,16 @@ fn sqrt_series(
                     value * [
                         || basic::fac(2 * (n - 1)).unwrap(),
                         || basic::pow(D1 - value, n - 1).unwrap()
-                    ].par_iter().map(|f| f())
+                    ].iter()
+                    .map(|f| f())
                     .reduce(|| D1, |u, d| u * d)
                 ),
                 || (
                     basic::pow([
                         || basic::fac(n - 1).unwrap(),
                         || basic::pow(D2, n - 1).unwrap()
-                    ].par_iter().map(|f| f())
+                    ].iter()
+                    .map(|f| f())
                     .reduce(|| D1, |u, d| u * d), 2)
                 )
             ].par_iter())

@@ -65,20 +65,16 @@ fn sqrt_series(
         (1..=terms).par_iter()
             .map(|n| [
                 || (
-                    value * [
-                        || basic::fac(2 * (n - 1)).unwrap(),
-                        || basic::pow(D1 - value, n - 1).unwrap()
-                    ].iter()
-                    .map(|f| f())
-                    .reduce(|| D1, |u, d| u * d)
+                    value *
+                    basic::fac(2 * (n - 1)).unwrap() *
+                    basic::pow(D1 - value, n - 1).unwrap()
                 ),
                 || (
-                    basic::pow([
-                        || basic::fac(n - 1).unwrap(),
-                        || basic::pow(D2, n - 1).unwrap()
-                    ].iter()
-                    .map(|f| f())
-                    .reduce(|| D1, |u, d| u * d), 2)
+                    basic::pow(
+                        basic::fac(n - 1).unwrap() *
+                        basic::pow(D2, n - 1).unwrap(),
+                        2
+                    )
                 )
             ].par_iter())
             .map(|t| t.map(|f| f()).collect())

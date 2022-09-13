@@ -6,7 +6,9 @@ use rayon::prelude::*;
 
 // Modules
 use crate::constants::{
-    SQRT_OF_THREE_HALFS
+    SQRT_OF_THREE_HALFS,
+    pow,
+    fac
 };
 
 //##########################################################################################################################
@@ -20,67 +22,32 @@ const D3DIV2 = dec!(1.5);
 
 //##########################################################################################################################
 
-pub fn pow(
-    value: Decimal,
-    exp: usize
-) -> Result<Decimal, Error> {
-    Ok(
-        match exp {
-            0 => D1,
-            1 => value,
-            _ => match value {
-                D0 => D0,
-                D1 => D1,
-                _ => (1..=exp).iter()
-                    .map(|_| value)
-                    .reduce(|| D1, |u, d| u * d),
-            },
-        }
-    )
-}
-
-//##########################################################################################################################
-
-pub fn fac(
-    value: usize,
-) -> Result<Decimal, Error> {
-    Ok(
-        match value {
-            0 => D1,
-            1 => D1,
-            _ => (1..=value).iter()
-                .map(|x| dec!(x))
-                .reduce(|| D1, |u, d| u * d),
-        }
-    )
-}
+// Re-export
+pub const pow = pow;
+pub const fac = fac;
 
 //##########################################################################################################################
 
 fn sqrt_series(
     terms: usize,
     value: Decimal
-) -> Result<Decimal, Error> {
-    Ok(
-        (1..=terms).par_iter()
-            .map(|n| [
-                || (
-                    value *
-                    basic::fac(2 * (n - 1)).unwrap() *
-                    basic::pow(D1 - value, n - 1).unwrap()
-                ),
-                || (
-                    basic::pow(
-                        basic::fac(n - 1).unwrap() *
-                        basic::pow(D2, n - 1).unwrap(),
-                        2
-                    )
-                )
-            ].par_iter())
-            .map(|t| t.map(|f| f()).collect())
-            .map(|t| t[0] / t[1])
-            .reduce(|| D0, |u, d| u + d)
-    )
+) -> Decimal {
+    (1..=terms).par_iter()
+        .map(|n| [
+            || (
+                value *
+                fac(2 * (n - 1)) *
+                pow(D1 - value, n - 1)
+            ),
+            || pow(
+                fac(n - 1) *
+                pow(D2, n - 1),
+                2
+            )
+        ].par_iter())
+        .map(|t| t.map(|f| f()).collect())
+        .map(|t| t[0] / t[1])
+        .reduce(|| D0, |u, d| u + d)
 }
 
 //##########################################################################################################################
@@ -121,7 +88,7 @@ pub fn sqrt(
             D1 => D1,
             _ => {
                 let (ratio, rem) = sqrt_prepare(value);
-                sqrt_series(terms, rem)? * ratio
+                ratio * sqrt_series(terms, rem)
             },
         }
     )

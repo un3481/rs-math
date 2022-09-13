@@ -5,10 +5,8 @@ use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-use crate::basic;
-use crate::constants::{
-    PI
-};
+use crate::basic::{ pow, fac };
+use crate::constants::{ PI };
 
 //##########################################################################################################################
 
@@ -24,7 +22,7 @@ const PIHNEG = PINEG / D2;
 
 //##########################################################################################################################
 
-fn trig_prepare(
+const fn trig_prepare(
     value: Decimal
 ) -> Decimal {
     let mut rem = value;
@@ -49,18 +47,15 @@ fn trig_prepare(
 fn cos_series(
     terms: usize,
     value: Decimal
-) -> Result<Decimal, Error> {
-    Ok(
-        (0..terms).par_iter()
-            .map(|n| [
-                || basic::pow(value, 2 * n).unwrap(),
-                || basic::fac(2 * n).unwrap(),
-                || basic::pow(D1NEG, n).unwrap()
-            ].par_iter()))
-            .map(|t| t.map(|f| f()).collect())
-            .map(|t| (t[0] / t[1]) * t[2])
-            .reduce(|| D0, |u, d| u + d)
-    )
+) -> Decimal {
+    (0..terms).par_iter()
+        .map(|n| (
+            pow(D1NEG, n) * (
+                pow(value, 2 * n) /
+                fac(2 * n)
+            )
+        ))
+        .reduce(|| D0, |u, d| u + d)
 }
 
 //##########################################################################################################################
@@ -77,7 +72,7 @@ pub fn cos(
             D0 => D1,
             PIHNEG => D0,
             PINEG => D1NEG,
-            _ => cos_series(terms, rem)?,
+            _ => cos_series(terms, rem),
         }
     )
 }
@@ -87,18 +82,15 @@ pub fn cos(
 fn sin_series(
     terms: usize,
     value: Decimal
-) -> Result<Decimal, Error> {
-    Ok(
-        (0..terms).par_iter()
-            .map(|n| [
-                || basic::pow(value, (2 * n) + 1).unwrap(),
-                || basic::fac((2 * n) + 1).unwrap(),
-                || basic::pow(D1NEG, n).unwrap()
-            ].par_iter()))
-            .map(|t| t.map(|f| f()).collect())
-            .map(|t| (t[0] / t[1]) * t[2])
-            .reduce(|| D0, |u, d| u + d)
-    )
+) -> Decimal {
+    (0..terms).par_iter()
+        .map(|n| (
+            pow(D1NEG, n) * (
+                pow(value, (2 * n) + 1) /
+                fac((2 * n) + 1)
+            )
+        ))
+        .reduce(|| D0, |u, d| u + d)
 }
 
 //##########################################################################################################################
@@ -115,7 +107,7 @@ pub fn sin(
             D0 => D0,
             PIHNEG => D1NEG,
             PINEG => D0,
-            _ => sin_series(terms, rem)?,
+            _ => sin_series(terms, rem),
         }
     )
 }

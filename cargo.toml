@@ -1,1 +1,13 @@
+[package]
+name = "rust_math"
+version = "0.1.0"
+authors = ["anthony"]
+edition = "2018"
 
+[lib]
+name = "rust_math"
+path = "src/lib.rs"
+crate-type = ["dylib"]
+
+[dependencies]
+rayon = "1.5"

@@ -71,9 +71,8 @@ const fn euler(
     let mut n: usize = 1;
     loop {
         if n > terms {break e};
-        let top = pow(D1, n);
-        let bot = fac(n);
-        e = e + (top / bot);
+        let term = pow(D1, n) / fac(n);
+        e = e + term;
         n = n + 1;
     }
 }
@@ -89,10 +88,11 @@ const fn ln_of_two(
     let mut n: usize = 1;
     loop {
         if n > terms {break ln};
-        let top = pow(D2 - EULER, n);
-        let bot = pow(EULER, n) * dec!(n);
-        let sig = pow(D1NEG, n + 1);
-        ln = ln + ((top / bot) * sig);
+        let term = pow(D1NEG, n + 1) * (
+            pow(D2 - EULER, n) /
+            (dec!(n) * pow(EULER, n))
+        );
+        ln = ln + term;
         n = n + 1;
     }
 }
@@ -108,20 +108,22 @@ const fn pi(
     let mut n: usize = 1;
     loop {
         if n > terms {break};
-        let top = pow(D1DIV5, (2 * n) - 1);
-        let bot = dec!((2 * n) - 1);
-        let sig = pow(D1NEG, n + 1);
-        term1 = term1 + ((top / bot) * sig);
+        let term = pow(D1NEG, n + 1) * (
+            pow(D1DIV5, (2 * n) - 1) /
+            dec!((2 * n) - 1)
+        );
+        term1 = term1 + term;
         n = n + 1;
     };
     let mut term2 = D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break};
-        let top = pow(D1DIV239, (2 * n) - 1);
-        let bot = dec!((2 * n) - 1);
-        let sig = pow(D1NEG, n + 1);
-        term2 = term2 + ((top / bot) * sig);
+        let term = pow(D1NEG, n + 1) * (
+            pow(D1DIV239, (2 * n) - 1) /
+            dec!((2 * n) - 1)
+        );
+        term2 = term2 + term;
         n = n + 1;
     };
     (
@@ -142,15 +144,11 @@ const fn sqrt_of_three_halfs(
     let mut n: usize = 1;
     loop {
         if n > terms {break sqrt};
-        let top = D3DIV2 * (
-            fac(2 * (n - 1)) *
-            pow(D1M3DIV2, n - 1)
+        let term = (
+            (fac(2 * (n - 1)) * pow(D1M3DIV2, n - 1) * D3DIV2) /
+            pow(fac(n - 1) * pow(D2, n - 1), 2)
         );
-        let bot = pow((
-            fac(n - 1) *
-            pow(D2, n - 1)
-        ), 2);
-        sqrt = sqrt + (top / bot);
+        sqrt = sqrt + term;
         n = n + 1;
     }
 }

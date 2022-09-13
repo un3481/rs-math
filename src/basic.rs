@@ -5,22 +5,17 @@ use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-use crate::constants::{ pow, fac, SQRT_OF_THREE_HALFS };
+use crate::constants::{ SQRT_OF_THREE_HALFS };
+pub use crate::constants::{ pow, fac };
 
 //##########################################################################################################################
 
 // Constants
-const D0 = dec!(0);
-const D1 = dec!(1);
-const D2 = dec!(2);
-const D1DIV2 = dec!(0.5);
-const D3DIV2 = dec!(1.5);
-
-//##########################################################################################################################
-
-// Re-export
-pub const pow = pow;
-pub const fac = fac;
+const D0: Decimal = dec!(0);
+const D1: Decimal = dec!(1);
+const D2: Decimal = dec!(2);
+const D1DIV2: Decimal = dec!(0.5);
+const D3DIV2: Decimal = dec!(1.5);
 
 //##########################################################################################################################
 

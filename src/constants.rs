@@ -11,15 +11,15 @@ pub const STD_ITER: usize = 128;
 //##########################################################################################################################
 
 // Constants
-const D0 = dec!(0);
-const D1 = dec!(1);
-const D2 = dec!(2);
-const D4 = dec!(4);
-const D1NEG = dec!(-1);
-const D1DIV5 = D1 / dec!(5);
-const D1DIV239 = D1 / dec!(239);
-const D3DIV2 = dec!(1.5);
-const D1M3DIV2 = D1 - D3DIV2;
+const D0: Decimal = dec!(0);
+const D1: Decimal = dec!(1);
+const D2: Decimal = dec!(2);
+const D4: Decimal = dec!(4);
+const D1NEG: Decimal = dec!(-1);
+const D1DIV5: Decimal = D1 / dec!(5);
+const D1DIV239: Decimal = D1 / dec!(239);
+const D3DIV2: Decimal = dec!(1.5);
+const D1M3DIV2: Decimal = D1 - D3DIV2;
 
 //##########################################################################################################################
 

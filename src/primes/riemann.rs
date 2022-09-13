@@ -8,6 +8,8 @@ use rayon::prelude::*;
 
 // Constants
 const D0 = dec!(0);
+const D1 = dec!(1);
+const D1NEG = dec!(-1);
 
 //##########################################################################################################################
 
@@ -38,9 +40,8 @@ fn mobius(
     };
     // Return Even or Odd
     Ok(
-        dec!(
-            if let 0=primes%2 {1} else {-1}
-        )
+        if let 0=primes%2 {D1}
+        else {D1NEG}
     )
 }
 

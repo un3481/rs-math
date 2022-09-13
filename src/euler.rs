@@ -5,11 +5,8 @@ use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-use crate::basic;
-use crate::constants::{
-    EULER,
-    LN_OF_TWO
-};
+use crate::basic::{ pow, fac };
+use crate::constants::{ EULER, LN_OF_TWO };
 
 //##########################################################################################################################
 
@@ -26,17 +23,10 @@ const EULERINV = D1 / EULER;
 fn power_series(
     terms: usize,
     value: Decimal
-) -> Result<Decimal, Error> {
-    Ok(
-        (0..terms).par_iter()
-            .map(|n| [
-                || basic::pow(value, n).unwrap(),
-                || basic::fac(n).unwrap()
-            ].par_iter())
-            .map(|t| t.map(|f| f()).collect())
-            .map(|t| t[0] / t[1])
-            .reduce(|| D0, |u, d| u + d)
-    )
+) -> Decimal {
+    (0..terms).par_iter()
+        .map(|n| pow(value, n) / fac(n))
+        .reduce(|| D0, |u, d| u + d)
 }
 
 //##########################################################################################################################
@@ -50,7 +40,7 @@ pub fn power(
             D1NEG => EULERINV,
             D0 => D1,
             D1 => EULER,
-            _  => power_series(terms, value)?,
+            _  => power_series(terms, value),
         }
     )
 }
@@ -60,19 +50,16 @@ pub fn power(
 fn ln_series(
     terms: usize,
     value: Decimal
-) -> Result<Decimal, Error> {
-    Ok(
-        D1 + (
-            (1..=terms).par_iter()
-                .map(|n| [
-                    || basic::pow(value - EULER, n).unwrap(),
-                    || basic::pow(EULER, n).unwrap() * dec!(n),
-                    || basic::pow(D1NEG, n + 1).unwrap()
-                ].par_iter())
-                .map(|t| t.map(|f| f()).collect())
-                .map(|t| (t[0] / t[1]) * t[2])
-                .reduce(|| D0, |u, d| u + d)
-        )
+) -> Decimal {
+    D1 + (
+        (1..=terms).par_iter()
+            .map(|n| (
+                pow(D1NEG, n + 1) * (
+                    pow(value - EULER, n) /
+                    (dec!(n) * pow(EULER, n))
+                )
+            ))
+            .reduce(|| D0, |u, d| u + d)
     )
 }
 
@@ -114,7 +101,7 @@ pub fn ln(
             EULER => D1,
             _ => {
                 let (exp, rem) = ln_prepare(value);
-                ln_series(terms, rem)? + exp
+                exp + ln_series(terms, rem)
             },
         }
     )

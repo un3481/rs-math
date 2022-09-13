@@ -5,11 +5,7 @@ use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-use crate::constants::{
-    SQRT_OF_THREE_HALFS,
-    pow,
-    fac
-};
+use crate::constants::{ pow, fac, SQRT_OF_THREE_HALFS };
 
 //##########################################################################################################################
 
@@ -33,20 +29,10 @@ fn sqrt_series(
     value: Decimal
 ) -> Decimal {
     (1..=terms).par_iter()
-        .map(|n| [
-            || (
-                value *
-                fac(2 * (n - 1)) *
-                pow(D1 - value, n - 1)
-            ),
-            || pow(
-                fac(n - 1) *
-                pow(D2, n - 1),
-                2
-            )
-        ].par_iter())
-        .map(|t| t.map(|f| f()).collect())
-        .map(|t| t[0] / t[1])
+        .map(|n| (
+            (fac(2 * (n - 1)) * pow(D1 - value, n - 1) * value) /
+            pow(fac(n - 1) * pow(D2, n - 1), 2)
+        ))
         .reduce(|| D0, |u, d| u + d)
 }
 

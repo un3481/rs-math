@@ -4,6 +4,8 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
+use std::error::Error;
+
 // Modules
 use crate::constants::{ SQRT_OF_THREE_HALFS };
 pub use crate::constants::{ pow, fac };
@@ -57,7 +59,7 @@ fn sqrt_series(
 pub fn sqrt(
     terms: usize,
     value: Decimal
-) -> Result<Decimal, Error> {
+) -> Result<Decimal, dyn Error> {
     if value < D0 {
         panic!("cannot calc sqrt(x) for x < 0");
     };

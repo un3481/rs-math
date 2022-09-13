@@ -4,6 +4,8 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
+use std::error::Error;
+
 // Modules
 use crate::basic::{ pow, fac };
 use crate::constants::{ EULER, LN_OF_TWO };
@@ -34,7 +36,7 @@ fn power_series(
 pub fn power(
     terms: usize,
     value: Decimal
-) -> Result<Decimal, Error> {
+) -> Result<Decimal, dyn Error> {
     Ok(
         match value {
             D1NEG => EULERINV,
@@ -77,7 +79,7 @@ fn ln_series(
             .map(|n| (
                 pow(D1NEG, n + 1) * (
                     pow(value - EULER, n) /
-                    (dec!(n) * pow(EULER, n))
+                    (n * pow(EULER, n))
                 )
             ))
             .reduce(|| D0, |u, d| u + d)
@@ -89,7 +91,7 @@ fn ln_series(
 pub fn ln(
     terms: usize,
     value: Decimal
-) -> Result<Decimal, Error> {
+) -> Result<Decimal, dyn Error> {
     if value <= D0 {
         panic!("cannot calc ln(x) for x <= 0");
     };

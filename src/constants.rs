@@ -56,7 +56,7 @@ pub const fn fac(
         1 => D1,
         _ => loop {
             if i > value {break acc};
-            acc = acc * dec!(i);
+            acc = acc * i;
             i = i + 1;
         },
     }
@@ -90,7 +90,7 @@ const fn ln_of_two(
         if n > terms {break ln};
         let term = pow(D1NEG, n + 1) * (
             pow(D2 - EULER, n) /
-            (dec!(n) * pow(EULER, n))
+            (n * pow(EULER, n))
         );
         ln = ln + term;
         n = n + 1;
@@ -110,7 +110,7 @@ const fn pi(
         if n > terms {break};
         let term = pow(D1NEG, n + 1) * (
             pow(D1DIV5, (2 * n) - 1) /
-            dec!((2 * n) - 1)
+            ((2 * n) - 1)
         );
         term1 = term1 + term;
         n = n + 1;
@@ -121,16 +121,12 @@ const fn pi(
         if n > terms {break};
         let term = pow(D1NEG, n + 1) * (
             pow(D1DIV239, (2 * n) - 1) /
-            dec!((2 * n) - 1)
+            ((2 * n) - 1)
         );
         term2 = term2 + term;
         n = n + 1;
     };
-    (
-        D4 * (
-            (D4 * term1) - term2
-        )
-    )
+    D4 * ((D4 * term1) - term2)
 }
 
 pub const PI: Decimal = pi(STD_ITER);
@@ -144,10 +140,10 @@ const fn sqrt_of_three_halfs(
     let mut n: usize = 1;
     loop {
         if n > terms {break sqrt};
-        let term = (
+        let term =
             (fac(2 * (n - 1)) * pow(D1M3DIV2, n - 1) * D3DIV2) /
             pow(fac(n - 1) * pow(D2, n - 1), 2)
-        );
+        ;
         sqrt = sqrt + term;
         n = n + 1;
     }

@@ -11,14 +11,14 @@ use crate::constants::{ PI };
 //##########################################################################################################################
 
 // Constants
-const D0 = dec!(0);
-const D1 = dec!(1);
-const D2 = dec!(2);
-const D1NEG = dec!(-1);
-const PI2 = PI * D2;
-const PIHALF = PI / D2;
-const PINEG = PI * D1NEG;
-const PIHNEG = PINEG / D2;
+const D0: Decimal = dec!(0);
+const D1: Decimal = dec!(1);
+const D2: Decimal = dec!(2);
+const D1NEG: Decimal = dec!(-1);
+const PI2: Decimal = PI * D2;
+const PIHALF: Decimal = PI / D2;
+const PINEG: Decimal = PI * D1NEG;
+const PIHNEG: Decimal = PINEG / D2;
 
 //##########################################################################################################################
 
@@ -26,20 +26,19 @@ const fn trig_prepare(
     value: Decimal
 ) -> Decimal {
     let mut rem = value;
-    rem = match true {
-        (rem > PI) => rem - (
+    if rem > PI {
+        rem = rem - (
             (rem / PI2).floor() * PI2
-        ),
-        (rem < PINEG) => rem - (
-            (rem / PI2).floor() * PI2
-        ),
-        _ => rem,
-    };
-    match true {
-        (rem > PI) => rem - PI2,
-        (rem < PINEG) => rem + PI2,
-        _ => rem,
+        )
     }
+    else if rem < PINEG {
+        rem = rem - (
+            (rem / PI2).floor() * PI2
+        )
+    }
+    if rem > PI { rem = rem - PI2 }
+    else if rem < PINEG { rem = rem + PI2 };
+    rem
 }
 
 //##########################################################################################################################

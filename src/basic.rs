@@ -25,17 +25,15 @@ const fn sqrt_prepare(
     let mut rem = value.copy();
     let mut ratio = D1;
     loop {
-        match true {
-            (rem > D3DIV2) => {
-                rem = rem / D3DIV2;
-                ratio = ratio * SQRT_OF_THREE_HALFS;
-            },
-            (rem < D1DIV2) => {
-                rem = rem * D3DIV2;
-                ratio = ratio / SQRT_OF_THREE_HALFS;
-            },
-            _ => {break},
+        if rem > D3DIV2 {
+            rem = rem / D3DIV2;
+            ratio = ratio * SQRT_OF_THREE_HALFS;
         }
+        else if rem < D1DIV2 {
+            rem = rem * D3DIV2;
+            ratio = ratio / SQRT_OF_THREE_HALFS;
+        }
+        else {break}
     };
     (ratio, rem)
 }

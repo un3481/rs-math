@@ -11,12 +11,12 @@ use crate::constants::{ EULER, LN_OF_TWO };
 //##########################################################################################################################
 
 // Constants
-const D0 = dec!(0);
-const D1 = dec!(1);
-const D2 = dec!(2);
-const D4 = dec!(4);
-const D1NEG = dec!(-1);
-const EULERINV = D1 / EULER;
+const D0: Decimal = dec!(0);
+const D1: Decimal = dec!(1);
+const D2: Decimal = dec!(2);
+const D4: Decimal = dec!(4);
+const D1NEG: Decimal = dec!(-1);
+const EULERINV: Decimal = D1 / EULER;
 
 //##########################################################################################################################
 
@@ -53,17 +53,15 @@ const fn ln_prepare(
     let mut rem = value;
     let mut exp = D0;
     loop {
-        match true {
-            (rem > D4) => {
-                rem = rem / D2;
-                exp = exp + LN_OF_TWO;
-            },
-            (rem < D2) => {
-                rem = rem * D2;
-                exp = exp - LN_OF_TWO;
-            },
-            _ => {break},
+        if rem > D4 {
+            rem = rem / D2;
+            exp = exp + LN_OF_TWO;
         }
+        else if rem < D2 {
+            rem = rem * D2;
+            exp = exp - LN_OF_TWO;
+        }
+        else {break}
     };
     (exp, rem)
 }
@@ -96,7 +94,7 @@ pub fn ln(
         panic!("cannot calc ln(x) for x <= 0");
     };
     Ok(
-        match  {
+        match value {
             D1 => D0,
             EULER => D1,
             _ => {

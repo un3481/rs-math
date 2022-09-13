@@ -65,7 +65,7 @@ fn ln_series(
 
 //##########################################################################################################################
 
-fn ln_prepare(
+const fn ln_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
     let mut rem = value;

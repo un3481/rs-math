@@ -76,13 +76,16 @@ pub fn cos(
     value: Decimal
 ) -> Result<Decimal, ()> {
     let rem = trig_prepare(value);
+    let PIHALF = PI / D2;
+    let PIHNEG = D1NEG * PIHALF;
+    let PINEG = D1NEG * PI;
     Ok(
         match rem {
             PI => D1NEG,
-            (PI / D2) => D0,
+            PIHALF => D0,
             D0 => D1,
-            (D1NEG * PI / D2) => D0,
-            (D1NEG * PI) => D1NEG,
+            PIHNEG => D0,
+            PINEG => D1NEG,
             _ => cos_series(terms, rem),
         }
     )
@@ -95,13 +98,16 @@ pub fn sin(
     value: Decimal
 ) -> Result<Decimal, ()> {
     let rem = trig_prepare(value);
+    let PIHALF = PI / D2;
+    let PIHNEG = D1NEG * PIHALF;
+    let PINEG = D1NEG * PI;
     Ok(
         match rem {
             PI => D0,
-            (PI / D2) => D1,
+            PIHALF => D1,
             D0 => D0,
-            (D1NEG * PI / D2) => D1NEG,
-            (D1NEG * PI) => D0,
+            PIHNEG => D1NEG,
+            PINEG => D0,
             _ => sin_series(terms, rem),
         }
     )

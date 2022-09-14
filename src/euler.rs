@@ -76,7 +76,7 @@ fn ln_series(
             .map(|n| (
                 pow(D1NEG, n + 1) * (
                     pow(value - EULER, n) /
-                    (dec(n) * pow(EULER, n))
+                    (pow(EULER, n) * dec(n))
                 )
             ))
             .reduce(|| D0, |u, d| u + d)

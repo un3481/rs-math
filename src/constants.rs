@@ -2,6 +2,7 @@
 // Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
+use rust_decimal::Error;
 
 //##########################################################################################################################
 
@@ -23,8 +24,12 @@ const D3DIV2: Decimal = dec!(1.5);
 //##########################################################################################################################
 
 // To Decimal
-pub const fn dec(num: usize) -> Decimal {
-    Decimal::from_str(&num.to_string()).unwrap()
+pub const fn _dec(num: usize) -> Decimal {
+    let _i64: i64 = num as i64;
+    match Decimal::try_new(_i64, 0) {
+        Ok(value) => value,
+        Err(_) => panic!("rust_decimal error"),
+    }
 }
 
 //##########################################################################################################################
@@ -33,7 +38,7 @@ pub const fn pow(
     value: Decimal,
     exp: usize
 ) -> Decimal {
-    let mut acc = D1;
+    let mut acc = D0 + D1;
     let mut i: usize = 1;
     match exp {
         0 => D1,
@@ -55,7 +60,7 @@ pub const fn pow(
 pub const fn fac(
     value: usize,
 ) -> Decimal {
-    let mut acc = D1;
+    let mut acc = D0 + D1;
     let mut i: usize = 1;
     match value {
         0 => D1,
@@ -73,7 +78,7 @@ pub const fn fac(
 const fn euler(
     terms: usize
 ) -> Decimal {
-    let mut e = D0;
+    let mut e = D0 + D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break e};
@@ -90,13 +95,13 @@ pub const EULER: Decimal = euler(STD_ITER);
 const fn ln_of_two(
     terms: usize
 ) -> Decimal {
-    let mut ln = D1;
+    let mut ln = D0 + D1;
     let mut n: usize = 1;
     loop {
         if n > terms {break ln};
         let term = pow(D1NEG, n + 1) * (
             pow(D2 - EULER, n) /
-            (dec(n) * pow(EULER, n))
+            (pow(EULER, n) * dec(n))
         );
         ln = ln + term;
         n = n + 1;
@@ -110,7 +115,7 @@ pub const LN_OF_TWO: Decimal = ln_of_two(STD_ITER);
 const fn pi(
     terms: usize
 ) -> Decimal {
-    let mut term1 = D0;
+    let mut term1 = D0 + D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break};
@@ -121,7 +126,7 @@ const fn pi(
         term1 = term1 + term;
         n = n + 1;
     };
-    let mut term2 = D0;
+    let mut term2 = D0 + D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break};
@@ -142,7 +147,7 @@ pub const PI: Decimal = pi(STD_ITER);
 const fn sqrt_of_three_halfs(
     terms: usize
 ) -> Decimal {
-    let mut sqrt = D0;
+    let mut sqrt = D0 + D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break sqrt};

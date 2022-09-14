@@ -32,9 +32,9 @@ pub fn power(
     value: f64
 ) -> f64 {
     match value {
-        -1.0 => 1.0 / EULER,
-        0.0 => 1.0,
-        1.0 => EULER,
+        -1 => 1.0 / EULER,
+        0 => 1.0,
+        1 => EULER,
         _ => power_series(terms, value),
     }
 }
@@ -89,7 +89,7 @@ pub fn ln(
     };
     Ok(
         match value {
-            1.0 => 0.0,
+            1 => 0.0,
             EULER => 1.0,
             _ => {
                 let (exp, rem) = ln_prepare(value);

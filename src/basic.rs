@@ -60,8 +60,8 @@ pub fn sqrt(
     };
     Ok(
         match value {
-            0.0 => 0.0,
-            1.0 => 1.0,
+            0 => 0.0,
+            1 => 1.0,
             _ => {
                 let (ratio, rem) = sqrt_prepare(value);
                 ratio * sqrt_series(terms, rem)

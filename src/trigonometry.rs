@@ -77,7 +77,7 @@ pub fn cos(
         match rem {
             PI => -1.0,
             PIHALF => 0.0,
-            0.0 => 1.0,
+            0 => 1.0,
             PIHNEG => 0.0,
             PINEG => -1.0,
             _ => cos_series(terms, rem),
@@ -96,7 +96,7 @@ pub fn sin(
         match rem {
             PI => 0.0,
             PIHALF => 1.0,
-            0.0 => 0.0,
+            0 => 0.0,
             PIHNEG => -1.0,
             PINEG => 0.0,
             _ => sin_series(terms, rem),

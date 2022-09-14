@@ -14,8 +14,8 @@ pub const fn pow(
         0 => 1.0,
         1 => value,
         _ => match value {
-            0.0 => 0.0,
-            1.0 => 1.0,
+            0 => 0.0,
+            1 => 1.0,
             _ => loop {
                 if n > exp {break acc};
                 acc = acc * value;

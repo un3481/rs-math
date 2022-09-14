@@ -24,7 +24,7 @@ const D3DIV2: Decimal = dec!(1.5);
 //##########################################################################################################################
 
 // To Decimal
-pub const fn _dec(num: usize) -> Decimal {
+pub const fn dec(num: usize) -> Decimal {
     let _i64: i64 = num as i64;
     match Decimal::try_new(_i64, 0) {
         Ok(value) => value,

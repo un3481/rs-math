@@ -1,63 +1,58 @@
 
 // Imports
-use rust_decimal_macros::dec;
-use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-use crate::basic::{ dec, pow, fac };
 use crate::constants::{ EULER, LN_OF_TWO };
+use crate::basic::{ pow, fac };
 
 //##########################################################################################################################
 
-// Constants
-const D0: Decimal = dec!(0);
-const D1: Decimal = dec!(1);
-const D2: Decimal = dec!(2);
-const D4: Decimal = dec!(4);
-const D1NEG: Decimal = dec!(-1);
-
-//##########################################################################################################################
-
-fn power_series(
+const fn power_series(
     terms: usize,
-    value: Decimal
-) -> Decimal {
-    (0..terms).into_par_iter()
-        .map(|n| pow(value, n) / fac(n))
-        .reduce(|| D0, |u, d| u + d)
+    value: f64
+) -> f64 {
+    let mut acc: f64 = 0.0;
+    let mut n: usize = 1;
+    loop {
+        if n > terms {break acc};
+        let term =
+            pow(value, n) /
+            (fac(n) as f64)
+        ;
+        acc = acc + term;
+        n = n + 1;
+    }
 }
 
 //##########################################################################################################################
 
 pub fn power(
     terms: usize,
-    value: Decimal
-) -> Result<Decimal, ()> {
-    Ok(
-        match value {
-            D1NEG => D1 / EULER,
-            D0 => D1,
-            D1 => EULER,
-            _  => power_series(terms, value),
-        }
-    )
+    value: f64
+) -> f64 {
+    match value {
+        -1.0 => 1.0 / EULER,
+        0.0 => 1.0,
+        1.0 => EULER,
+        _ => power_series(terms, value),
+    }
 }
 
 //##########################################################################################################################
 
 const fn ln_prepare(
-    value: Decimal
-) -> (Decimal, Decimal) {
-    let mut rem = value;
-    let mut exp = D0;
+    value: f64
+) -> (f64, f64) {
+    let mut rem: f64 = value;
+    let mut exp: f64 = 0.0;
     loop {
-        if rem > D4 {
-            rem = rem / D2;
+        if rem > 4.0 {
+            rem = rem / 2.0;
             exp = exp + LN_OF_TWO;
         }
-        else if rem < D2 {
-            rem = rem * D2;
+        else if rem < 2.0 {
+            rem = rem * 2.0;
             exp = exp - LN_OF_TWO;
         }
         else {break}
@@ -69,17 +64,17 @@ const fn ln_prepare(
 
 fn ln_series(
     terms: usize,
-    value: Decimal
-) -> Decimal {
-    D1 + (
+    value: f64
+) -> f64 {
+    1.0 + (
         (1..=terms).into_par_iter()
-            .map(|n| (
-                pow(D1NEG, n + 1) * (
+            .map(|n|
+                pow(-1.0, n + 1) * (
                     pow(value - EULER, n) /
-                    (pow(EULER, n) * dec(n))
+                    (pow(EULER, n) * (n as f64))
                 )
-            ))
-            .reduce(|| D0, |u, d| u + d)
+            )
+            .reduce(|| 0.0, |u, d| u + d)
     )
 }
 
@@ -87,15 +82,15 @@ fn ln_series(
 
 pub fn ln(
     terms: usize,
-    value: Decimal
-) -> Result<Decimal, &'static str> {
-    if value <= D0 {
-        panic!("cannot calc ln(x) for x <= 0");
+    value: f64
+) -> Result<f64, &'static str> {
+    if value <= 0.0 {
+        return Err("cannot calc ln(x) for x <= 0")
     };
     Ok(
         match value {
-            D1 => D0,
-            EULER => D1,
+            1.0 => 0.0,
+            EULER => 1.0,
             _ => {
                 let (exp, rem) = ln_prepare(value);
                 exp + ln_series(terms, rem)

@@ -1,39 +1,36 @@
 
 // Imports
-use rust_decimal_macros::dec;
-use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-use crate::basic::{ pow, fac };
 use crate::constants::{ PI };
+use crate::basic::{ pow, fac };
 
 //##########################################################################################################################
 
 // Constants
-const D0: Decimal = dec!(0);
-const D1: Decimal = dec!(1);
-const D2: Decimal = dec!(2);
-const D1NEG: Decimal = dec!(-1);
+const PIHALF: f64 = PI / 2.0;
+const PIHNEG: f64 = -PIHALF;
+const PINEG: f64 = -PI;
 
 //##########################################################################################################################
 
 const fn trig_prepare(
-    value: Decimal
-) -> Decimal {
-    let mut rem = value;
+    value: f64
+) -> f64 {
+    let mut rem: f64 = value;
     if rem > PI {
         rem = rem - (
-            (rem / (PI * D2)).floor() * PI * D2
+            (rem / (PI * 2.0)).floor() * PI * 2.0
         )
     }
-    else if rem < (D1NEG * PI) {
+    else if rem < -PI {
         rem = rem - (
-            (rem / (PI * D2)).floor() * PI * D2
+            (rem / (PI * 2.0)).floor() * PI * 2.0
         )
     }
-    if rem > PI { rem = rem - (PI * D2) }
-    else if rem < (D1NEG * PI) { rem = rem + (PI * D2) };
+    if rem > PI { rem = rem - (PI * 2.0) }
+    else if rem < -PI { rem = rem + (PI * 2.0) };
     rem
 }
 
@@ -41,51 +38,48 @@ const fn trig_prepare(
 
 fn cos_series(
     terms: usize,
-    value: Decimal
-) -> Decimal {
+    value: f64
+) -> f64 {
     (0..terms).into_par_iter()
-        .map(|n| (
-            pow(D1NEG, n) * (
+        .map(|n|
+            pow(-1.0, n) * (
                 pow(value, 2 * n) /
-                fac(2 * n)
+                (fac(2 * n) as f64)
             )
-        ))
-        .reduce(|| D0, |u, d| u + d)
+        )
+        .reduce(|| 0.0, |u, d| u + d)
 }
 
 //##########################################################################################################################
 
 fn sin_series(
     terms: usize,
-    value: Decimal
-) -> Decimal {
+    value: f64
+) -> f64 {
     (0..terms).into_par_iter()
-        .map(|n| (
-            pow(D1NEG, n) * (
+        .map(|n|
+            pow(-1.0, n) * (
                 pow(value, (2 * n) + 1) /
-                fac((2 * n) + 1)
+                (fac((2 * n) + 1) as f64)
             )
-        ))
-        .reduce(|| D0, |u, d| u + d)
+        )
+        .reduce(|| 0.0, |u, d| u + d)
 }
 
 //##########################################################################################################################
 
 pub fn cos(
     terms: usize,
-    value: Decimal
-) -> Result<Decimal, ()> {
-    let rem = trig_prepare(value);
-    let PIHALF = PI / D2;
-    let PIHNEG = D1NEG * PIHALF;
-    let PINEG = D1NEG * PI;
+    value: f64
+) -> Result<f64, ()> {
+    let rem: f64 = trig_prepare(value);
     Ok(
         match rem {
-            PI => D1NEG,
-            PIHALF => D0,
-            D0 => D1,
-            PIHNEG => D0,
-            PINEG => D1NEG,
+            PI => -1.0,
+            PIHALF => 0.0,
+            0.0 => 1.0,
+            PIHNEG => 0.0,
+            PINEG => -1.0,
             _ => cos_series(terms, rem),
         }
     )
@@ -95,19 +89,16 @@ pub fn cos(
 
 pub fn sin(
     terms: usize,
-    value: Decimal
-) -> Result<Decimal, ()> {
-    let rem = trig_prepare(value);
-    let PIHALF = PI / D2;
-    let PIHNEG = D1NEG * PIHALF;
-    let PINEG = D1NEG * PI;
+    value: f64
+) -> Result<f64, ()> {
+    let rem: f64 = trig_prepare(value);
     Ok(
         match rem {
-            PI => D0,
-            PIHALF => D1,
-            D0 => D0,
-            PIHNEG => D1NEG,
-            PINEG => D0,
+            PI => 0.0,
+            PIHALF => 1.0,
+            0.0 => 0.0,
+            PIHNEG => -1.0,
+            PINEG => 0.0,
             _ => sin_series(terms, rem),
         }
     )

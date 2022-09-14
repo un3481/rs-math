@@ -1,6 +1,6 @@
 
 // Imports
-use rust_decimal_macros::dec;
+use rust_decimal_macros::dec
 use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
@@ -15,10 +15,6 @@ const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
 const D1NEG: Decimal = dec!(-1);
-const PI2: Decimal = PI * D2;
-const PIHALF: Decimal = PI / D2;
-const PINEG: Decimal = PI * D1NEG;
-const PIHNEG: Decimal = PINEG / D2;
 
 //##########################################################################################################################
 
@@ -28,16 +24,16 @@ const fn trig_prepare(
     let mut rem = value;
     if rem > PI {
         rem = rem - (
-            (rem / PI2).floor() * PI2
+            (rem / (PI * D2)).floor() * PI * D2
         )
     }
-    else if rem < PINEG {
+    else if rem < (D1NEG * PI) {
         rem = rem - (
-            (rem / PI2).floor() * PI2
+            (rem / (PI * D2)).floor() * PI * D2
         )
     }
-    if rem > PI { rem = rem - PI2 }
-    else if rem < PINEG { rem = rem + PI2 };
+    if rem > PI { rem = rem - (PI * D2) }
+    else if rem < (D1NEG * PI) { rem = rem + (PI * D2) };
     rem
 }
 
@@ -83,10 +79,10 @@ pub fn cos(
     Ok(
         match rem {
             PI => D1NEG,
-            PIHALF => D0,
+            (PI / D2) => D0,
             D0 => D1,
-            PIHNEG => D0,
-            PINEG => D1NEG,
+            (D1NEG * PI / D2) => D0,
+            (D1NEG * PI) => D1NEG,
             _ => cos_series(terms, rem),
         }
     )
@@ -102,10 +98,10 @@ pub fn sin(
     Ok(
         match rem {
             PI => D0,
-            PIHALF => D1,
+            (PI / D2) => D1,
             D0 => D0,
-            PIHNEG => D1NEG,
-            PINEG => D0,
+            (D1NEG * PI / D2) => D1NEG,
+            (D1NEG * PI) => D0,
             _ => sin_series(terms, rem),
         }
     )

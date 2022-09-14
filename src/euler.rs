@@ -16,7 +16,6 @@ const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
 const D4: Decimal = dec!(4);
 const D1NEG: Decimal = dec!(-1);
-const EULERINV: Decimal = D1 / EULER;
 
 //##########################################################################################################################
 
@@ -37,7 +36,7 @@ pub fn power(
 ) -> Result<Decimal, ()> {
     Ok(
         match value {
-            D1NEG => EULERINV,
+            D1NEG => D1 / EULER,
             D0 => D1,
             D1 => EULER,
             _  => power_series(terms, value),

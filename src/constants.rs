@@ -19,9 +19,6 @@ const D1NEG: Decimal = dec!(-1);
 const D5: Decimal = dec!(5);
 const D239: Decimal = dec!(239);
 const D3DIV2: Decimal = dec!(1.5);
-const D1DIV5: Decimal = D1 / D5;
-const D1DIV239: Decimal = D1 / D239;
-const D1M3DIV2: Decimal = D1 - D3DIV2;
 
 //##########################################################################################################################
 
@@ -118,7 +115,7 @@ const fn pi(
     loop {
         if n > terms {break};
         let term = pow(D1NEG, n + 1) * (
-            pow(D1DIV5, (2 * n) - 1) /
+            pow(D1 / D5, (2 * n) - 1) /
             dec((2 * n) - 1)
         );
         term1 = term1 + term;
@@ -129,7 +126,7 @@ const fn pi(
     loop {
         if n > terms {break};
         let term = pow(D1NEG, n + 1) * (
-            pow(D1DIV239, (2 * n) - 1) /
+            pow(D1 / D239, (2 * n) - 1) /
             dec((2 * n) - 1)
         );
         term2 = term2 + term;
@@ -150,7 +147,7 @@ const fn sqrt_of_three_halfs(
     loop {
         if n > terms {break sqrt};
         let term =
-            (fac(2 * (n - 1)) * pow(D1M3DIV2, n - 1) * D3DIV2) /
+            (fac(2 * (n - 1)) * pow(D1 - D3DIV2, n - 1) * D3DIV2) /
             pow(fac(n - 1) * pow(D2, n - 1), 2)
         ;
         sqrt = sqrt + term;

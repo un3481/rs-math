@@ -4,8 +4,6 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
-use std::error::Error;
-
 // Modules
 use crate::basic::{ pow, fac };
 use crate::constants::{ PI };
@@ -49,7 +47,7 @@ fn cos_series(
     terms: usize,
     value: Decimal
 ) -> Decimal {
-    (0..terms).par_iter()
+    (0..terms).into_par_iter()
         .map(|n| (
             pow(D1NEG, n) * (
                 pow(value, 2 * n) /
@@ -65,7 +63,7 @@ fn sin_series(
     terms: usize,
     value: Decimal
 ) -> Decimal {
-    (0..terms).par_iter()
+    (0..terms).into_par_iter()
         .map(|n| (
             pow(D1NEG, n) * (
                 pow(value, (2 * n) + 1) /
@@ -80,7 +78,7 @@ fn sin_series(
 pub fn cos(
     terms: usize,
     value: Decimal
-) -> Result<Decimal, dyn Error> {
+) -> Result<Decimal, ()> {
     let rem = trig_prepare(value);
     Ok(
         match rem {
@@ -99,7 +97,7 @@ pub fn cos(
 pub fn sin(
     terms: usize,
     value: Decimal
-) -> Result<Decimal, dyn Error> {
+) -> Result<Decimal, ()> {
     let rem = trig_prepare(value);
     Ok(
         match rem {

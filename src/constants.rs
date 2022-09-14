@@ -16,10 +16,19 @@ const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
 const D4: Decimal = dec!(4);
 const D1NEG: Decimal = dec!(-1);
-const D1DIV5: Decimal = D1 / dec!(5);
-const D1DIV239: Decimal = D1 / dec!(239);
+const D5: Decimal = dec!(5);
+const D239: Decimal = dec!(239);
 const D3DIV2: Decimal = dec!(1.5);
+const D1DIV5: Decimal = D1 / D5;
+const D1DIV239: Decimal = D1 / D239;
 const D1M3DIV2: Decimal = D1 - D3DIV2;
+
+//##########################################################################################################################
+
+// To Decimal
+pub const fn dec(num: usize) -> Decimal {
+    Decimal::from_str(&num.to_string()).unwrap()
+}
 
 //##########################################################################################################################
 
@@ -56,7 +65,7 @@ pub const fn fac(
         1 => D1,
         _ => loop {
             if i > value {break acc};
-            acc = acc * i;
+            acc = acc * dec(i);
             i = i + 1;
         },
     }
@@ -90,7 +99,7 @@ const fn ln_of_two(
         if n > terms {break ln};
         let term = pow(D1NEG, n + 1) * (
             pow(D2 - EULER, n) /
-            (n * pow(EULER, n))
+            (dec(n) * pow(EULER, n))
         );
         ln = ln + term;
         n = n + 1;
@@ -110,7 +119,7 @@ const fn pi(
         if n > terms {break};
         let term = pow(D1NEG, n + 1) * (
             pow(D1DIV5, (2 * n) - 1) /
-            ((2 * n) - 1)
+            dec((2 * n) - 1)
         );
         term1 = term1 + term;
         n = n + 1;
@@ -121,7 +130,7 @@ const fn pi(
         if n > terms {break};
         let term = pow(D1NEG, n + 1) * (
             pow(D1DIV239, (2 * n) - 1) /
-            ((2 * n) - 1)
+            dec((2 * n) - 1)
         );
         term2 = term2 + term;
         n = n + 1;

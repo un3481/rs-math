@@ -1,6 +1,6 @@
 
 // Imports
-use rust_decimal_macros::dec
+use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 use rayon::prelude::*;
 

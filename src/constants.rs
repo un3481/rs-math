@@ -38,7 +38,7 @@ pub const fn pow(
     value: Decimal,
     exp: usize
 ) -> Decimal {
-    let mut acc = D0 + D1;
+    let mut acc = D1;
     let mut i: usize = 1;
     match exp {
         0 => D1,
@@ -60,7 +60,7 @@ pub const fn pow(
 pub const fn fac(
     value: usize,
 ) -> Decimal {
-    let mut acc = D0 + D1;
+    let mut acc = D1;
     let mut i: usize = 1;
     match value {
         0 => D1,
@@ -78,7 +78,7 @@ pub const fn fac(
 const fn euler(
     terms: usize
 ) -> Decimal {
-    let mut e = D0 + D0;
+    let mut e = D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break e};
@@ -95,7 +95,7 @@ pub const EULER: Decimal = euler(STD_ITER);
 const fn ln_of_two(
     terms: usize
 ) -> Decimal {
-    let mut ln = D0 + D1;
+    let mut ln = D1;
     let mut n: usize = 1;
     loop {
         if n > terms {break ln};
@@ -115,7 +115,7 @@ pub const LN_OF_TWO: Decimal = ln_of_two(STD_ITER);
 const fn pi(
     terms: usize
 ) -> Decimal {
-    let mut term1 = D0 + D0;
+    let mut term1 = D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break};
@@ -126,7 +126,7 @@ const fn pi(
         term1 = term1 + term;
         n = n + 1;
     };
-    let mut term2 = D0 + D0;
+    let mut term2 = D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break};
@@ -147,7 +147,7 @@ pub const PI: Decimal = pi(STD_ITER);
 const fn sqrt_of_three_halfs(
     terms: usize
 ) -> Decimal {
-    let mut sqrt = D0 + D0;
+    let mut sqrt = D0;
     let mut n: usize = 1;
     loop {
         if n > terms {break sqrt};

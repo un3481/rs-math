@@ -8,6 +8,13 @@ use crate::basic::{ pow, fac };
 
 //##########################################################################################################################
 
+// Constants
+const ZERO: f64 = 0.0;
+const ONE: f64 = 1.0;
+const MINUS_ONE: f64 = -1.0;
+
+//##########################################################################################################################
+
 const fn power_series(
     terms: usize,
     value: f64
@@ -32,9 +39,9 @@ pub fn power(
     value: f64
 ) -> f64 {
     match value {
-        -1 => 1.0 / EULER,
-        0 => 1.0,
-        1 => EULER,
+        MINUS_ONE => 1.0 / EULER,
+        ZERO => 1.0,
+        ONE => EULER,
         _ => power_series(terms, value),
     }
 }
@@ -89,7 +96,7 @@ pub fn ln(
     };
     Ok(
         match value {
-            1 => 0.0,
+            ONE => 0.0,
             EULER => 1.0,
             _ => {
                 let (exp, rem) = ln_prepare(value);

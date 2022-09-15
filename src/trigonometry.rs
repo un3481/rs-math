@@ -131,7 +131,7 @@ fn tan_prepare(
 
 //##########################################################################################################################
 
-fn arctan_series(
+fn atan_series(
     value: Decimal,
     terms: usize
 ) -> Decimal {
@@ -159,7 +159,7 @@ pub fn atan(
     else if isin == D0 { return if icos > D0 {D0} else {PI} };
 
     let (tan, divs) = tan_prepare(icos, isin, terms);
-    divs * arctan_series(tan, terms)
+    divs * atan_series(tan, terms)
 }
 
 //##########################################################################################################################

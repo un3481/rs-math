@@ -5,7 +5,7 @@ use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-use crate::constants::{ consts };
+use crate::constants::{ E, LN_2 };
 use crate::arithmetic::{ dec, pow, fac };
 
 //##########################################################################################################################
@@ -35,10 +35,10 @@ pub fn power(
     terms: usize,
     value: Decimal
 ) -> Decimal {
-    let E = *consts.E; 
-         if value == D1N {D1 / E}
+    let _e = *E; 
+         if value == D1N {D1 / _e}
     else if value == D0  {D1}
-    else if value == D1  {E}
+    else if value == D1  {_e}
     else
         { power_series(terms, value) }
 }
@@ -48,17 +48,17 @@ pub fn power(
 fn ln_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
-    let LN_2 = *consts.LN_2;
+    let _ln2 = *LN_2;
     let mut rem: Decimal = value;
     let mut exp: Decimal = D0;
     loop {
         if rem > D4 {
             rem = rem / D2;
-            exp = exp + LN_2;
+            exp = exp + _ln2;
         }
         else if rem < D2 {
             rem = rem * D2;
-            exp = exp - LN_2;
+            exp = exp - _ln2;
         }
         else {break}
     };
@@ -71,13 +71,13 @@ fn ln_series(
     terms: usize,
     value: Decimal
 ) -> Decimal {
-    let E = *consts.E;
+    let _e = *E;
     D1 + (
         (1..=terms).into_par_iter()
             .map(|n|
                 pow(D1N, n + 1) * (
-                    pow(value - E, n) /
-                    (pow(E, n) * dec(n))
+                    pow(value - _e, n) /
+                    (pow(_e, n) * dec(n))
                 )
             )
             .reduce(|| D0, |u, d| u + d)
@@ -93,10 +93,10 @@ pub fn ln(
     if value <= D0 {
         return Err("cannot calc ln(x) for x <= 0")
     };
-    let E = *consts.E;
+    let _e = *E;
     Ok(
              if value == D1 {D0}
-        else if value == E  {D1}
+        else if value == _e {D1}
         else {
             let (exp, rem) = ln_prepare(value);
             exp + ln_series(terms, rem)

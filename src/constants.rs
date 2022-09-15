@@ -2,12 +2,13 @@
 // Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
+use lazy_static::lazy_static;
 
 use crate::arithmetic::{ dec, pow, fac };
 
 //##########################################################################################################################
 
-pub const STD_ITER: usize = 100;
+pub const STD_ITER: usize = 128;
 
 const D1N: Decimal = dec!(-1);
 const D0: Decimal = dec!(0);
@@ -20,30 +21,6 @@ const D239: Decimal = dec!(239);
 
 //##########################################################################################################################
 
-struct Consts {
-    pub E: Box<Decimal>,
-    pub PI: Box<Decimal>,
-    pub LN_2: Box<Decimal>,
-    pub SQRT_3DIV2: Box<Decimal>,
-    pub PI2: Box<Decimal>,
-    pub PIDIV2: Box<Decimal>,
-    pub PIDIV2N: Box<Decimal>,
-    pub PIN: Box<Decimal>
-}
-
-pub static consts: Consts = Consts{
-    E: Box::new(D0),
-    PI: Box::new(D0),
-    LN_2: Box::new(D0),
-    SQRT_3DIV2: Box::new(D0),
-    PI2: Box::new(D0),
-    PIDIV2: Box::new(D0),
-    PIDIV2N: Box::new(D0),
-    PIN: Box::new(D0)
-};
-
-//##########################################################################################################################
-
 pub fn euler(
     terms: usize
 ) -> Decimal {
@@ -51,6 +28,10 @@ pub fn euler(
         .map(|n| D1 / fac(n))
         .reduce(|u, d| u + d)
         .unwrap_or(D0)
+}
+
+lazy_static! {
+    pub static ref E: Decimal = euler(STD_ITER);
 }
 
 //##########################################################################################################################
@@ -89,21 +70,29 @@ pub fn pi(
     D4 * ((D4 * term1) - term2)
 }
 
+lazy_static! {
+    pub static ref PI: Decimal = pi(STD_ITER);
+}
+
 //##########################################################################################################################
 
 pub fn ln_2(
     terms: usize
 ) -> Decimal {
-    let E = *consts.E;
+    let _e = *E;
     D1 + (1..=terms).into_iter()
         .map(|n|
             pow(D1N, n + 1) * (
-                pow(D2 - E, n) /
-                (pow(E, n) * dec(n))
+                pow(D2 - _e, n) /
+                (pow(_e, n) * dec(n))
             )
         )
         .reduce(|u, d| u + d)
         .unwrap_or(D0)
+}
+
+lazy_static! {
+    pub static ref LN_2: Decimal = ln_2(STD_ITER);
 }
 
 //##########################################################################################################################
@@ -128,20 +117,17 @@ pub fn sqrt_3div2(
         .unwrap_or(D0)
 }
 
+lazy_static! {
+    pub static ref SQRT_3DIV2: Decimal = sqrt_3div2(STD_ITER);
+}
+
 //##########################################################################################################################
 
-pub fn init(
-    terms: usize
-) {
-    let mut p = *consts.E; p = euler(terms);
-    let mut p = *consts.PI; p = pi(terms);
-    let mut p = *consts.LN_2; p = ln_2(terms);
-    let mut p = *consts.SQRT_3DIV2; p = sqrt_3div2(terms);
-
-    let mut p = *consts.PI2; p = (*consts.PI) * D2;
-    let mut p = *consts.PIDIV2; p = (*consts.PI) / D2;
-    let mut p = *consts.PIDIV2N; p = (*consts.PIDIV2) * D1N;
-    let mut p = *consts.PIN; p = (*consts.PI) * D1N;
+lazy_static! {
+    pub static ref PI2: Decimal = (*PI) * D2;
+    pub static ref PIDIV2: Decimal = (*PI) / D2;
+    pub static ref PIDIV2N: Decimal = (*PIDIV2) * D1N;
+    pub static ref PIN: Decimal = (*PI) * D1N;
 }
 
 //##########################################################################################################################

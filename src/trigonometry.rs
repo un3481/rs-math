@@ -5,7 +5,7 @@ use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-use crate::constants::{ consts };
+use crate::constants::{ PI, PIDIV2, PIDIV2N, PIN, PI2 };
 use crate::arithmetic::{ pow, fac };
 
 //##########################################################################################################################
@@ -14,27 +14,28 @@ use crate::arithmetic::{ pow, fac };
 const D1N: Decimal = dec!(-1);
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
-const D2: Decimal = dec!(2);
 
 //##########################################################################################################################
 
 fn trig_prepare(
     value: Decimal
 ) -> Decimal {
-    let PI = *consts.PI;
+    let _pi = *PI;
+    let _pi2 = *PI2;
+    let _pin = *PIN;
     let mut rem: Decimal = value;
-    if rem > PI {
+    if rem > _pi {
         rem = rem - (
-            (rem / (PI * D2)).floor() * PI * D2
+            (rem / _pi2).floor() * _pi2
         )
     }
-    else if rem < -PI {
+    else if rem < _pin {
         rem = rem - (
-            (rem / (PI * D2)).floor() * PI * D2
+            (rem / _pi2).floor() * _pi2
         )
     }
-         if rem >  PI { rem = rem - (PI * D2) }
-    else if rem < -PI { rem = rem + (PI * D2) };
+         if rem >  _pi { rem = rem - _pi2 }
+    else if rem < _pin { rem = rem + _pi2 };
     rem
 }
 
@@ -78,11 +79,11 @@ pub fn cos(
 ) -> Result<Decimal, ()> {
     let rem: Decimal = trig_prepare(value);
     Ok(
-             if rem == *consts.PI {D1N}
-        else if rem == *consts.PIDIV2 {D0}
+             if rem == *PI {D1N}
+        else if rem == *PIDIV2 {D0}
         else if rem == D0 {D1}
-        else if rem == *consts.PIDIV2N {D0}
-        else if rem == *consts.PIN {D1N}
+        else if rem == *PIDIV2N {D0}
+        else if rem == *PIN {D1N}
         else
             { cos_series(terms, rem) }
     )
@@ -96,11 +97,11 @@ pub fn sin(
 ) -> Result<Decimal, ()> {
     let rem: Decimal = trig_prepare(value);
     Ok(
-             if rem == *consts.PI {D1N}
-        else if rem == *consts.PIDIV2 {D0}
+             if rem == *PI {D1N}
+        else if rem == *PIDIV2 {D0}
         else if rem == D0 {D1}
-        else if rem == *consts.PIDIV2N {D0}
-        else if rem == *consts.PIN {D1N}
+        else if rem == *PIDIV2N {D0}
+        else if rem == *PIN {D1N}
         else
             { sin_series(terms, rem) }
     )

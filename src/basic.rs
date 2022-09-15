@@ -5,7 +5,7 @@ use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-use crate::constants::{ consts };
+use crate::constants::{ SQRT_3DIV2 };
 use crate::arithmetic::{ pow, fac };
 
 //##########################################################################################################################
@@ -22,17 +22,17 @@ const D3DIV2: Decimal = dec!(1.5);
 fn sqrt_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
-    let SQRT_3DIV2 = *consts.SQRT_3DIV2;
+    let _sqrt3div2 = *SQRT_3DIV2;
     let mut rem: Decimal = value;
     let mut ratio: Decimal = D1;
     loop {
         if rem > D3DIV2 {
             rem = rem / D3DIV2;
-            ratio = ratio * SQRT_3DIV2;
+            ratio = ratio * _sqrt3div2;
         }
         else if rem < D1DIV2 {
             rem = rem * D3DIV2;
-            ratio = ratio / SQRT_3DIV2;
+            ratio = ratio / _sqrt3div2;
         }
         else {break}
     };

@@ -153,13 +153,17 @@ pub fn atan(
     terms: usize
 ) -> <Decimal, Error> {
     let modl = sqrt((icos * icos) + (isin * isin), terms);
-
-         if modl != D1 { return Err(Error::InvalidSineOrCosine) }
-    else if icos == D0 { return if isin > D0 {PIDIV2} else {PI3DIV2} }
-    else if isin == D0 { return if icos > D0 {D0} else {PI} };
-
-    let (tan, divs) = tan_prepare(icos, isin, terms);
-    divs * atan_series(tan, terms)
+    if modl != D1 { return Err(Error::InvalidSineOrCosine) };
+    Ok(
+             if icos == D0 && isin > D0 {PIDIV2}
+        else if icos == D0 && isin < D0 {PI3DIV2}
+        else if isin == D0 && icos > D0 {D0}
+        else if isin == D0 && icos < D0 {PI}
+        else {
+            let (tan, divs) = tan_prepare(icos, isin, terms);
+            divs * atan_series(tan, terms)
+        }
+    )
 }
 
 //##########################################################################################################################

@@ -130,18 +130,18 @@ pub fn sqrt_3div2(
 
 //##########################################################################################################################
 
-pub unsafe fn init(
+pub fn init(
     terms: usize
 ) {
-    consts.E.as_mut_ptr().write(euler(terms));
-    consts.PI.as_mut_ptr().write(pi(terms));
-    consts.LN_2.as_mut_ptr().write(ln_2(terms));
-    consts.SQRT_3DIV2.as_mut_ptr().write(sqrt_3div2(terms));
+    let mut p = *consts.E; p = euler(terms);
+    let mut p = *consts.PI; p = pi(terms);
+    let mut p = *consts.LN_2; p = ln_2(terms);
+    let mut p = *consts.SQRT_3DIV2; p = sqrt_3div2(terms);
 
-    consts.PI2.as_mut_ptr().write((*consts.PI) * D2);
-    consts.PIDIV2.as_mut_ptr().write((*consts.PI) / D2);
-    consts.PIDIV2N.as_mut_ptr().write((*consts.PIDIV2) * D1N);
-    consts.PIN.as_mut_ptr().write((*consts.PI) * D1N);
+    let mut p = *consts.PI2; p = (*consts.PI) * D2;
+    let mut p = *consts.PIDIV2; p = (*consts.PI) / D2;
+    let mut p = *consts.PIDIV2N; p = (*consts.PIDIV2) * D1N;
+    let mut p = *consts.PIN; p = (*consts.PI) * D1N;
 }
 
 //##########################################################################################################################

@@ -76,17 +76,15 @@ fn sin_series(
 pub fn cos(
     value: Decimal,
     terms: usize
-) -> Result<Decimal, ()> {
+) -> Decimal {
     let rem: Decimal = trig_prepare(value);
-    Ok(
-             if rem == *PI {D1N}
-        else if rem == *PIDIV2 {D0}
-        else if rem == D0 {D1}
-        else if rem == *PIDIV2N {D0}
-        else if rem == *PIN {D1N}
-        else
-            { cos_series(rem, terms) }
-    )
+         if rem == *PI {D1N}
+    else if rem == *PIDIV2 {D0}
+    else if rem == D0 {D1}
+    else if rem == *PIDIV2N {D0}
+    else if rem == *PIN {D1N}
+    else
+        { cos_series(rem, terms) }
 }
 
 //##########################################################################################################################
@@ -94,17 +92,15 @@ pub fn cos(
 pub fn sin(
     value: Decimal,
     terms: usize
-) -> Result<Decimal, ()> {
+) -> Decimal {
     let rem: Decimal = trig_prepare(value);
-    Ok(
-             if rem == *PI {D1N}
-        else if rem == *PIDIV2 {D0}
-        else if rem == D0 {D1}
-        else if rem == *PIDIV2N {D0}
-        else if rem == *PIN {D1N}
-        else
-            { sin_series(rem, terms) }
-    )
+         if rem == *PI {D1N}
+    else if rem == *PIDIV2 {D0}
+    else if rem == D0 {D1}
+    else if rem == *PIDIV2N {D0}
+    else if rem == *PIN {D1N}
+    else
+        { sin_series(rem, terms) }
 }
 
 //##########################################################################################################################

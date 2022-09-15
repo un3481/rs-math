@@ -1,4 +1,5 @@
 
+pub mod arithmetic;
 pub mod constants;
 pub mod basic;
 pub mod euler;

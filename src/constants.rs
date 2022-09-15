@@ -1,160 +1,146 @@
 
+// Imports
+use rust_decimal_macros::dec;
+use rust_decimal::prelude::*;
+
+use crate::arithmetic::{ dec, pow, fac };
+
 //##########################################################################################################################
 
-// Constants
 pub const STD_ITER: usize = 100;
-const ZERO: f64 = 0.0;
-const ONE: f64 = 1.0;
+
+const D1N: Decimal = dec!(-1);
+const D0: Decimal = dec!(0);
+const D1: Decimal = dec!(1);
+const D2: Decimal = dec!(2);
+const D3: Decimal = dec!(3);
+const D4: Decimal = dec!(4);
+const D5: Decimal = dec!(5);
+const D239: Decimal = dec!(239);
 
 //##########################################################################################################################
 
-pub const fn pow(
-    value: f64,
-    exp: usize
-) -> f64 {
-    let mut acc: f64 = 1.0;
-    let mut n: usize = 1;
-    match exp {
-        0 => 1.0,
-        1 => value,
-        _ => match value {
-            ZERO => 0.0,
-            ONE => 1.0,
-            _ => loop {
-                if n > exp {break acc};
-                acc = acc * value;
-                n = n + 1;
-            },
-        },
-    }
+struct Consts {
+    pub E: Decimal,
+    pub PI: Decimal,
+    pub LN_2: Decimal,
+    pub SQRT_3DIV2: Decimal,
+    pub PI2: Decimal,
+    pub PIDIV2: Decimal,
+    pub PIDIV2N: Decimal,
+    pub PIN: Decimal
 }
 
-//##########################################################################################################################
-
-pub const fn fac(
-    value: usize,
-) -> u128 {
-    let mut acc: u128 = 1;
-    let mut n: usize = 1;
-    match value {
-        0 => 1,
-        1 => 1,
-        _ => loop {
-            if n > value {break acc};
-            acc = acc * (n as u128);
-            n = n + 1;
-        },
-    }
-}
+pub static consts: Consts = Consts{
+    E: D0,
+    PI: D0,
+    LN_2: D0,
+    SQRT_3DIV2: D0,
+    PI2: D0,
+    PIDIV2: D0,
+    PIDIV2N: D0,
+    PIN: D0
+};
 
 //##########################################################################################################################
 
-const fn euler(
+pub fn euler(
     terms: usize
-) -> f64 {
-    let mut acc: f64 = 0.0;
-    let mut n: usize = 1;
-    loop {
-        if n > terms {break acc};
-        let term: f64 =
-            1.0 /
-            (fac(n) as f64)
-        ;
-        acc = acc + term;
-        n = n + 1;
-    }
+) -> Decimal {
+    (1..=terms).into_iter()
+        .map(|n| D1 / fac(n))
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
 }
-
-pub const EULER: f64 = euler(STD_ITER);
 
 //##########################################################################################################################
 
-const fn ln_of_two(
+pub fn pi(
     terms: usize
-) -> f64 {
-    let mut acc: f64 = 1.0;
-    let mut n: usize = 1;
-    loop {
-        if n > terms {break acc};
-        let term: f64 = 
-            pow(-1.0, n + 1) * (
-                pow(2.0 - EULER, n) /
-                (pow(EULER, n) * (n as f64))
+) -> Decimal {
+    let term1: Decimal =
+        (1..=terms).into_iter()
+            .map(|n|
+                pow(D1N, n + 1) * (
+                    pow(
+                        D1 / D5,
+                        (2 * n) - 1
+                    ) /
+                    ((D2 * dec(n)) - D1)
+                )
             )
-        ;
-        acc = acc + term;
-        n = n + 1;
-    }
+            .reduce(|u, d| u + d)
+            .unwrap_or(D0);
+    
+    let term2: Decimal =
+        (1..=terms).into_iter()
+            .map(|n|
+                pow(D1N, n + 1) * (
+                    pow(
+                        D1 / D239,
+                        (2 * n) - 1
+                    ) /
+                    ((D2 * dec(n)) - D1)
+                )
+            )
+            .reduce(|u, d| u + d)
+            .unwrap_or(D0);
+    
+    D4 * ((D4 * term1) - term2)
 }
-
-pub const LN_OF_TWO: f64 = ln_of_two(STD_ITER);
 
 //##########################################################################################################################
 
-const fn pi(
+pub fn ln_2(
     terms: usize
-) -> f64 {
-    let mut term1: f64 = 0.0;
-    let mut n: usize = 1;
-    loop {
-        if n > terms {break};
-        let term: f64 =
-            pow(-1.0, n + 1) * (
-                pow(
-                    1.0 / 5.0,
-                    (2 * n) - 1
-                ) /
-                ((2.0 * (n as f64)) - 1.0)
+) -> Decimal {
+    let E = consts.E;
+    D1 + (1..=terms).into_iter()
+        .map(|n|
+            pow(D1N, n + 1) * (
+                pow(D2 - E, n) /
+                (pow(E, n) * dec(n))
             )
-        ;
-        term1 = term1 + term;
-        n = n + 1;
-    };
-    let mut term2: f64 = 0.0;
-    let mut n: usize = 1;
-    loop {
-        if n > terms {break};
-        let term: f64 =
-            pow(-1.0, n + 1) * (
-                pow(
-                    1.0 / 239.0,
-                    (2 * n) - 1
-                ) /
-                ((2.0 * (n as f64)) - 1.0)
-            )
-        ;
-        term2 = term2 + term;
-        n = n + 1;
-    };
-    4.0 * ((4.0 * term1) - term2)
+        )
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
 }
-
-pub const PI: f64 = pi(STD_ITER);
 
 //##########################################################################################################################
 
-const fn sqrt_of_three_halfs(
+pub fn sqrt_3div2(
     terms: usize
-) -> f64 {
-    let mut acc: f64 = 0.0;
-    let mut n: usize = 1;
-    loop {
-        if n > terms {break acc};
-        let term: f64 = (
-            (3.0 / 2.0) *
-            (fac(2 * (n - 1)) as f64) *
-            pow(1.0 / 2.0, n - 1)
-        ) /
-        pow(
-            (fac(n - 1) as f64) *
-            pow(2.0, n - 1),
-            2
-        );
-        acc = acc + term;
-        n = n + 1;
-    }
+) -> Decimal {
+    (1..=terms).into_iter()
+        .map(|n|
+            (
+                (D3 / D2) *
+                fac(2 * (n - 1)) *
+                pow(D1 / D2, n - 1)
+            ) /
+            pow(
+                fac(n - 1) *
+                pow(D2, n - 1),
+                2
+            )
+        )
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
 }
 
-pub const SQRT_OF_THREE_HALFS: f64 = sqrt_of_three_halfs(STD_ITER);
+//##########################################################################################################################
+
+pub fn init(
+    terms: usize
+) {
+    consts.E = euler(terms);
+    consts.PI = pi(terms);
+    consts.LN_2 = ln_2(terms);
+    consts.SQRT_3DIV2 = sqrt_3div2(terms);
+    consts.PI2 = consts.PI * D2;
+    consts.PIDIV2 = consts.PI / D2;
+    consts.PIDIV2N = consts.PIDIV2 * D1N;
+    consts.PIN = consts.PI * D1N;
+}
 
 //##########################################################################################################################

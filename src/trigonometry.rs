@@ -42,8 +42,8 @@ fn trig_prepare(
 //##########################################################################################################################
 
 fn cos_series(
-    terms: usize,
-    value: Decimal
+    value: Decimal,
+    terms: usize
 ) -> Decimal {
     (0..terms).into_par_iter()
         .map(|n|
@@ -58,8 +58,8 @@ fn cos_series(
 //##########################################################################################################################
 
 fn sin_series(
-    terms: usize,
-    value: Decimal
+    value: Decimal,
+    terms: usize
 ) -> Decimal {
     (0..terms).into_par_iter()
         .map(|n|
@@ -74,8 +74,8 @@ fn sin_series(
 //##########################################################################################################################
 
 pub fn cos(
-    terms: usize,
-    value: Decimal
+    value: Decimal,
+    terms: usize
 ) -> Result<Decimal, ()> {
     let rem: Decimal = trig_prepare(value);
     Ok(
@@ -85,15 +85,15 @@ pub fn cos(
         else if rem == *PIDIV2N {D0}
         else if rem == *PIN {D1N}
         else
-            { cos_series(terms, rem) }
+            { cos_series(rem, terms) }
     )
 }
 
 //##########################################################################################################################
 
 pub fn sin(
-    terms: usize,
-    value: Decimal
+    value: Decimal,
+    terms: usize
 ) -> Result<Decimal, ()> {
     let rem: Decimal = trig_prepare(value);
     Ok(
@@ -103,7 +103,7 @@ pub fn sin(
         else if rem == *PIDIV2N {D0}
         else if rem == *PIN {D1N}
         else
-            { sin_series(terms, rem) }
+            { sin_series(rem, terms) }
     )
 }
 

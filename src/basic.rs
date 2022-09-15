@@ -7,6 +7,8 @@ use rayon::prelude::*;
 // Modules
 use crate::constants::{ SQRT_3DIV2 };
 use crate::arithmetic::{ pow, fac };
+use crate::euler::{ epow, ln };
+use crate::error::Error;
 
 //##########################################################################################################################
 
@@ -42,8 +44,8 @@ fn sqrt_prepare(
 //##########################################################################################################################
 
 fn sqrt_series(
-    terms: usize,
-    value: Decimal
+    value: Decimal,
+    terms: usize
 ) -> Decimal {
     (1..=terms).into_par_iter()
         .map(|n|
@@ -64,20 +66,31 @@ fn sqrt_series(
 //##########################################################################################################################
 
 pub fn sqrt(
-    terms: usize,
-    value: Decimal
-) -> Result<Decimal, &'static str> {
-    if value < D0 {
-        return Err("cannot calc sqrt(x) for x < 0")
-    };
+    value: Decimal,
+    terms: usize
+) -> Result<Decimal, Error> {
+    if value < D0 { return Err(Error::InputOutOfRange) };
     Ok(
              if value == D0 {D0}
         else if value == D1 {D1}
         else {
             let (ratio, rem) = sqrt_prepare(value);
-            ratio * sqrt_series(terms, rem)
+            ratio * sqrt_series(rem, terms)
         }
     )
+}
+
+//##########################################################################################################################
+
+pub fn power(
+    value: Decimal,
+    power: Decimal,
+    terms: usize
+) -> Result<Decimal, Error> {
+    match ln(value, terms) {
+        Ok(ln) => Ok(epow(ln * power, terms)),
+        Err(err) => Err(err),
+    }
 }
 
 //##########################################################################################################################

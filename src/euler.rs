@@ -7,6 +7,7 @@ use rayon::prelude::*;
 // Modules
 use crate::constants::{ E, LN_2 };
 use crate::arithmetic::{ dec, pow, fac };
+use crate::error::Error;
 
 //##########################################################################################################################
 
@@ -20,8 +21,8 @@ const D4: Decimal = dec!(4);
 //##########################################################################################################################
 
 fn power_series(
-    terms: usize,
-    value: Decimal
+    value: Decimal,
+    terms: usize
 ) -> Decimal {
     (1..=terms).into_iter()
         .map(|n| pow(value, n) / fac(n))
@@ -31,16 +32,16 @@ fn power_series(
 
 //##########################################################################################################################
 
-pub fn power(
-    terms: usize,
-    value: Decimal
+pub fn epow(
+    value: Decimal,
+    terms: usize
 ) -> Decimal {
     let _e = *E; 
          if value == D1N {D1 / _e}
     else if value == D0  {D1}
     else if value == D1  {_e}
     else
-        { power_series(terms, value) }
+        { power_series(value, terms) }
 }
 
 //##########################################################################################################################
@@ -68,8 +69,8 @@ fn ln_prepare(
 //##########################################################################################################################
 
 fn ln_series(
-    terms: usize,
-    value: Decimal
+    value: Decimal,
+    terms: usize
 ) -> Decimal {
     let _e = *E;
     D1 + (
@@ -87,19 +88,17 @@ fn ln_series(
 //##########################################################################################################################
 
 pub fn ln(
-    terms: usize,
-    value: Decimal
-) -> Result<Decimal, &'static str> {
-    if value <= D0 {
-        return Err("cannot calc ln(x) for x <= 0")
-    };
+    value: Decimal,
+    terms: usize
+) -> Result<Decimal, Error> {
+    if value <= D0 { return Err(Error::InputOutOfRange) };
     let _e = *E;
     Ok(
              if value == D1 {D0}
         else if value == _e {D1}
         else {
             let (exp, rem) = ln_prepare(value);
-            exp + ln_series(terms, rem)
+            exp + ln_series(rem, terms)
         }
     )
 }

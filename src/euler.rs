@@ -35,7 +35,7 @@ pub fn power(
     terms: usize,
     value: Decimal
 ) -> Decimal {
-    let E = consts.E; 
+    let E = *consts.E; 
          if value == D1N {D1 / E}
     else if value == D0  {D1}
     else if value == D1  {E}
@@ -48,7 +48,7 @@ pub fn power(
 fn ln_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
-    let LN_2 = consts.LN_2;
+    let LN_2 = *consts.LN_2;
     let mut rem: Decimal = value;
     let mut exp: Decimal = D0;
     loop {
@@ -71,7 +71,7 @@ fn ln_series(
     terms: usize,
     value: Decimal
 ) -> Decimal {
-    let E = consts.E;
+    let E = *consts.E;
     D1 + (
         (1..=terms).into_par_iter()
             .map(|n|
@@ -93,7 +93,7 @@ pub fn ln(
     if value <= D0 {
         return Err("cannot calc ln(x) for x <= 0")
     };
-    let E = consts.E;
+    let E = *consts.E;
     Ok(
              if value == D1 {D0}
         else if value == E  {D1}

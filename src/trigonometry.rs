@@ -21,7 +21,7 @@ const D2: Decimal = dec!(2);
 fn trig_prepare(
     value: Decimal
 ) -> Decimal {
-    let PI = consts.PI;
+    let PI = *consts.PI;
     let mut rem: Decimal = value;
     if rem > PI {
         rem = rem - (
@@ -78,11 +78,11 @@ pub fn cos(
 ) -> Result<Decimal, ()> {
     let rem: Decimal = trig_prepare(value);
     Ok(
-             if rem == consts.PI {D1N}
-        else if rem == consts.PIDIV2 {D0}
+             if rem == *consts.PI {D1N}
+        else if rem == *consts.PIDIV2 {D0}
         else if rem == D0 {D1}
-        else if rem == consts.PIDIV2N {D0}
-        else if rem == consts.PIN {D1N}
+        else if rem == *consts.PIDIV2N {D0}
+        else if rem == *consts.PIN {D1N}
         else
             { cos_series(terms, rem) }
     )
@@ -96,11 +96,11 @@ pub fn sin(
 ) -> Result<Decimal, ()> {
     let rem: Decimal = trig_prepare(value);
     Ok(
-             if rem == consts.PI {D1N}
-        else if rem == consts.PIDIV2 {D0}
+             if rem == *consts.PI {D1N}
+        else if rem == *consts.PIDIV2 {D0}
         else if rem == D0 {D1}
-        else if rem == consts.PIDIV2N {D0}
-        else if rem == consts.PIN {D1N}
+        else if rem == *consts.PIDIV2N {D0}
+        else if rem == *consts.PIN {D1N}
         else
             { sin_series(terms, rem) }
     )

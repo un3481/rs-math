@@ -22,7 +22,7 @@ const D3DIV2: Decimal = dec!(1.5);
 fn sqrt_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
-    let SQRT_3DIV2 = consts.SQRT_3DIV2;
+    let SQRT_3DIV2 = *consts.SQRT_3DIV2;
     let mut rem: Decimal = value;
     let mut ratio: Decimal = D1;
     loop {

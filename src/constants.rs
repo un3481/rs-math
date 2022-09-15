@@ -138,10 +138,10 @@ pub unsafe fn init(
     consts.LN_2.as_mut_ptr().write(ln_2(terms));
     consts.SQRT_3DIV2.as_mut_ptr().write(sqrt_3div2(terms));
 
-    consts.PI2.as_mut_ptr().write(consts.PI * D2);
-    consts.PIDIV2.as_mut_ptr().write(consts.PI / D2);
-    consts.PIDIV2N.as_mut_ptr().write(consts.PIDIV2 * D1N);
-    consts.PIN.as_mut_ptr().write(consts.PI * D1N);
+    consts.PI2.as_mut_ptr().write((*consts.PI) * D2);
+    consts.PIDIV2.as_mut_ptr().write((*consts.PI) / D2);
+    consts.PIDIV2N.as_mut_ptr().write((*consts.PIDIV2) * D1N);
+    consts.PIN.as_mut_ptr().write((*consts.PI) * D1N);
 }
 
 //##########################################################################################################################

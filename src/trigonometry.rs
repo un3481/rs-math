@@ -6,7 +6,9 @@ use rayon::prelude::*;
 
 // Modules
 use crate::constants::{ PI, PIDIV2, PIDIV2N, PIN, PI2 };
-use crate::arithmetic::{ pow, fac };
+use crate::arithmetic::{ dec, pow, fac };
+use crate::basic::{ sqrt }
+use crate::error::Error;
 
 //##########################################################################################################################
 
@@ -101,6 +103,63 @@ pub fn sin(
     else if rem == *PIN {D1N}
     else
         { sin_series(rem, terms) }
+}
+
+//##########################################################################################################################
+
+fn tan_prepare(
+    icos: Decimal,
+    isin: Decimal,
+    terms: usize
+) -> (Decimal, Decimal) {
+    let cosdiv2 = sqrt((D1 + icos) / D2, terms);
+    let cosdiv4 = sqrt((D1 + cosdiv2) / D2, terms);
+    let sindiv4 = cosdiv4 * if isin < D0 {D1N} else {D1};
+    let tandiv8 =
+        if sindiv4 == D0 {D0}
+        else { (D1 - cosdiv4) / sindiv4 }
+    ;
+    let mut tandiv = tandiv8;
+    let mut divs = D8;
+    loop {
+        if tandiv < D1DIV5 && tandiv > D1DIV5N {break tandiv}
+        tandiv = (sqrt(D1 + pow(tandiv, 2), terms) - D1) / tandiv;
+        divs = divs * D2;
+    };
+    (tandiv, divs)
+} 
+
+//##########################################################################################################################
+
+fn arctan_series(
+    value: Decimal,
+    terms: usize
+) -> Decimal {
+    (1..terms).into_par_iter()
+        .map(|n|
+            pow(D1N, n + 1) * (
+                pow(value, (2 * (n - 1)) + 1) /
+                ((D2 * (dec(n) - D1)) + D1)
+            )
+        )
+        .reduce(|| D0, |u, d| u + d)
+}
+
+//##########################################################################################################################
+
+pub fn atan(
+    icos: Decimal,
+    isin: Decimal,
+    terms: usize
+) -> <Decimal, Error> {
+    let modl = sqrt((icos * icos) + (isin * isin), terms);
+
+         if modl != D1 { return Err(Error::InvalidSineOrCosine) }
+    else if icos == D0 { return if isin > D0 {PIDIV2} else {PI3DIV2} }
+    else if isin == D0 { return if icos > D0 {D0} else {PI} };
+
+    let (tan, divs) = tan_prepare(icos, isin, terms);
+    divs * arctan_series(tan, terms)
 }
 
 //##########################################################################################################################

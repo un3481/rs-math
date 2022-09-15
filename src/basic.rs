@@ -7,7 +7,7 @@ use rayon::prelude::*;
 // Modules
 use crate::constants::{ SQRT_3DIV2 };
 use crate::arithmetic::{ pow, fac };
-use crate::euler::{ epow, ln };
+use crate::euler::{ exp, ln };
 use crate::error::Error;
 
 //##########################################################################################################################
@@ -88,7 +88,7 @@ pub fn dpow(
     terms: usize
 ) -> Result<Decimal, Error> {
     match ln(value, terms) {
-        Ok(ln) => Ok(epow(ln * power, terms)),
+        Ok(ln) => Ok(exp(ln * power, terms)),
         Err(err) => Err(err),
     }
 }

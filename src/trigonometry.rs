@@ -137,9 +137,9 @@ fn atan_series(
 ) -> Decimal {
     (1..terms).into_par_iter()
         .map(|n|
-            pow(D1N, n + 1) * (
-                pow(value, (2 * (n - 1)) + 1) /
-                ((D2 * (dec(n) - D1)) + D1)
+            pow(D1N, n) * (
+                pow(value, (2 * n) + 1) /
+                ((D2 * dec(n)) + D1)
             )
         )
         .reduce(|| D0, |u, d| u + d)

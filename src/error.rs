@@ -1,5 +1,5 @@
 
 pub enum Error {
     InputOutOfRange,
-    InvalidSineOrCosine
+    InvalidSineCosinePair
 }

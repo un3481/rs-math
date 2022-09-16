@@ -153,7 +153,7 @@ pub fn atan(
     terms: usize
 ) -> <Decimal, Error> {
     let module = (icos * icos) + (isin * isin);
-    if module != D1 { return Err(Error::InvalidSineOrCosine) };
+    if module != D1 { return Err(Error::InvalidSineCosinePair) };
     Ok(
              if icos == D0 && isin > D0 {PIDIV2}
         else if icos == D0 && isin < D0 {PI3DIV2}

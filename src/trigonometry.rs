@@ -152,8 +152,8 @@ pub fn atan(
     isin: Decimal,
     terms: usize
 ) -> <Decimal, Error> {
-    let modl = sqrt((icos * icos) + (isin * isin), terms);
-    if modl != D1 { return Err(Error::InvalidSineOrCosine) };
+    let module = (icos * icos) + (isin * isin);
+    if module != D1 { return Err(Error::InvalidSineOrCosine) };
     Ok(
              if icos == D0 && isin > D0 {PIDIV2}
         else if icos == D0 && isin < D0 {PI3DIV2}

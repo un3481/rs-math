@@ -33,8 +33,12 @@ pub fn c_ln(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let norm_sqr = value.norm_sqr();
-    let norm_ln = ln(norm_sqr, terms).unwrap_or(D0) / D2;
+    let norm_ln = (
+        ln(
+            value.norm_sqr(),
+            terms
+        ).unwrap_or(D0) 
+    ) / D2;
     let _arg = value.arg(terms);
     Complex::new(norm_ln, _arg)
 }

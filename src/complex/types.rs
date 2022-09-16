@@ -1,16 +1,56 @@
 
+// Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 use std::fmt;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
+// Modules
+use crate::complex::types::{ Complex, Polar };
+use crate::trigonometry::{ cos, sin, atan };
+use crate::basic::{ sqrt };
+
+//##########################################################################################################################
+
+// Constants
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 
-/// A complex number in Cartesian form.
+//##########################################################################################################################
+
+/// A complex number in Polar form. `z = r * exp(i * theta)`
 #[derive(PartialEq, Copy, Clone, Hash, Debug)]
-#[cfg_attr(feature = "rustc-serialize", derive(RustcEncodable, RustcDecodable))]
+pub struct Polar {
+    /// Modulus of complex number |self|
+    pub radius: Decimal,
+    /// Angle of complex number
+    pub theta: Decimal
+}
+
+impl Polar {
+    /// Create a new Complex in Polar form
+    #[inline]
+    pub fn new(radius: Decimal, theta: Decimal) -> Polar {
+        Polar { radius: radius, theta: theta }
+    }
+
+    /// Convert a polar representation into a complex number.
+    #[inline]
+    pub fn to_cartesian(&self, n: usize) -> Complex {
+        let costheta = cos(value.theta, n);
+        let sintheta = sin(value.theta, n);
+        Complex::new(
+            value.radius * costheta,
+            value.radius * sintheta
+        )
+    }
+}
+
+//##########################################################################################################################
+
+/// A complex number in Cartesian form. `z = a + i * b`
+#[derive(PartialEq, Copy, Clone, Hash, Debug)]
 pub struct Complex {
     /// Real portion of the complex number
     pub re: Decimal,
@@ -35,21 +75,60 @@ impl Complex {
     /// have a sqrt function), i.e. `re^2 + im^2`.
     #[inline]
     pub fn norm_sqr(&self) -> Decimal {
-        self.re.clone() * self.re.clone() + self.im.clone() * self.im.clone()
+        (self.re.clone() * self.re.clone()) +
+        (self.im.clone() * self.im.clone())
+    }
+
+    /// Calculate |self|
+    #[inline]
+    pub fn norm(&self, n: usize) -> Decimal {
+        sqrt(
+            self.norm_sqr(),
+            n
+        ).unwrap()
     }
 
     /// Multiplies `self` by the scalar `t`.
     #[inline]
     pub fn scale(&self, t: Decimal) -> Complex {
-        Complex::new(self.re.clone() * t.clone(), self.im.clone() * t)
+        Complex::new(
+            self.re.clone() * t.clone(),
+            self.im.clone() * t
+        )
     }
 
     /// Divides `self` by the scalar `t`.
     #[inline]
     pub fn unscale(&self, t: Decimal) -> Complex {
-        Complex::new(self.re.clone() / t.clone(), self.im.clone() / t)
+        Complex::new(
+            self.re.clone() / t.clone(),
+            self.im.clone() / t
+        )
+    }
+
+    /// Calculate the principal Arg of self.
+    #[inline]
+    pub fn arg(&self, n: usize) -> Decimal {
+        if self.is_zero() { return D0 }
+        let normal = self.norm(n);
+        atan(
+            self.re / normal,
+            self.im / normal,
+            n
+        ).unwrap()
+    }
+
+    /// Convert to polar form (r, theta)
+    #[inline]
+    pub fn to_polar(&self, n: usize) -> Polar {
+        Polar::new(
+            self.norm(n),
+            self.arg(n)
+        )
     }
 }
+
+//##########################################################################################################################
 
 impl Complex {
     /// Returns the complex conjugate. i.e. `re - i im`
@@ -92,6 +171,8 @@ impl Complex {
         self.re.is_normal() && self.im.is_normal()
     }
 }
+
+//##########################################################################################################################
 
 // (a + i b) + (c + i d) == (a + c) + i (b + d)
 impl Add<Complex> for Complex {
@@ -157,6 +238,8 @@ impl<'a> Neg for &'a Complex {
     }
 }
 
+//##########################################################################################################################
+
 /* constants */
 impl Zero for Complex {
     #[inline]
@@ -181,3 +264,5 @@ impl fmt::Display for Complex {
         }
     }
 }
+
+//##########################################################################################################################

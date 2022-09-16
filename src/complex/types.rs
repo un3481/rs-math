@@ -7,7 +7,6 @@ use std::fmt;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 // Modules
-use crate::complex::types::{ Complex, Polar };
 use crate::trigonometry::{ cos, sin, atan };
 use crate::basic::{ sqrt };
 

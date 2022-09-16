@@ -34,12 +34,13 @@ pub fn cln(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let modsq = (
+    let normsq = (
         (value.re * value.re) +
         (value.im * value.im)
     );
-    let modln = ln(modsq, terms).unwrap() / D2;
-    Complex::new(modln, arg(value))
+    let normln = ln(normsq, terms).unwrap() / D2;
+    let _arg = arg(value, terms);
+    Complex::new(normln, _arg)
 }
 
 //##########################################################################################################################

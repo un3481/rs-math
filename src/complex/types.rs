@@ -137,10 +137,14 @@ impl Complex {
     #[inline]
     pub fn inv(&self) -> Complex {
         let norm_sqr = self.norm_sqr();
-        Complex::new(self.re.clone() / norm_sqr.clone(),
-                     -self.im.clone() / norm_sqr)
+        Complex::new(
+            self.re.clone() / norm_sqr.clone(),
+            -self.im.clone() / norm_sqr
+        )
     }
 }
+
+/*
 
 impl Complex {
     /// Checks if the given complex number is NaN
@@ -167,6 +171,8 @@ impl Complex {
         self.re.is_normal() && self.im.is_normal()
     }
 }
+
+*/
 
 //##########################################################################################################################
 

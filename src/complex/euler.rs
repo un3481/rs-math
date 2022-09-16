@@ -12,7 +12,6 @@ use crate::euler::{ exp, ln };
 
 // Constants
 const D0: Decimal = dec!(0);
-const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
 
 //##########################################################################################################################
@@ -39,7 +38,7 @@ pub fn c_ln(
         (value.im * value.im)
     ;
     let normln = ln(normsq, terms).unwrap_or(D0) / D2;
-    let _arg = value.arg(terms).unwrap_or(D0);
+    let _arg = value.arg(terms);
     Complex::new(normln, _arg)
 }
 

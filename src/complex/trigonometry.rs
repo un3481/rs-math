@@ -1,4 +1,78 @@
 
+// Imports
+use rust_decimal_macros::dec;
+use rust_decimal::prelude::*;
+use lazy_static::lazy_static;
+
+// Modules
+use crate::complex::types::{ Complex };
+use crate::complex::euler::{ c_exp, c_ln };
+
+//##########################################################################################################################
+
+const D1N: Decimal = dec!(-1);
+const D0: Decimal = dec!(0);
+const D1: Decimal = dec!(1);
+const D2: Decimal = dec!(2);
+
+lazy_static! {
+    static ref C1: Complex = Complex::new(D1, D0);
+    static ref C2: Complex = Complex::new(D2, D0);
+    static ref CI: Complex = Complex::new(D0, D1);
+    static ref CI2: Complex = Complex::new(D0, D2);
+    static ref CIN: Complex = Complex::new(D0, D1N);
+}
+
+//##########################################################################################################################
+
+pub fn c_cos(
+    value: Complex,
+    terms: usize
+) -> Complex {
+    (
+        c_exp(value * (*CI), terms) +
+        c_exp(value * (*CIN), terms)
+    ) / (*C2)
+}
+
+//##########################################################################################################################
+
+pub fn c_sin(
+    value: Complex,
+    terms: usize
+) -> Complex {
+    (
+        c_exp(value * (*CI), terms) -
+        c_exp(value * (*CIN), terms)
+    ) / (*CI2)
+}
+
+//##########################################################################################################################
+
+pub fn c_tan(
+    value: Complex,
+    terms: usize
+) -> Complex {
+    c_sin(value, terms) /
+    c_cos(value, terms)
+}
+
+//##########################################################################################################################
+
+pub fn c_atan(
+    value: Complex,
+    terms: usize
+) -> Complex {
+    (
+        c_ln((*C1) + ((*CI) * value), terms) -
+        c_ln((*C1) - ((*CI) * value), terms)
+    ) / (*CI2)
+}
+
+//##########################################################################################################################
+
+/*
+
 /// Computes the principal value of the square root of `self`.
 ///
 /// This function has one branch cut:
@@ -51,8 +125,6 @@ pub fn atan(&self) -> Complex {
     }
     ((one + i * self).ln() - (one - i * self).ln()) / (two * i)
 }
-
-/*
 
 /// Computes the principal value of the inverse sine of `self`.
 ///

@@ -36,12 +36,12 @@ impl Polar {
 
     /// Convert a polar representation into a complex number.
     #[inline]
-    pub fn to_cartesian(&self, n: usize) -> Complex {
-        let costheta = cos(value.theta, n);
-        let sintheta = sin(value.theta, n);
+    pub fn to_cartesian(&self, terms: usize) -> Complex {
+        let costheta = cos(self.theta, terms);
+        let sintheta = sin(self.theta, terms);
         Complex::new(
-            value.radius * costheta,
-            value.radius * sintheta
+            self.radius * costheta,
+            self.radius * sintheta
         )
     }
 }
@@ -70,23 +70,6 @@ impl Complex {
         Self::new(D0, D1)
     }
 
-    /// Returns the square of the norm (since `T` doesn't necessarily
-    /// have a sqrt function), i.e. `re^2 + im^2`.
-    #[inline]
-    pub fn norm_sqr(&self) -> Decimal {
-        (self.re.clone() * self.re.clone()) +
-        (self.im.clone() * self.im.clone())
-    }
-
-    /// Calculate |self|
-    #[inline]
-    pub fn norm(&self, n: usize) -> Decimal {
-        sqrt(
-            self.norm_sqr(),
-            n
-        ).unwrap()
-    }
-
     /// Multiplies `self` by the scalar `t`.
     #[inline]
     pub fn scale(&self, t: Decimal) -> Complex {
@@ -105,24 +88,38 @@ impl Complex {
         )
     }
 
+    /// Returns the square of the norm (since `T` doesn't necessarily
+    /// have a sqrt function), i.e. `re^2 + im^2`.
+    #[inline]
+    pub fn norm_sqr(&self) -> Decimal {
+        (self.re.clone() * self.re.clone()) +
+        (self.im.clone() * self.im.clone())
+    }
+
+    /// Calculate |self|
+    #[inline]
+    pub fn norm(&self, terms: usize) -> Decimal {
+        sqrt(self.norm_sqr(), terms).unwrap_or(D0)
+    }
+
     /// Calculate the principal Arg of self.
     #[inline]
-    pub fn arg(&self, n: usize) -> Decimal {
+    pub fn arg(&self, terms: usize) -> Decimal {
         if self.is_zero() { return D0 }
-        let normal = self.norm(n);
+        let normal = self.norm(terms);
         atan(
             self.re / normal,
             self.im / normal,
-            n
-        ).unwrap()
+            terms
+        ).unwrap_or(D0)
     }
 
     /// Convert to polar form (r, theta)
     #[inline]
-    pub fn to_polar(&self, n: usize) -> Polar {
+    pub fn to_polar(&self, terms: usize) -> Polar {
         Polar::new(
-            self.norm(n),
-            self.arg(n)
+            self.norm(terms),
+            self.arg(terms)
         )
     }
 }

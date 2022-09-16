@@ -127,6 +127,7 @@ lazy_static! {
     pub static ref PI2: Decimal = (*PI) * D2;
     pub static ref PIDIV2: Decimal = (*PI) / D2;
     pub static ref PIDIV2N: Decimal = (*PIDIV2) * D1N;
+    pub static ref PI3DIV2: Decimal = (D3 * (*PI)) / D2;
     pub static ref PIN: Decimal = (*PI) * D1N;
 }
 

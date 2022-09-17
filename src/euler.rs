@@ -24,10 +24,9 @@ fn power_series(
     value: Decimal,
     terms: usize
 ) -> Decimal {
-    (1..=terms).into_iter()
+    (1..=terms).into_par_iter()
         .map(|n| pow(value, n) / fac(n))
-        .reduce(|u, d| u + d)
-        .unwrap_or(D0)
+        .reduce(|| D0, |u, d| u + d)
 }
 
 //##########################################################################################################################

@@ -16,31 +16,29 @@ const D2: Decimal = dec!(2);
 
 //##########################################################################################################################
 
+/// e^(a + bi) = e^a * (cos(b) + i*sin(b))
 pub fn c_exp(
     value: Complex,
     terms: usize
 ) -> Complex {
     let ea = exp(value.re, terms);
-    Complex::new(
-        ea * cos(value.im, terms),
-        ea * sin(value.im, terms)
-    )
+    let cosb = cos(value.im, terms);
+    let sinb = sin(value.im, terms);
+    Complex::new(ea * cosb, ea * sinb)
 }
 
 //##########################################################################################################################
 
+/// ln(z) = ln(|z|) + i*arg(z) = (ln(|z|^2) / 2) + i*arg(z)
 pub fn c_ln(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let norm_ln = (
-        ln(
-            value.norm_sqr(),
-            terms
-        ).unwrap_or(D0) 
-    ) / D2;
     let arg = value.arg(terms);
-    Complex::new(norm_ln, arg)
+    let modsqr = value.norm_sqr();
+    let lnmodsqr = ln(modsqr, terms).unwrap_or(D0);
+    let lnmod = lnmodsqr / D2;
+    Complex::new(lnmod, arg)
 }
 
 //##########################################################################################################################

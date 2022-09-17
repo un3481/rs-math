@@ -39,8 +39,8 @@ pub fn c_ln(
             terms
         ).unwrap_or(D0) 
     ) / D2;
-    let _arg = value.arg(terms);
-    Complex::new(norm_ln, _arg)
+    let arg = value.arg(terms);
+    Complex::new(norm_ln, arg)
 }
 
 //##########################################################################################################################

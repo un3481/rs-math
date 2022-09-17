@@ -25,50 +25,51 @@ lazy_static! {
 
 //##########################################################################################################################
 
+/// cos(z) = (e^zi + e^-zi) / 2
 pub fn c_cos(
     value: Complex,
     terms: usize
 ) -> Complex {
-    (
-        c_exp(value * (*CI), terms) +
-        c_exp(value * (*CIN), terms)
-    ) / (*C2)
+    let ei = c_exp(value * (*CI), terms);
+    let ein = (*C1) / ei;
+    (ei + ein) / (*C2)
 }
 
 //##########################################################################################################################
 
+/// sin(z) = (e^zi - e^-zi) / 2i
 pub fn c_sin(
     value: Complex,
     terms: usize
 ) -> Complex {
-    (
-        c_exp(value * (*CI), terms) -
-        c_exp(value * (*CIN), terms)
-    ) / (*CI2)
+    let ei = c_exp(value * (*CI), terms);
+    let ein = (*C1) / ei;
+    (ei - ein) / (*CI2)
 }
 
 //##########################################################################################################################
 
+/// tan(z) = sin(z) / cos(z) = ((e^zi - e^-zi) / 2i) / ((e^zi + e^-zi) / 2)
 pub fn c_tan(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let expi = c_exp(value * (*CI), terms);
-    let expin = c_exp(value * (*CIN), terms);
-    ((expi - expin) / (*CI2)) /
-    ((expi + expin) / (*C2))
+    let ei = c_exp(value * (*CI), terms);
+    let ein = (*C1) / ei;
+    ((ei - ein) / (*CI2)) /
+    ((ei + ein) / (*C2))
 }
 
 //##########################################################################################################################
 
+/// atan(z) = (ln(1 + zi) - ln(1 - zi)) / 2i
 pub fn c_atan(
     value: Complex,
     terms: usize
 ) -> Complex {
-    (
-        c_ln((*C1) + ((*CI) * value), terms) -
-        c_ln((*C1) - ((*CI) * value), terms)
-    ) / (*CI2)
+    let ln1pzi = c_ln((*C1) + ((*CI) * value), terms);
+    let ln1mzi = c_ln((*C1) - ((*CI) * value), terms);
+    (ln1pzi - ln1mzi) / (*CI2)
 }
 
 //##########################################################################################################################

@@ -53,8 +53,10 @@ pub fn c_tan(
     value: Complex,
     terms: usize
 ) -> Complex {
-    c_sin(value, terms) /
-    c_cos(value, terms)
+    let expi = c_exp(value * (*CI), terms);
+    let expin = c_exp(value * (*CIN), terms);
+    ((expi - expin) / (*CI2)) /
+    ((expi + expin) / (*C2))
 }
 
 //##########################################################################################################################

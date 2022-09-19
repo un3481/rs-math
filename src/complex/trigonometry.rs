@@ -67,8 +67,9 @@ pub fn c_atan(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let ln1pzi = c_ln((*C1) + ((*CI) * value), terms);
-    let ln1mzi = c_ln((*C1) - ((*CI) * value), terms);
+    let zi = (*CI) * value;
+    let ln1pzi = c_ln((*C1) + zi, terms);
+    let ln1mzi = c_ln((*C1) - zi, terms);
     (ln1pzi - ln1mzi) / (*CI2)
 }
 

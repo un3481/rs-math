@@ -25,7 +25,7 @@ pub fn c_pow(
     power: usize
 ) -> Complex {
     match power {
-        0 => (*C1),
+        0 => *C1,
         1 => value,
         _ => {
                  if value == *C0 {*C0}

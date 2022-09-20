@@ -49,6 +49,7 @@ fn trig_prepare(
 
 //##########################################################################################################################
 
+/// sin(x) = sum(0->k; -1^n * (x^2n / 2n!))
 fn cos_series(
     value: Decimal,
     terms: usize
@@ -65,6 +66,7 @@ fn cos_series(
 
 //##########################################################################################################################
 
+/// sin(x) = sum(0->k; -1^n * (x^(2n + 1) / (2n + 1)!))
 fn sin_series(
     value: Decimal,
     terms: usize
@@ -121,6 +123,9 @@ fn is_valid_pair(icos: Decimal, isin: Decimal) -> bool {
 
 //##########################################################################################################################
 
+/// cos(x/2) = sqrt((1 + cos(x)) / 2)
+/// tan(x/2) = (1 - cos(x)) / sin(x)
+/// tan(x/2) = (sqrt(1 + tan(x)^2) - 1) / tan(x)
 fn tan_prepare(
     icos: Decimal,
     isin: Decimal,
@@ -128,7 +133,7 @@ fn tan_prepare(
 ) -> Result<(Decimal, Decimal), Error> {
     let cosdiv2 = sqrt((D1 + icos) / D2, terms)?;
     let cosdiv4 = sqrt((D1 + cosdiv2) / D2, terms)?;
-    let sindiv4 = cosdiv4 * if isin < D0 {D1N} else {D1};
+    let sindiv4 = cosdiv4 * (if isin < D0 {D1N} else {D1});
     let tandiv8 =
         if sindiv4 == D0 {D0}
         else { (D1 - cosdiv4) / sindiv4 }
@@ -136,7 +141,7 @@ fn tan_prepare(
     let mut tandiv = tandiv8;
     let mut divs = D8;
     loop {
-        if tandiv < D1DIV5 && tandiv > D1DIV5N {break tandiv}
+        if (D1DIV5N < tandiv) && (tandiv < D1DIV5) {break tandiv}
         tandiv = (sqrt(D1 + pow(tandiv, 2), terms)? - D1) / tandiv;
         divs = divs * D2;
     };
@@ -147,6 +152,7 @@ fn tan_prepare(
 
 //##########################################################################################################################
 
+/// atan(x) = sum(1->k; -1^n * (x^(2n + 1) / (2n + 1)))
 fn atan_series(
     value: Decimal,
     terms: usize

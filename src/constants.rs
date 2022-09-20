@@ -21,6 +21,7 @@ const D239: Decimal = dec!(239);
 
 //##########################################################################################################################
 
+/// e = sum(1->k; 1 / n!)
 fn euler(
     terms: usize
 ) -> Decimal {
@@ -36,37 +37,31 @@ lazy_static! {
 
 //##########################################################################################################################
 
+/// pi_term(x) = sum(1->k; -1^(n + 1) * x^(2n - 1) / (2n - 1))
+fn pi_term(
+    value: Decimal,
+    terms: usize
+) -> Decimal {
+    (1..=terms).into_iter()
+        .map(|n|
+            pow(D1N, n + 1) * (
+                pow(
+                    value,
+                    (2 * n) - 1
+                ) /
+                ((D2 * dec(n)) - D1)
+            )
+        )
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
+}
+
+/// pi = 4 * ((4 * pi_term(1 / 5)) - pi_term(1 / 239))
 fn pi(
     terms: usize
 ) -> Decimal {
-    let term1: Decimal =
-        (1..=terms).into_iter()
-            .map(|n|
-                pow(D1N, n + 1) * (
-                    pow(
-                        D1 / D5,
-                        (2 * n) - 1
-                    ) /
-                    ((D2 * dec(n)) - D1)
-                )
-            )
-            .reduce(|u, d| u + d)
-            .unwrap_or(D0);
-    
-    let term2: Decimal =
-        (1..=terms).into_iter()
-            .map(|n|
-                pow(D1N, n + 1) * (
-                    pow(
-                        D1 / D239,
-                        (2 * n) - 1
-                    ) /
-                    ((D2 * dec(n)) - D1)
-                )
-            )
-            .reduce(|u, d| u + d)
-            .unwrap_or(D0);
-    
+    let term1 = pi_term(D1 / D5, terms);
+    let term2 = pi_term(D1 / D239, terms);
     D4 * ((D4 * term1) - term2)
 }
 
@@ -76,6 +71,7 @@ lazy_static! {
 
 //##########################################################################################################################
 
+/// ln(2) = 1 + sum(1->k; -1^(n + 1) * ((2 - e)^n / (n * e^n)))
 fn ln_2(
     terms: usize
 ) -> Decimal {
@@ -97,6 +93,7 @@ lazy_static! {
 
 //##########################################################################################################################
 
+/// sqrt(3 / 2) = sum(1->k; ((3 / 2) * (2 * (n - 1))! * (1 - (3 / 2))^(n - 1)) / ((n - 1)! * 2^(n - 1))^2)
 fn sqrt_3div2(
     terms: usize
 ) -> Decimal {

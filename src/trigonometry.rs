@@ -20,6 +20,8 @@ const D2: Decimal = dec!(2);
 const D8: Decimal = dec!(8);
 const D1DIV5: Decimal = dec!(0.2);
 const D1DIV5N: Decimal = dec!(-0.2);
+const TRIG_LOWER: Decimal = dec!(0.999);
+const TRIG_UPPER: Decimal = dec!(1.001);
 
 //##########################################################################################################################
 
@@ -111,6 +113,14 @@ pub fn sin(
 
 //##########################################################################################################################
 
+#[inline]
+fn is_valid_pair(icos: Decimal, isin: Decimal) -> bool {
+    let module = (icos * icos) + (isin * isin);
+    (TRIG_LOWER < module) && (module < TRIG_UPPER)
+}
+
+//##########################################################################################################################
+
 fn tan_prepare(
     icos: Decimal,
     isin: Decimal,
@@ -158,8 +168,7 @@ pub fn atan(
     isin: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
-    let module = (icos * icos) + (isin * isin);
-    if module != D1 { return Err(Error::InvalidSineCosinePair) };
+    if !is_valid_pair(icos, isin) { return Err(Error::InvalidSineCosinePair) };
     Ok(
              if icos == D0 && isin > D0 {*PIDIV2}
         else if icos == D0 && isin < D0 {*PI3DIV2}

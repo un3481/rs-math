@@ -141,7 +141,7 @@ fn tan_prepare(
     let mut tandiv = tandiv8;
     let mut divs = D8;
     loop {
-        if (D1DIV5N < tandiv) && (tandiv < D1DIV5) {break tandiv}
+        if (D1DIV5N < tandiv) && (tandiv < D1DIV5) {break tandiv};
         tandiv = (sqrt(D1 + pow(tandiv, 2), terms)? - D1) / tandiv;
         divs = divs * D2;
     };

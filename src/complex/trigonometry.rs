@@ -62,15 +62,16 @@ pub fn c_tan(
 
 //##########################################################################################################################
 
-/// atan(z) = (ln(1 + zi) - ln(1 - zi)) / 2i
+/// atan(z) = (ln(1 + zi) - ln(1 - zi)) / 2i = ln((1 + zi) / (1 - zi)) / 2i
 pub fn c_atan(
     value: Complex,
     terms: usize
 ) -> Complex {
     let zi = (*CI) * value;
-    let ln1pzi = c_ln((*C1) + zi, terms);
-    let ln1mzi = c_ln((*C1) - zi, terms);
-    (ln1pzi - ln1mzi) / (*CI2)
+    let term1 = (*C1) + zi;
+    let term2 = (*C1) - zi;
+    let _ln = c_ln(term1 / term2, terms);
+    _ln / (*CI2)
 }
 
 //##########################################################################################################################

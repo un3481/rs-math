@@ -5,7 +5,8 @@ use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-use crate::constants::{ PI, PIDIV2, PI3DIV2, PI2, PIDIV6, PIDIV18, PIDIV36, TAN_PIDIV6, TAN_PIDIV18, TAN_PIDIV36 };
+use crate::constants::{ PI, PIDIV2, PI3DIV2, PI2 };
+use crate::constants::{ PIDIV6, PIDIV18, PIDIV36, TAN_PIDIV6, TAN_PIDIV18, TAN_PIDIV36 };
 use crate::arithmetic::{ dec, pow, fac };
 use crate::error::Error;
 

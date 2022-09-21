@@ -122,36 +122,6 @@ pub fn sin(
 
 //##########################################################################################################################
 
-#[inline]
-fn is_valid_pair(icos: Decimal, isin: Decimal) -> bool {
-    let module = (icos * icos) + (isin * isin);
-    (TRIG_LOWER < module) && (module < TRIG_UPPER)
-}
-
-//##########################################################################################################################
-
-/// cos(a - b) = (cos(a) * cos(b)) + (sin(a) * sin(b))
-pub fn cos_sub(arg: Pair, sub: Pair) -> Decimal {
-    (arg.0 * sub.0) + (arg.1 * sub.1)
-}
-
-/// sin(a - b) = (sin(a) * cos(b)) - (sin(b) * cos(a))
-pub fn sin_sub(arg: Pair, sub: Pair) -> Decimal {
-    (arg.1 * sub.0) - (sub.1 * arg.0)
-}
-
-/// tan(a - b) = sin(a - b) / cos(a - b)
-pub fn tan_sub2(arg: Pair, sub: Pair) -> Decimal {
-    cos_sub(arg, sub) / sin_sub(arg, sub)
-}
-
-/// tan(a - b) = (tan(a) - tan(b)) / (1 + (tan(a) * tan(b)))
-pub fn tan_sub(arg: Decimal, sub: Decimal) -> Decimal {
-    (arg - sub) / (D1 + (arg * sub))
-}
-
-//##########################################################################################################################
-
 lazy_static! {
     static ref PIDIV6: Decimal = (*PI) / D6;
     static ref PIDIV18: Decimal = (*PI) / D18;
@@ -159,6 +129,38 @@ lazy_static! {
     static ref TAN_PIDIV6: Decimal = sin(*PIDIV6, STD_ITER) / cos(*PIDIV6, STD_ITER);
     static ref TAN_PIDIV18: Decimal = sin(*PIDIV18, STD_ITER) / cos(*PIDIV18, STD_ITER);
     static ref TAN_PIDIV36: Decimal = sin(*PIDIV36, STD_ITER) / cos(*PIDIV36, STD_ITER);
+}
+
+//##########################################################################################################################
+
+#[inline]
+fn is_valid_pair(icos: Decimal, isin: Decimal) -> bool {
+    let module = (icos * icos) + (isin * isin);
+    (TRIG_LOWER < module) && (module < TRIG_UPPER)
+}
+
+/// cos(a - b) = (cos(a) * cos(b)) + (sin(a) * sin(b))
+#[inline]
+pub fn cos_sub(arg: Pair, sub: Pair) -> Decimal {
+    (arg.0 * sub.0) + (arg.1 * sub.1)
+}
+
+/// sin(a - b) = (sin(a) * cos(b)) - (sin(b) * cos(a))
+#[inline]
+pub fn sin_sub(arg: Pair, sub: Pair) -> Decimal {
+    (arg.1 * sub.0) - (sub.1 * arg.0)
+}
+
+/// tan(a - b) = sin(a - b) / cos(a - b)
+#[inline]
+pub fn tan_sub2(arg: Pair, sub: Pair) -> Decimal {
+    cos_sub(arg, sub) / sin_sub(arg, sub)
+}
+
+/// tan(a - b) = (tan(a) - tan(b)) / (1 + (tan(a) * tan(b)))
+#[inline]
+pub fn tan_sub(arg: Decimal, sub: Decimal) -> Decimal {
+    (arg - sub) / (D1 + (arg * sub))
 }
 
 //##########################################################################################################################

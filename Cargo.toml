@@ -13,4 +13,3 @@ crate-type = ["dylib"]
 rust_decimal = "1.26"
 rust_decimal_macros = "1.26"
 rayon = "1.5"
-lazy_static = "1.4"

@@ -36,9 +36,9 @@ pub fn exp(
     value: Decimal,
     terms: usize
 ) -> Decimal {
-         if value == D1N {D1 / *E}
+         if value == D1N {D1 / E}
     else if value == D0  {D1}
-    else if value == D1  {*E}
+    else if value == D1  {E}
     else
         { power_series(value, terms) }
 }
@@ -48,17 +48,16 @@ pub fn exp(
 fn ln_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
-    let _ln2 = *LN_2;
     let mut rem: Decimal = value;
     let mut exp: Decimal = D0;
     loop {
         if rem > D4 {
             rem = rem / D2;
-            exp = exp + _ln2;
+            exp = exp + LN_2;
         }
         else if rem < D2 {
             rem = rem * D2;
-            exp = exp - _ln2;
+            exp = exp - LN_2;
         }
         else {break}
     };
@@ -72,13 +71,12 @@ fn ln_series(
     value: Decimal,
     terms: usize
 ) -> Decimal {
-    let _e = *E;
     D1 + (
         (1..=terms).into_par_iter()
             .map(|n|
                 pow(D1N, n + 1) * (
-                    pow(value - _e, n) /
-                    (pow(_e, n) * dec(n))
+                    pow(value - E, n) /
+                    (pow(E, n) * dec(n))
                 )
             )
             .reduce(|| D0, |u, d| u + d)
@@ -94,7 +92,7 @@ pub fn ln(
     if value <= D0 { return Err(Error::InputOutOfRange) };
     Ok(
              if value == D1 {D0}
-        else if value == *E {D1}
+        else if value ==  E {D1}
         else {
             let (exp, rem) = ln_prepare(value);
             exp + ln_series(rem, terms)

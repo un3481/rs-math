@@ -5,5 +5,4 @@ pub mod constants;
 pub mod trigonometry;
 pub mod euler;
 pub mod basic;
-
 pub mod complex;

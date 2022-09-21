@@ -24,17 +24,16 @@ const D3DIV2: Decimal = dec!(1.5);
 fn sqrt_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
-    let _sqrt3div2 = *SQRT_3DIV2;
     let mut rem: Decimal = value;
     let mut ratio: Decimal = D1;
     loop {
         if rem > D3DIV2 {
             rem = rem / D3DIV2;
-            ratio = ratio * _sqrt3div2;
+            ratio = ratio * SQRT_3DIV2;
         }
         else if rem < D1DIV2 {
             rem = rem * D3DIV2;
-            ratio = ratio / _sqrt3div2;
+            ratio = ratio / SQRT_3DIV2;
         }
         else {break}
     };
@@ -90,7 +89,7 @@ pub fn d_pow(
     terms: usize
 ) -> Result<Decimal, Error> {
     match ln(value, terms) {
-        Ok(_ln) => Ok(exp(_ln * power, terms)),
+        Ok(lnvalue) => Ok(exp(lnvalue * power, terms)),
         Err(err) => Err(err),
     }
 }

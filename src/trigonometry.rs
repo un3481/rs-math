@@ -26,9 +26,6 @@ const D1DIV5: Decimal = dec!(0.2);
 const D2DIV5: Decimal = dec!(0.4);
 const TRIG_LOWER: Decimal = dec!(0.999);
 const TRIG_UPPER: Decimal = dec!(1.001);
-const PI_PAIR: Pair = (D1N, D0);
-const PIDIV2_PAIR: Pair = (D0, D1);
-const PI3DIV2_PAIR: Pair = (D0, D1N);
 
 //##########################################################################################################################
 
@@ -121,6 +118,10 @@ pub fn sin(
 }
 
 //##########################################################################################################################
+
+const PI_PAIR: Pair = (D1N, D0);
+const PIDIV2_PAIR: Pair = (D0, D1);
+const PI3DIV2_PAIR: Pair = (D0, D1N);
 
 lazy_static! {
     static ref PIDIV6: Decimal = (*PI) / D6;

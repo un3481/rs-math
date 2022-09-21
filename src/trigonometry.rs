@@ -10,6 +10,8 @@ use crate::constants::{ STD_ITER, PI, PIDIV2, PIDIV2N, PI3DIV2, PIN, PI2 };
 use crate::arithmetic::{ dec, pow, fac };
 use crate::error::Error;
 
+type Pair = (Decimal, Decimal);
+
 //##########################################################################################################################
 
 // Constants
@@ -24,9 +26,9 @@ const D1DIV5: Decimal = dec!(0.2);
 const D2DIV5: Decimal = dec!(0.4);
 const TRIG_LOWER: Decimal = dec!(0.999);
 const TRIG_UPPER: Decimal = dec!(1.001);
-const PI_PAIR: (Decimal, Decimal) = (D1N, D0);
-const PIDIV2_PAIR: (Decimal, Decimal) = (D0, D1);
-const PI3DIV2_PAIR: (Decimal, Decimal) = (D0, D1N);
+const PI_PAIR: Pair = (D1N, D0);
+const PIDIV2_PAIR: Pair = (D0, D1);
+const PI3DIV2_PAIR: Pair = (D0, D1N);
 
 //##########################################################################################################################
 
@@ -129,34 +131,22 @@ fn is_valid_pair(icos: Decimal, isin: Decimal) -> bool {
 //##########################################################################################################################
 
 /// cos(a - b) = (cos(a) * cos(b)) + (sin(a) * sin(b))
-pub fn cos_sub(
-    arg: (Decimal, Decimal),
-    sub: (Decimal, Decimal)
-) -> Decimal {
+pub fn cos_sub(arg: Pair, sub: Pair) -> Decimal {
     (arg.0 * sub.0) + (arg.1 * sub.1)
 }
 
 /// sin(a - b) = (sin(a) * cos(b)) - (sin(b) * cos(a))
-pub fn sin_sub(
-    arg: (Decimal, Decimal),
-    sub: (Decimal, Decimal)
-) -> Decimal {
+pub fn sin_sub(arg: Pair, sub: Pair) -> Decimal {
     (arg.1 * sub.0) - (sub.1 * arg.0)
 }
 
 /// tan(a - b) = sin(a - b) / cos(a - b)
-pub fn tan_sub2(
-    arg: (Decimal, Decimal),
-    sub: (Decimal, Decimal)
-) -> Decimal {
+pub fn tan_sub2(arg: Pair, sub: Pair) -> Decimal {
     cos_sub(arg, sub) / sin_sub(arg, sub)
 }
 
 /// tan(a - b) = (tan(a) - tan(b)) / (1 + (tan(a) * tan(b)))
-pub fn tan_sub(
-    arg: Decimal,
-    sub: Decimal
-) -> Decimal {
+pub fn tan_sub(arg: Decimal, sub: Decimal) -> Decimal {
     (arg - sub) / (D1 + (arg * sub))
 }
 
@@ -186,7 +176,7 @@ fn tan_prepare(
         else                                 {                 isin / icos                  }
     ;
     loop {
-        if tansub < D1DIV5 {break tansub};
+        if tansub < D1DIV5 {break};
         tansub =
                  if tansub > D1     { rem = rem + (*PIDIV6);  tan_sub(tansub, *TAN_PIDIV6)  }
             else if tansub > D2DIV5 { rem = rem + (*PIDIV18); tan_sub(tansub, *TAN_PIDIV18) }

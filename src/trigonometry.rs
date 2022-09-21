@@ -2,12 +2,12 @@
 // Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
+use lazy_static::lazy_static;
 use rayon::prelude::*;
 
 // Modules
-use crate::constants::{ PI, PIDIV2, PIDIV2N, PI3DIV2, PIN, PI2 };
+use crate::constants::{ STD_ITER, PI, PIDIV2, PIDIV2N, PI3DIV2, PIN, PI2 };
 use crate::arithmetic::{ dec, pow, fac };
-use crate::basic::{ sqrt };
 use crate::error::Error;
 
 //##########################################################################################################################
@@ -17,11 +17,20 @@ const D1N: Decimal = dec!(-1);
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
+const D6: Decimal = dec!(6);
 const D8: Decimal = dec!(8);
+const D18: Decimal = dec!(18);
+const D36: Decimal = dec!(36);
+
 const D1DIV5: Decimal = dec!(0.2);
-const D1DIV5N: Decimal = dec!(-0.2);
+const D2DIV5: Decimal = dec!(0.4);
+
 const TRIG_LOWER: Decimal = dec!(0.999);
 const TRIG_UPPER: Decimal = dec!(1.001);
+
+const PI_PAIR: (Decimal, Decimal) = (D1N, D0);
+const PIDIV2_PAIR: (Decimal, Decimal) = (D0, D1);
+const PI3DIV2_PAIR: (Decimal, Decimal) = (D0, D1N);
 
 //##########################################################################################################################
 
@@ -123,33 +132,75 @@ fn is_valid_pair(icos: Decimal, isin: Decimal) -> bool {
 
 //##########################################################################################################################
 
-/// cos(x/2) = sqrt((1 + cos(x)) / 2)
-/// tan(x/2) = (1 - cos(x)) / sin(x)
-/// tan(x/2) = (sqrt(1 + tan(x)^2) - 1) / tan(x)
-fn tan_prepare(
-    icos: Decimal,
-    isin: Decimal,
-    terms: usize
-) -> Result<(Decimal, Decimal), Error> {
-    let cosdiv2 = sqrt((D1 + icos) / D2, terms)?;
-    let cosdiv4 = sqrt((D1 + cosdiv2) / D2, terms)?;
-    let sindiv4 = cosdiv4 * (if isin < D0 {D1N} else {D1});
-    let tandiv8 =
-        if sindiv4 == D0 {D0}
-        else { (D1 - cosdiv4) / sindiv4 }
-    ;
-    let mut tandiv = tandiv8;
-    let mut divs = D8;
-    loop {
-        if (D1DIV5N < tandiv) && (tandiv < D1DIV5) {break tandiv};
-        tandiv = (sqrt(D1 + pow(tandiv, 2), terms)? - D1) / tandiv;
-        divs = divs * D2;
-    };
-    Ok(
-        (tandiv, divs)
-    )
+/// cos(a - b) = (cos(a) * cos(b)) + (sin(a) * sin(b))
+pub fn cos_sub(
+    arg: (Decimal, Decimal),
+    sub: (Decimal, Decimal)
+) -> Decimal {
+    (arg.0 * sub.0) + (arg.1 * sub.1)
 }
 
+/// sin(a - b) = (sin(a) * cos(b)) - (sin(b) * cos(a))
+pub fn sin_sub(
+    arg: (Decimal, Decimal),
+    sub: (Decimal, Decimal)
+) -> Decimal {
+    (arg.1 * sub.0) - (sub.1 * arg.0)
+}
+
+/// tan(a - b) = sin(a - b) / cos(a - b)
+pub fn tan_sub2(
+    arg: (Decimal, Decimal),
+    sub: (Decimal, Decimal)
+) -> Decimal {
+    cos_sub(arg, sub) / sin_sub(arg, sub)
+}
+
+/// tan(a - b) = (tan(a) - tan(b)) / (1 + (tan(a) * tan(b)))
+pub fn tan_sub(
+    arg: Decimal,
+    sub: Decimal
+) -> Decimal {
+    (arg - sub) / (D1 + (arg * sub))
+}
+
+
+//##########################################################################################################################
+
+lazy_static! {
+    static ref PIDIV6: Decimal = (*PI) / D6;
+    static ref PIDIV18: Decimal = (*PI) / D18;
+    static ref PIDIV36: Decimal = (*PI) / D36;
+    static ref TAN_PIDIV6: Decimal = sin(*PIDIV6, STD_ITER) / cos(*PIDIV6, STD_ITER);
+    static ref TAN_PIDIV18: Decimal = sin(*PIDIV18, STD_ITER) / cos(*PIDIV18, STD_ITER);
+    static ref TAN_PIDIV36: Decimal = sin(*PIDIV36, STD_ITER) / cos(*PIDIV36, STD_ITER);
+}
+
+//##########################################################################################################################
+
+fn tan_prepare(
+    icos: Decimal,
+    isin: Decimal
+) -> (Decimal, Decimal) {
+    let pair = (icos, isin);
+    let mut rem: Decimal = D0;
+    let mut tansub =
+             if (isin <  D0) && (icos >  D0) { rem = *PI3DIV2; tan_sub2(pair, PI3DIV2_PAIR) }
+        else if (isin <  D0) && (icos <= D0) { rem = *PI;      tan_sub2(pair, PI_PAIR)      }
+        else if (isin >= D0) && (icos >  D0) { rem = *PIDIV2;  tan_sub2(pair, PIDIV2_PAIR)  }
+        else                                 {                 isin / icos                  }
+    ;
+    loop {
+        if tansub < D1DIV5 {break tansub};
+        tansub =
+                 if tansub > D1     { rem = rem + (*PIDIV6);  tan_sub(tansub, *TAN_PIDIV6)  }
+            else if tansub > D2DIV5 { rem = rem + (*PIDIV18); tan_sub(tansub, *TAN_PIDIV18) }
+            else                    { rem = rem + (*PIDIV36); tan_sub(tansub, *TAN_PIDIV36) }
+        ;
+    };
+    (tansub, rem)
+}
+ 
 //##########################################################################################################################
 
 /// atan(x) = sum(n=1; -1^n * (x^(2n + 1) / (2n + 1)))
@@ -181,8 +232,8 @@ pub fn atan(
         else if isin == D0 && icos > D0 {D0}
         else if isin == D0 && icos < D0 {*PI}
         else {
-            let (tan, divs) = tan_prepare(icos, isin, terms)?;
-            divs * atan_series(tan, terms)
+            let (tan, rem) = tan_prepare(icos, isin);
+            rem + atan_series(tan, terms)
         }
     )
 }

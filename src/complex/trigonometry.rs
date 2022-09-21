@@ -2,7 +2,6 @@
 // Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
-use lazy_static::lazy_static;
 
 // Modules
 use crate::complex::types::{ Complex };
@@ -10,18 +9,13 @@ use crate::complex::euler::{ c_exp, c_ln };
 
 //##########################################################################################################################
 
-const D1N: Decimal = dec!(-1);
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
-
-lazy_static! {
-    static ref C1: Complex = Complex::new(D1, D0);
-    static ref C2: Complex = Complex::new(D2, D0);
-    static ref CI: Complex = Complex::new(D0, D1);
-    static ref CI2: Complex = Complex::new(D0, D2);
-    static ref CIN: Complex = Complex::new(D0, D1N);
-}
+const C1: Complex = Complex{ re: D1, im: D0 };
+const C2: Complex = Complex{ re: D2, im: D0 };
+const CI: Complex = Complex{ re: D0, im: D1 };
+const CI2: Complex = Complex{ re: D0, im: D2 };
 
 //##########################################################################################################################
 
@@ -30,9 +24,9 @@ pub fn c_cos(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let ei = c_exp(value * (*CI), terms);
-    let ein = (*C1) / ei;
-    (ei + ein) / (*C2)
+    let ei = c_exp(value * CI, terms);
+    let ein = C1 / ei;
+    (ei + ein) / C2
 }
 
 //##########################################################################################################################
@@ -42,9 +36,9 @@ pub fn c_sin(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let ei = c_exp(value * (*CI), terms);
-    let ein = (*C1) / ei;
-    (ei - ein) / (*CI2)
+    let ei = c_exp(value * CI, terms);
+    let ein = C1 / ei;
+    (ei - ein) / CI2
 }
 
 //##########################################################################################################################
@@ -54,10 +48,10 @@ pub fn c_tan(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let ei = c_exp(value * (*CI), terms);
-    let ein = (*C1) / ei;
-    ((ei - ein) / (*CI2)) /
-    ((ei + ein) / (*C2))
+    let ei = c_exp(value * CI, terms);
+    let ein = C1 / ei;
+    ((ei - ein) / CI2) /
+    ((ei + ein) / C2)
 }
 
 //##########################################################################################################################
@@ -67,11 +61,11 @@ pub fn c_atan(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let zi = (*CI) * value;
-    let term1 = (*C1) + zi;
-    let term2 = (*C1) - zi;
+    let zi = CI * value;
+    let term1 = C1 + zi;
+    let term2 = C1 - zi;
     let _ln = c_ln(term1 / term2, terms);
-    _ln / (*CI2)
+    _ln / CI2
 }
 
 //##########################################################################################################################

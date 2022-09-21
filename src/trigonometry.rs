@@ -142,25 +142,25 @@ fn is_valid_pair(icos: Decimal, isin: Decimal) -> bool {
 
 /// cos(a - b) = (cos(a) * cos(b)) + (sin(a) * sin(b))
 #[inline]
-pub fn cos_sub(arg: Pair, sub: Pair) -> Decimal {
+fn cos_sub2(arg: Pair, sub: Pair) -> Decimal {
     (arg.0 * sub.0) + (arg.1 * sub.1)
 }
 
 /// sin(a - b) = (sin(a) * cos(b)) - (sin(b) * cos(a))
 #[inline]
-pub fn sin_sub(arg: Pair, sub: Pair) -> Decimal {
+fn sin_sub2(arg: Pair, sub: Pair) -> Decimal {
     (arg.1 * sub.0) - (sub.1 * arg.0)
 }
 
 /// tan(a - b) = sin(a - b) / cos(a - b)
 #[inline]
-pub fn tan_sub2(arg: Pair, sub: Pair) -> Decimal {
-    cos_sub(arg, sub) / sin_sub(arg, sub)
+fn tan_sub2(arg: Pair, sub: Pair) -> Decimal {
+    sin_sub2(arg, sub) / cos_sub2(arg, sub)
 }
 
 /// tan(a - b) = (tan(a) - tan(b)) / (1 + (tan(a) * tan(b)))
 #[inline]
-pub fn tan_sub(arg: Decimal, sub: Decimal) -> Decimal {
+fn tan_sub(arg: Decimal, sub: Decimal) -> Decimal {
     (arg - sub) / (D1 + (arg * sub))
 }
 

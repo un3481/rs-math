@@ -18,16 +18,12 @@ const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
 const D6: Decimal = dec!(6);
-const D8: Decimal = dec!(8);
 const D18: Decimal = dec!(18);
 const D36: Decimal = dec!(36);
-
 const D1DIV5: Decimal = dec!(0.2);
 const D2DIV5: Decimal = dec!(0.4);
-
 const TRIG_LOWER: Decimal = dec!(0.999);
 const TRIG_UPPER: Decimal = dec!(1.001);
-
 const PI_PAIR: (Decimal, Decimal) = (D1N, D0);
 const PIDIV2_PAIR: (Decimal, Decimal) = (D0, D1);
 const PI3DIV2_PAIR: (Decimal, Decimal) = (D0, D1N);

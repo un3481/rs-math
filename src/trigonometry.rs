@@ -92,11 +92,11 @@ pub fn cos(
     terms: usize
 ) -> Decimal {
     let rem: Decimal = trig_prepare(value);
-         if rem == *PI {D1N}
-    else if rem == *PIDIV2 {D0}
-    else if rem == D0 {D1}
+         if rem == *PI      {D1N}
+    else if rem == *PIDIV2  {D0}
+    else if rem == D0       {D1}
     else if rem == *PIDIV2N {D0}
-    else if rem == *PIN {D1N}
+    else if rem == *PIN     {D1N}
     else
         { cos_series(rem, terms) }
 }
@@ -108,11 +108,11 @@ pub fn sin(
     terms: usize
 ) -> Decimal {
     let rem: Decimal = trig_prepare(value);
-         if rem == *PI {D1N}
-    else if rem == *PIDIV2 {D0}
-    else if rem == D0 {D1}
+         if rem == *PI      {D1N}
+    else if rem == *PIDIV2  {D0}
+    else if rem == D0       {D1}
     else if rem == *PIDIV2N {D0}
-    else if rem == *PIN {D1N}
+    else if rem == *PIN     {D1N}
     else
         { sin_series(rem, terms) }
 }
@@ -215,10 +215,10 @@ pub fn atan(
 ) -> Result<Decimal, Error> {
     if !is_valid_pair(icos, isin) { return Err(Error::InvalidSineCosinePair) };
     Ok(
-             if icos == D0 && isin > D0 {*PIDIV2}
-        else if icos == D0 && isin < D0 {*PI3DIV2}
-        else if isin == D0 && icos > D0 {D0}
+             if isin == D0 && icos > D0 {D0}
+        else if icos == D0 && isin > D0 {*PIDIV2}
         else if isin == D0 && icos < D0 {*PI}
+        else if icos == D0 && isin < D0 {*PI3DIV2}
         else {
             let (tan, rem) = tan_prepare(icos, isin);
             rem + atan_series(tan, terms)

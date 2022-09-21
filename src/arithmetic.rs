@@ -31,7 +31,7 @@ pub fn pow(
                 (1..=power).into_iter()
                     .map(|_| value)
                     .reduce(|u, d| u * d)
-                    .unwrap()
+                    .unwrap_or(D0)
             }
         },
     }
@@ -48,7 +48,7 @@ pub fn fac(
         _ => (1..=value).into_iter()
             .map(|n| dec(n))
             .reduce(|u, d| u * d)
-            .unwrap(),
+            .unwrap_or(D0),
     }
 }
 

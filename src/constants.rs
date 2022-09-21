@@ -8,7 +8,7 @@ use crate::arithmetic::{ dec, pow, fac };
 
 //##########################################################################################################################
 
-pub const STD_ITER: usize = 128;
+pub const STD_ITER: usize = 64;
 
 const D1N: Decimal = dec!(-1);
 const D0: Decimal = dec!(0);

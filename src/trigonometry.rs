@@ -171,7 +171,7 @@ fn tan_prepare(
 ) -> (Decimal, Decimal) {
     let pair = (icos, isin);
     let mut rem: Decimal = D0;
-    let mut tansub =
+    let mut tansub: Decimal =
              if (isin <  D0) && (icos >  D0) { rem = *PI3DIV2; tan_sub2(pair, PI3DIV2_PAIR) }
         else if (isin <  D0) && (icos <= D0) { rem = *PI;      tan_sub2(pair, PI_PAIR)      }
         else if (isin >= D0) && (icos >  D0) { rem = *PIDIV2;  tan_sub2(pair, PIDIV2_PAIR)  }

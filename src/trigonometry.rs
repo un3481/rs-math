@@ -241,7 +241,7 @@ pub fn atan2(
              if isin == D0 && icos > D0 {D0}
         else if icos == D0 && isin > D0 {PIDIV2}
         else if isin == D0 && icos < D0 {PI}
-        else if icos == D0 && isin < D0 {PI3DIV2}
+        else if icos == D0 && isin < D0 {-PIDIV2}
         else {
             let (tan, rem) = tan2_prepare(icos, isin);
             let arg = rem + atan_series(tan, terms);

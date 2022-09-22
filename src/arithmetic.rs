@@ -15,6 +15,11 @@ pub fn dec(value: usize) -> Decimal {
     Decimal::new(value as i64, 0)
 }
 
+#[inline]
+pub fn pos(value: Decimal) -> Decimal {
+    value * (if value < D0 {-D1} else {D1})
+}
+
 //##########################################################################################################################
 
 pub fn pow(

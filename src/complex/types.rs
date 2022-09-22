@@ -8,6 +8,7 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 
 // Modules
 use crate::trigonometry::{ cos, sin, atan2 };
+use crate::arithmetic::{ pos };
 use crate::basic::{ sqrt };
 
 //##########################################################################################################################
@@ -100,8 +101,8 @@ impl Complex {
     #[inline]
     pub fn norm(&self, terms: usize) -> Decimal {
              if self.is_zero() {D0}
-        else if self.im == D0 { self.re.clone() }
-        else if self.re == D0 { self.im.clone() }
+        else if self.im == D0 { pos(self.re.clone()) }
+        else if self.re == D0 { pos(self.im.clone()) }
         else {
             let _sqr = self.norm_sqr();
             sqrt(_sqr, terms).unwrap_or(D0)

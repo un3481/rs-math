@@ -245,7 +245,7 @@ pub fn atan2(
         else {
             let (tan, rem) = tan2_prepare(icos, isin);
             let arg = rem + atan_series(tan, terms);
-            arg - (if arg > PI {PI2} else {D0})
+            if arg <= PI {arg} else {arg - PI2}
         }
     )
 }

@@ -50,8 +50,7 @@ pub fn c_tan(
 ) -> Complex {
     let ei = c_exp(value * CI, terms);
     let ein = C1 / ei;
-    ((ei - ein) / CI2) /
-    ((ei + ein) / C2)
+    ((ei - ein) / CI2) / ((ei + ein) / C2)
 }
 
 //##########################################################################################################################
@@ -61,9 +60,8 @@ pub fn c_atan(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let zi = CI * value;
-    let term1 = C1 + zi;
-    let term2 = C1 - zi;
+    let term1 = C1 + (CI * value);
+    let term2 = C1 - (CI * value);
     let _ln = c_ln(term1 / term2, terms);
     _ln / CI2
 }

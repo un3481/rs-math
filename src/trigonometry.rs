@@ -238,10 +238,10 @@ pub fn atan2(
 ) -> Result<Decimal, Error> {
     if !is_valid_pair(icos, isin) { return Err(Error::InvalidSineCosinePair) };
     Ok(
-             if isin == D0 && icos > D0 {D0}
-        else if icos == D0 && isin > D0 {PIDIV2}
-        else if isin == D0 && icos < D0 {PI}
-        else if icos == D0 && isin < D0 {-PIDIV2}
+             if (isin == D0) && (icos > D0) {D0}
+        else if (icos == D0) && (isin > D0) {PIDIV2}
+        else if (isin == D0) && (icos < D0) {PI}
+        else if (icos == D0) && (isin < D0) {-PIDIV2}
         else {
             let (tan, rem) = tan2_prepare(icos, isin);
             let arg = rem + atan_series(tan, terms);

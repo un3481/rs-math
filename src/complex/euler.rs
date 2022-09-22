@@ -21,10 +21,10 @@ pub fn c_exp(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let ea = exp(value.re, terms);
-    let cosb = cos(value.im, terms);
-    let sinb = sin(value.im, terms);
-    Complex::new(ea * cosb, ea * sinb)
+    let _ea = exp(value.re, terms);
+    let _cos = cos(value.im, terms);
+    let _sin = sin(value.im, terms);
+    Complex::new(_ea * _cos, _ea * _sin)
 }
 
 //##########################################################################################################################
@@ -34,11 +34,11 @@ pub fn c_ln(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let arg = value.arg(terms);
-    let modsqr = value.norm_sqr();
-    let lnmodsqr = ln(modsqr, terms).unwrap_or(D0);
-    let lnmod = lnmodsqr / D2;
-    Complex::new(lnmod, arg)
+    let _arg = value.arg(terms);
+    let _sqr = value.norm_sqr();
+    let _ln_sqr = ln(_sqr, terms).unwrap_or(D0);
+    let _ln = _ln_sqr / D2;
+    Complex::new(_ln, _arg)
 }
 
 //##########################################################################################################################

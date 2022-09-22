@@ -113,9 +113,9 @@ impl Complex {
     pub fn arg(&self, terms: usize) -> Decimal {
         if self.is_zero() {D0}
         else {
-            let normal = self.norm(terms);
-            let _cos = self.re.clone() / normal;
-            let _sin = self.im.clone() / normal;
+            let _norm = self.norm(terms);
+            let _cos = self.re.clone() / _norm;
+            let _sin = self.im.clone() / _norm;
             atan2(_cos, _sin, terms).unwrap_or(D0)
         }
     }

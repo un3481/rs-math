@@ -89,7 +89,7 @@ pub fn d_pow(
     terms: usize
 ) -> Result<Decimal, Error> {
     match ln(value, terms) {
-        Ok(lnvalue) => Ok(exp(lnvalue * power, terms)),
+        Ok(_ln) => Ok(exp(_ln * power, terms)),
         Err(err) => Err(err),
     }
 }

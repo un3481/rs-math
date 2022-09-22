@@ -16,7 +16,6 @@ use crate::error::Error;
 type Pair = (Decimal, Decimal);
 
 // Constants
-const D1N: Decimal = dec!(-1);
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
@@ -24,9 +23,9 @@ const D1DIV5: Decimal = dec!(0.2);
 const D2DIV5: Decimal = dec!(0.4);
 const TRIG_LOWER: Decimal = dec!(0.999);
 const TRIG_UPPER: Decimal = dec!(1.001);
-const PI_PAIR: Pair = (D1N, D0);
-const PIDIV2_PAIR: Pair = (D0, D1);
-const PI3DIV2_PAIR: Pair = (D0, D1N);
+const PI_PAIR: Pair = (dec!(-1), dec!(0));
+const PIDIV2_PAIR: Pair = (dec!(0), dec!(1));
+const PI3DIV2_PAIR: Pair = (dec!(0), dec!(-1));
 
 //##########################################################################################################################
 
@@ -58,7 +57,7 @@ fn cos_series(
 ) -> Decimal {
     (0..terms).into_par_iter()
         .map(|n|
-            pow(D1N, n) * (
+            pow(-D1, n) * (
                 pow(value, 2 * n) /
                 fac(2 * n)
             )
@@ -75,7 +74,7 @@ fn sin_series(
 ) -> Decimal {
     (0..terms).into_par_iter()
         .map(|n|
-            pow(D1N, n) * (
+            pow(-D1, n) * (
                 pow(value, (2 * n) + 1) /
                 fac((2 * n) + 1)
             )
@@ -90,11 +89,11 @@ pub fn cos(
     terms: usize
 ) -> Decimal {
     let rem: Decimal = trig_prepare(value);
-         if rem == PI      {D1N}
+         if rem == PI      {-D1}
     else if rem == PIDIV2  {D0}
     else if rem == D0      {D1}
     else if rem == -PIDIV2 {D0}
-    else if rem == -PI     {D1N}
+    else if rem == -PI     {-D1}
     else
         { cos_series(rem, terms) }
 }
@@ -106,11 +105,11 @@ pub fn sin(
     terms: usize
 ) -> Decimal {
     let rem: Decimal = trig_prepare(value);
-         if rem == PI      {D1N}
-    else if rem == PIDIV2  {D0}
-    else if rem == D0      {D1}
-    else if rem == -PIDIV2 {D0}
-    else if rem == -PI     {D1N}
+         if rem == PI      {D0}
+    else if rem == PIDIV2  {D1}
+    else if rem == D0      {D0}
+    else if rem == -PIDIV2 {-D1}
+    else if rem == -PI     {D0}
     else
         { sin_series(rem, terms) }
 }
@@ -175,7 +174,7 @@ fn tan_prepare(
     let tansub: Decimal =
              if itan >= D0  { rem = D0;      itan                             }
         else if itan >  -D1 { rem = -PIDIV4; tan_sub(itan, -D1)               }
-        else if itan <  -D1 { rem = -PIDIV2; tan_sub(tan_sub(itan, -D1), -D1) }
+        else if itan <= -D1 { rem = -PIDIV2; tan_sub(tan_sub(itan, -D1), -D1) }
         else                { rem = D0;      itan                             }
     ;
     tan_lower(tansub, rem)
@@ -207,7 +206,7 @@ fn atan_series(
 ) -> Decimal {
     (1..terms).into_par_iter()
         .map(|n|
-            pow(D1N, n) * (
+            pow(-D1, n) * (
                 pow(value, (2 * n) + 1) /
                 ((D2 * dec(n)) + D1)
             )
@@ -221,8 +220,9 @@ pub fn atan(
     itan: Decimal,
     terms: usize
 ) -> Decimal {
-         if itan == D0 {D0}
-    else if itan == D1 {PIDIV4}
+         if itan == D0  {D0}
+    else if itan == D1  {PIDIV4}
+    else if itan == -D1 {-PIDIV4}
     else {
         let (tan, rem) = tan_prepare(itan);
         rem + atan_series(tan, terms)

@@ -21,10 +21,10 @@ pub fn c_exp(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let _ea = exp(value.re, terms);
+    let ea = exp(value.re, terms);
     let _cos = cos(value.im, terms);
     let _sin = sin(value.im, terms);
-    Complex::new(_ea * _cos, _ea * _sin)
+    Complex::new(ea * _cos, ea * _sin)
 }
 
 //##########################################################################################################################

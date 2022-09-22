@@ -7,7 +7,7 @@ use std::fmt;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 // Modules
-use crate::trigonometry::{ cos, sin, atan };
+use crate::trigonometry::{ cos, sin, atan2 };
 use crate::basic::{ sqrt };
 
 //##########################################################################################################################
@@ -107,7 +107,7 @@ impl Complex {
     pub fn arg(&self, terms: usize) -> Decimal {
         if self.is_zero() { return D0 }
         let normal = self.norm(terms);
-        atan(
+        atan2(
             self.re / normal,
             self.im / normal,
             terms

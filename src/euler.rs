@@ -35,9 +35,9 @@ pub fn exp(
     value: Decimal,
     terms: usize
 ) -> Decimal {
-         if value == -D1 {D1DIVE}
-    else if value == D0  {D1}
+         if value == D0  {D1}
     else if value == D1  {E}
+    else if value == -D1 {D1DIVE}
     else
         { power_series(value, terms) }
 }
@@ -90,8 +90,9 @@ pub fn ln(
 ) -> Result<Decimal, Error> {
     if value <= D0 { return Err(Error::InputOutOfRange) };
     Ok(
-             if value == D1 {D0}
-        else if value ==  E {D1}
+             if value == D1     {D0}
+        else if value == E      {D1}
+        else if value == D1DIVE {-D1}
         else {
             let (exp, rem) = ln_prepare(value);
             exp + ln_series(rem, terms)

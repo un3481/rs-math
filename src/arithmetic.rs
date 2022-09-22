@@ -17,7 +17,7 @@ pub fn dec(value: usize) -> Decimal {
 
 #[inline]
 pub fn pos(value: Decimal) -> Decimal {
-    value * (if value < D0 {-D1} else {D1})
+    if value < D0 {-value} else {value}
 }
 
 //##########################################################################################################################

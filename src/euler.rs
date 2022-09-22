@@ -5,14 +5,13 @@ use rust_decimal::prelude::*;
 use rayon::prelude::*;
 
 // Modules
-use crate::constants::{ E, LN_2 };
+use crate::constants::{ E, D1DIVE, LN_2 };
 use crate::arithmetic::{ dec, pow, fac };
 use crate::error::Error;
 
 //##########################################################################################################################
 
 // Constants
-const D1N: Decimal = dec!(-1);
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
@@ -36,7 +35,7 @@ pub fn exp(
     value: Decimal,
     terms: usize
 ) -> Decimal {
-         if value == D1N {D1 / E}
+         if value == -D1 {D1DIVE}
     else if value == D0  {D1}
     else if value == D1  {E}
     else
@@ -74,7 +73,7 @@ fn ln_series(
     D1 + (
         (1..=terms).into_par_iter()
             .map(|n|
-                pow(D1N, n + 1) * (
+                pow(-D1, n + 1) * (
                     pow(value - E, n) /
                     (pow(E, n) * dec(n))
                 )

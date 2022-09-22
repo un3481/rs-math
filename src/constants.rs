@@ -11,6 +11,7 @@ use crate::arithmetic::{ dec, pow, fac };
 pub const STD_ITER: usize = 64;
 
 pub const E: Decimal = dec!(2.7182818284590452353602874713);
+pub const D1DIVE: Decimal = dec!(0.3678794411714423215955237701);
 pub const LN_2: Decimal = dec!(0.6931471805599453094172321214);
 pub const SQRT_3DIV2: Decimal = dec!(1.2247448713915890490986420373);
 
@@ -30,7 +31,6 @@ pub const TAN_PIDIV36: Decimal = dec!(0.0874886635259240052220186694);
 
 //##########################################################################################################################
 
-const D1N: Decimal = dec!(-1);
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
@@ -59,7 +59,7 @@ fn pi_term(
 ) -> Decimal {
     (1..=terms).into_par_iter()
         .map(|n|
-            pow(D1N, n + 1) * (
+            pow(-D1, n + 1) * (
                 pow(
                     value,
                     (2 * n) - 1
@@ -87,7 +87,7 @@ pub fn ln_2(
 ) -> Decimal {
     D1 + (1..=terms).into_par_iter()
         .map(|n|
-            pow(D1N, n + 1) * (
+            pow(-D1, n + 1) * (
                 pow(D2 - E, n) /
                 (pow(E, n) * dec(n))
             )

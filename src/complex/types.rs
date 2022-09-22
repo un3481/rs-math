@@ -37,11 +37,11 @@ impl Polar {
     /// Convert a polar representation into a complex number.
     #[inline]
     pub fn to_cartesian(&self, terms: usize) -> Complex {
-        let costheta = cos(self.theta, terms);
-        let sintheta = sin(self.theta, terms);
+        let costheta = cos(self.theta.clone(), terms);
+        let sintheta = sin(self.theta.clone(), terms);
         Complex::new(
-            self.radius * costheta,
-            self.radius * sintheta
+            self.radius.clone() * costheta,
+            self.radius.clone() * sintheta
         )
     }
 }
@@ -99,19 +99,25 @@ impl Complex {
     /// Calculate |self|
     #[inline]
     pub fn norm(&self, terms: usize) -> Decimal {
-        sqrt(self.norm_sqr(), terms).unwrap_or(D0)
+             if self.is_zero() {D0}
+        else if self.im == D0 { self.re.clone() }
+        else if self.re == D0 { self.im.clone() }
+        else {
+            let _sqr = self.norm_sqr();
+            sqrt(_sqr, terms).unwrap_or(D0)
+        }
     }
 
     /// Calculate the principal Arg of self.
     #[inline]
     pub fn arg(&self, terms: usize) -> Decimal {
-        if self.is_zero() { return D0 }
-        let normal = self.norm(terms);
-        atan2(
-            self.re / normal,
-            self.im / normal,
-            terms
-        ).unwrap_or(D0)
+        if self.is_zero() {D0}
+        else {
+            let normal = self.norm(terms);
+            let _cos = self.re.clone() / normal;
+            let _sin = self.im.clone() / normal;
+            atan2(_cos, _sin, terms).unwrap_or(D0)
+        }
     }
 
     /// Convert to polar form (r, theta)

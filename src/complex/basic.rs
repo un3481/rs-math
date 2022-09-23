@@ -44,8 +44,8 @@ pub fn cc_pow(
     power: Complex,
     terms: usize
 ) -> Complex {
-    let _ln = c_ln(value, terms);
-    c_exp(_ln * power, terms)
+    let ln_val = c_ln(value, terms);
+    c_exp(ln_val * power, terms)
 }
 
 //##########################################################################################################################

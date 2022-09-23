@@ -62,8 +62,8 @@ pub fn c_atan(
 ) -> Complex {
     let term1 = C1 + (CI * value);
     let term2 = C1 - (CI * value);
-    let _ln = c_ln(term1 / term2, terms);
-    _ln / CI2
+    let ln_term = c_ln(term1 / term2, terms);
+    ln_term / CI2
 }
 
 //##########################################################################################################################

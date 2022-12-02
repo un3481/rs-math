@@ -3,6 +3,9 @@
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
+// Modules
+use crate::factorial::{ LFAC0 };
+
 //##########################################################################################################################
 
 const D0: Decimal = dec!(0);
@@ -18,6 +21,14 @@ pub fn dec(value: usize) -> Decimal {
 #[inline]
 pub fn pos(value: Decimal) -> Decimal {
     if value < D0 {-value} else {value}
+}
+
+//##########################################################################################################################
+
+#[inline]
+pub fn fac(value: usize) -> Decimal {
+    if value > 27 { panic!("input too large for 'fac': {}", value) };
+    LFAC0[value]
 }
 
 //##########################################################################################################################
@@ -39,21 +50,6 @@ pub fn pow(
                     .unwrap_or(D0)
             }
         },
-    }
-}
-
-//##########################################################################################################################
-
-pub fn fac(
-    value: usize,
-) -> Decimal {
-    match value {
-        0 => D1,
-        1 => D1,
-        _ => (1..=value).into_iter()
-            .map(|n| dec(n))
-            .reduce(|u, d| u * d)
-            .unwrap_or(D0),
     }
 }
 

@@ -4,7 +4,7 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
-use crate::factorial::{ LFAC0 };
+use crate::factorial::{ LFAC };
 
 //##########################################################################################################################
 
@@ -27,8 +27,8 @@ pub fn pos(value: Decimal) -> Decimal {
 
 #[inline]
 pub fn fac(value: usize) -> Decimal {
-    if value > 27 { panic!("input too large for 'fac': {}", value) };
-    LFAC0[value]
+    if value > 27 { panic!("factorial too large for: {}", value) };
+    LFAC[value]
 }
 
 //##########################################################################################################################

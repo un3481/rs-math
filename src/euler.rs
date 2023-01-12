@@ -2,11 +2,10 @@
 // Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
-use rayon::prelude::*;
 
 // Modules
 use crate::constants::{ E, D1DIVE, LN_2 };
-use crate::arithmetic::{ dec, pow, fac };
+use crate::arithmetic::{ dec, fac, pow, a_pow };
 use crate::error::Error;
 
 //##########################################################################################################################
@@ -24,13 +23,20 @@ fn power_series(
     value: Decimal,
     terms: usize
 ) -> Decimal {
-    (1..=terms).into_par_iter()
-        .map(|n| pow(value, n) / fac(n))
-        .reduce(|| D0, |u, d| u + d)
+    let mut acc1: (Decimal, usize) = (D1, 0);
+    // Iterate over Series
+    (1..=terms).into_iter()
+        .map(|n|
+            a_pow(value, n, acc1) /
+            fac(n)
+        )
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
 }
 
 //##########################################################################################################################
 
+#[inline]
 pub fn exp(
     value: Decimal,
     terms: usize
@@ -70,20 +76,26 @@ fn ln_series(
     value: Decimal,
     terms: usize
 ) -> Decimal {
+    let mut acc1: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Decimal, usize) = (D1, 0);
+    let mut acc3: (Decimal, usize) = (D1, 0);
+    // Iterate over Series
     D1 + (
-        (1..=terms).into_par_iter()
+        (1..=terms).into_iter()
             .map(|n|
-                pow(-D1, n + 1) * (
-                    pow(value - E, n) /
-                    (pow(E, n) * dec(n))
+                a_pow(-D1, n + 1, acc1) * (
+                    a_pow(value - E, n, acc2) /
+                    (a_pow(E, n, acc3) * dec(n))
                 )
             )
-            .reduce(|| D0, |u, d| u + d)
+            .reduce(|u, d| u + d)
+            .unwrap_or(D0)
     )
 }
 
 //##########################################################################################################################
 
+#[inline]
 pub fn ln(
     value: Decimal,
     terms: usize

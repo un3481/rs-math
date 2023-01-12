@@ -2,6 +2,7 @@
 // Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
+use rayon::prelude::*;
 
 // Modules
 use crate::complex::types::{ Complex };
@@ -21,9 +22,16 @@ pub fn c_exp(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let exp_re = exp(value.re, terms);
-    let cos_im = cos(value.im, terms);
-    let sin_im = sin(value.im, terms);
+    let results = [
+        || exp(value.re, terms),
+        || cos(value.im, terms),
+        || sin(value.im, terms)
+    ].par_iter().map(|f| f()).collect();
+    // Extract Variables
+    let exp_re = results[0];
+    let cos_im = results[1];
+    let sin_im = results[2];
+    // Calculate Complex
     let re = exp_re * cos_im;
     let im = exp_re * sin_im;
     Complex::new(re, im)
@@ -36,9 +44,14 @@ pub fn c_ln(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let arg = value.arg(terms);
-    let norm_sqr = value.norm_sqr();
-    let ln_norm_sqr = ln(norm_sqr, terms).unwrap_or(D0);
+    let results = [
+        || value.arg(terms),
+        || ln(value.norm_sqr(), terms).unwrap_or(D0)
+    ].par_iter().map(|f| f()).collect();
+    // Extract Variables
+    let arg = results[0];
+    let ln_norm_sqr = results[1];
+    // Calculate Complex
     let ln_norm = ln_norm_sqr / D2;
     Complex::new(ln_norm, arg)
 }

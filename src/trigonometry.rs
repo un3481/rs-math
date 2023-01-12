@@ -2,13 +2,12 @@
 // Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
-use rayon::prelude::*;
 
 // Modules
 use crate::constants::{ PI, PIDIV2, PI3DIV2, PI2 };
 use crate::constants::{ PIDIV4, PIDIV6, PIDIV18, PIDIV36 };
 use crate::constants::{ TAN_PIDIV6, TAN_PIDIV18, TAN_PIDIV36 };
-use crate::arithmetic::{ dec, pow, fac };
+use crate::arithmetic::{ dec, fac, pow, a_pow };
 use crate::error::Error;
 
 //##########################################################################################################################
@@ -55,14 +54,18 @@ fn cos_series(
     value: Decimal,
     terms: usize
 ) -> Decimal {
-    (0..terms).into_par_iter()
+    let mut acc1: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Decimal, usize) = (D1, 0);
+    // Iterate over Series
+    (0..terms).into_iter()
         .map(|n|
-            pow(-D1, n) * (
-                pow(value, 2 * n) /
+            a_pow(-D1, n, acc1) * (
+                a_pow(value, 2 * n, acc2) /
                 fac(2 * n)
             )
         )
-        .reduce(|| D0, |u, d| u + d)
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
 }
 
 //##########################################################################################################################
@@ -72,18 +75,23 @@ fn sin_series(
     value: Decimal,
     terms: usize
 ) -> Decimal {
-    (0..terms).into_par_iter()
+    let mut acc1: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Decimal, usize) = (D1, 0);
+    // Iterate over Series
+    (0..terms).into_iter()
         .map(|n|
-            pow(-D1, n) * (
-                pow(value, (2 * n) + 1) /
+            a_pow(-D1, n, acc1) * (
+                a_pow(value, (2 * n) + 1, acc2) /
                 fac((2 * n) + 1)
             )
         )
-        .reduce(|| D0, |u, d| u + d)
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
 }
 
 //##########################################################################################################################
 
+#[inline]
 pub fn cos(
     value: Decimal,
     terms: usize
@@ -100,6 +108,7 @@ pub fn cos(
 
 //##########################################################################################################################
 
+#[inline]
 pub fn sin(
     value: Decimal,
     terms: usize
@@ -167,6 +176,7 @@ fn tan_lower(
 
 //##########################################################################################################################
 
+#[inline]
 fn tan_prepare(
     itan: Decimal
 ) -> (Decimal, Decimal) {
@@ -182,6 +192,7 @@ fn tan_prepare(
 
 //##########################################################################################################################
 
+#[inline]
 fn tan2_prepare(
     icos: Decimal,
     isin: Decimal
@@ -204,18 +215,23 @@ fn atan_series(
     value: Decimal,
     terms: usize
 ) -> Decimal {
-    (1..terms).into_par_iter()
+    let mut acc1: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Decimal, usize) = (D1, 0);
+    // Iterate over Series
+    (1..terms).into_iter()
         .map(|n|
-            pow(-D1, n) * (
-                pow(value, (2 * n) + 1) /
+            a_pow(-D1, n, acc1) * (
+                a_pow(value, (2 * n) + 1, acc2) /
                 ((D2 * dec(n)) + D1)
             )
         )
-        .reduce(|| D0, |u, d| u + d)
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
 }
 
 //##########################################################################################################################
 
+#[inline]
 pub fn atan(
     itan: Decimal,
     terms: usize
@@ -231,6 +247,7 @@ pub fn atan(
 
 //##########################################################################################################################
 
+#[inline]
 pub fn atan2(
     icos: Decimal,
     isin: Decimal,

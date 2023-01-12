@@ -2,7 +2,9 @@
 // Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
-use rayon::prelude::*;
+
+// Modules
+use crate::error::Error;
 
 //##########################################################################################################################
 
@@ -16,9 +18,8 @@ const D1NEG = dec!(-1);
 fn mobius(
     value: usize
 ) -> Result<Decimal, Error> {
-    if value <= 0 {
-        panic!("cannot calc mobius(x) for x <= 0");
-    };
+    if value <= 0 { return Err(Error::InputOutOfRange) };
+    // Set Variables
     let mut acc: usize = value;
     let mut primes: usize = 0;
     // Check 2

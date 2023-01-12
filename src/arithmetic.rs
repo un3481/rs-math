@@ -33,6 +33,17 @@ pub fn fac(value: usize) -> Decimal {
 
 //##########################################################################################################################
 
+fn pow_series(
+    value: Decimal,
+    power: usize
+) -> Decimal {
+    (1..=power).into_iter()
+        .map(|_| value)
+        .reduce(|u, d| u * d)
+        .unwrap()
+}
+
+#[inline]
 pub fn pow(
     value: Decimal,
     power: usize
@@ -43,14 +54,24 @@ pub fn pow(
         _ => {
                  if value == D0 {D0}
             else if value == D1 {D1}
-            else {
-                (1..=power).into_iter()
-                    .map(|_| value)
-                    .reduce(|u, d| u * d)
-                    .unwrap_or(D0)
-            }
+            else { pow_series(value, power) }
         },
     }
+}
+
+//##########################################################################################################################
+
+#[inline]
+pub fn a_pow(
+    value: Decimal,
+    power: usize,
+    base: mut (Decimal, usize)
+) -> Decimal {
+    if (base.1 > power) { base.1 = power };
+    let dif = pow(value, power - base.1);
+    let result = dif * base.0;
+    base = (result, power);
+    result
 }
 
 //##########################################################################################################################

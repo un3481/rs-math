@@ -2,9 +2,8 @@
 // Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
-use rayon::prelude::*;
 
-use crate::arithmetic::{ dec, pow, fac };
+use crate::arithmetic::{ dec, fac, pow, a_pow };
 
 //##########################################################################################################################
 
@@ -45,9 +44,10 @@ const D239: Decimal = dec!(239);
 pub fn euler(
     terms: usize
 ) -> Decimal {
-    (1..=terms).into_par_iter()
+    (1..=terms).into_iter()
         .map(|n| D1 / fac(n))
-        .reduce(|| D0, |u, d| u + d)
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
 }
 
 //##########################################################################################################################
@@ -57,20 +57,22 @@ fn pi_term(
     value: Decimal,
     terms: usize
 ) -> Decimal {
-    (1..=terms).into_par_iter()
+    let mut acc1: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Decimal, usize) = (D1, 0);
+    // Iterate over Series
+    (1..=terms).into_iter()
         .map(|n|
-            pow(-D1, n + 1) * (
-                pow(
-                    value,
-                    (2 * n) - 1
-                ) /
+            a_pow(-D1, n + 1, acc1) * (
+                a_pow(value, (2 * n) - 1, acc2) /
                 ((D2 * dec(n)) - D1)
             )
         )
-        .reduce(|| D0, |u, d| u + d)
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
 }
 
 /// pi = 4 * ((4 * pi_term(1 / 5)) - pi_term(1 / 239))
+#[inline]
 pub fn pi(
     terms: usize
 ) -> Decimal {
@@ -85,14 +87,21 @@ pub fn pi(
 pub fn ln_2(
     terms: usize
 ) -> Decimal {
-    D1 + (1..=terms).into_par_iter()
-        .map(|n|
-            pow(-D1, n + 1) * (
-                pow(D2 - E, n) /
-                (pow(E, n) * dec(n))
+    let mut acc1: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Decimal, usize) = (D1, 0);
+    let mut acc3: (Decimal, usize) = (D1, 0);
+    // Iterate over Series
+    D1 + (
+        (1..=terms).into_iter()
+            .map(|n|
+                a_pow(-D1, n + 1, acc1) * (
+                    a_pow(D2 - E, n, acc2) /
+                    (a_pow(E, n, acc3) * dec(n))
+                )
             )
-        )
-        .reduce(|| D0, |u, d| u + d)
+            .reduce(|u, d| u + d)
+            .unwrap_or(D0)
+    )
 }
 
 //##########################################################################################################################
@@ -101,20 +110,24 @@ pub fn ln_2(
 pub fn sqrt_3div2(
     terms: usize
 ) -> Decimal {
-    (1..=terms).into_par_iter()
+    let mut acc1: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Decimal, usize) = (D1, 0);
+    // Iterate over Series
+    (1..=terms).into_iter()
         .map(|n|
             (
                 (D3 / D2) *
                 fac(2 * (n - 1)) *
-                pow(D1 / D2, n - 1)
+                a_pow(D1 / D2, n - 1, acc1)
             ) /
             pow(
                 fac(n - 1) *
-                pow(D2, n - 1),
+                a_pow(D2, n - 1, acc2),
                 2
             )
         )
-        .reduce(|| D0, |u, d| u + d)
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
 }
 
 //##########################################################################################################################

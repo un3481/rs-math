@@ -16,6 +16,17 @@ const C1: Complex = Complex{ re: D1, im: D0 };
 
 //##########################################################################################################################
 
+fn c_pow_series(
+    value: Complex,
+    power: usize
+) -> Complex {
+    (1..=power).into_iter()
+        .map(|_| value)
+        .reduce(|u, d| u * d)
+        .unwrap()
+}
+
+#[inline]
 pub fn c_pow(
     value: Complex,
     power: usize
@@ -26,12 +37,7 @@ pub fn c_pow(
         _ => {
                  if value == C0 {C0}
             else if value == C1 {C1}
-            else {
-                (1..=power).into_iter()
-                    .map(|_| value)
-                    .reduce(|u, d| u * d)
-                    .unwrap()
-            }
+            else { c_pow_series(value, power) }
         },
     }
 }
@@ -39,6 +45,7 @@ pub fn c_pow(
 //##########################################################################################################################
 
 /// z^w = e^(ln(z) * w)
+#[inline]
 pub fn cc_pow(
     value: Complex,
     power: Complex,

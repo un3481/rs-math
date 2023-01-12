@@ -2,11 +2,10 @@
 // Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
-use rayon::prelude::*;
 
 // Modules
 use crate::constants::{ SQRT_3DIV2 };
-use crate::arithmetic::{ pow, fac };
+use crate::arithmetic::{ fac, pow, a_pow };
 use crate::euler::{ exp, ln };
 use crate::error::Error;
 
@@ -47,24 +46,29 @@ fn sqrt_series(
     value: Decimal,
     terms: usize
 ) -> Decimal {
-    (1..=terms).into_par_iter()
+    let mut acc1: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Decimal, usize) = (D1, 0);
+    // Iterate over Taylor Series
+    (1..=terms).into_iter()
         .map(|n|
             (
                 value *
                 fac(2 * (n - 1)) *
-                pow(D1 - value, n - 1)
+                a_pow(D1 - value, n - 1, acc1)
             ) /
             pow(
                 fac(n - 1) *
-                pow(D2, n - 1),
+                a_pow(D2, n - 1, acc2),
                 2
             )
         )
-        .reduce(|| D0, |u, d| u + d)
+        .reduce(|u, d| u + d)
+        .unwrap_or(D0)
 }
  
 //##########################################################################################################################
 
+#[inline]
 pub fn sqrt(
     value: Decimal,
     terms: usize
@@ -83,6 +87,7 @@ pub fn sqrt(
 //##########################################################################################################################
 
 /// a^b = e^(ln(a) * b)
+#[inline]
 pub fn d_pow(
     value: Decimal,
     power: Decimal,

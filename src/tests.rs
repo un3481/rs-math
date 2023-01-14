@@ -41,9 +41,9 @@ const CI1: Complex = Complex{ re: D0, im: D1 };
 #[test]
     fn test_cc_pow() -> Result<(), Error> {
         let terms = 48;
-        let res1 = cc_pow(CI1, C1DIV2, terms);
+        let res1 = cc_pow(-C1, C1DIV2, terms);
         let res2 = cc_pow(C4, C1DIV2, terms);
-        assert_eq!(res1, -C1);
+        assert_eq!(res1, CI1);
         assert_eq!(res2, C2);
         assert_eq!(res1, res2);
         Ok(())

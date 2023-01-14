@@ -20,27 +20,31 @@ const C1: Complex = Complex{ re: D1, im: D0 };
 fn c_pow_series(
     value: Complex,
     power: usize
-) -> Complex {
+) -> Result<Complex, Error> {
     (1..=power).into_iter()
-        .map(|_| value)
-        .reduce(|u, d| u * d)
-        .unwrap_or(C1)
+        .map(|_| Ok(value))
+        .reduce(|u, d| Ok(
+            u? * d?
+        ))
+        .unwrap_or(Err(Error::IteratorError))
 }
 
 #[inline]
 pub fn c_pow(
     value: Complex,
     power: usize
-) -> Complex {
-    match power {
-        0 => C1,
-        1 => value,
-        _ => {
-                 if value == C0 {C0}
-            else if value == C1 {C1}
-            else { c_pow_series(value, power) }
-        },
-    }
+) -> Result<Complex, Error> {
+    Ok(
+        match power {
+            0 => C1,
+            1 => value,
+            _ => {
+                     if value == C0 {C0}
+                else if value == C1 {C1}
+                else { c_pow_series(value, power)? }
+            },
+        }
+    )
 }
 
 //##########################################################################################################################

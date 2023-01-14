@@ -43,17 +43,12 @@ pub fn c_ln(
     value: Complex,
     terms: usize
 ) -> Result<Complex, Error> {
-    /*
     // Execute Parallel
     let p_ln_norm = spawn(move || Ok(ln(value.norm_sqr()?, terms)? / D2));
     let p_val_arg = spawn(move || value.arg(terms));
     // Extract Variables
     let re = p_ln_norm.join().unwrap()?;
     let im = p_val_arg.join().unwrap()?;
-    */
-    // Execute Sync
-    let re = ln(value.norm_sqr()?, terms)? / D2;
-    let im = value.arg(terms)?;
     // Calculate Complex
     Ok(Complex::new(re, im))
 }

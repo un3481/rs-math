@@ -30,18 +30,12 @@ fn power_series(
     Ok(
         D1 + (
             (1..=terms).into_iter()
-                .map(|n|
-                    Ok(
-                        (
-                            am_pow(value, n, &mut acc1)? / m_fac(n)?
-                        ).squash()?
-                    )
-                )
-                .reduce(|u, d| {
-                    let (_u, _d) = (u?, d?);
-                    let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
-                    Ok(res)
-                })
+                .map(|n| Ok(
+                    (am_pow(value, n, &mut acc1)? / m_fac(n)?).squash()?
+                ))
+                .reduce(|u, d| Ok(
+                    u?.checked_add(d?).ok_or(Error::AddOverflow)?
+                ))
                 .unwrap_or(Ok(D0))
         )?
     )
@@ -98,19 +92,14 @@ fn ln_series(
     Ok(
         D1 + (
             (1..=terms).into_iter()
-                .map(|n|
-                    Ok(
-                        a_pow(-D1, n + 1, &mut acc1)? * (
-                            am_pow(value - E, n, &mut acc2)? /
-                            (am_pow(E, n, &mut acc3)? * dec(n))
-                        ).squash()?
-                    )
-                )
-                .reduce(|u, d| {
-                    let (_u, _d) = (u?, d?);
-                    let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
-                    Ok(res)
-                })
+                .map(|n| Ok(
+                    a_pow(-D1, n + 1, &mut acc1)? * (
+                        am_pow(value - E, n, &mut acc2)? / (dec(n) * am_pow(E, n, &mut acc3)?)
+                    ).squash()?
+                ))
+                .reduce(|u, d| Ok(
+                    u?.checked_add(d?).ok_or(Error::AddOverflow)?
+                ))
                 .unwrap_or(Ok(D0))
         )?
     )

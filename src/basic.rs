@@ -52,28 +52,24 @@ fn sqrt_series(
     let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Taylor Series
     (1..=terms).into_iter()
-        .map(|n|
-            Ok(
+        .map(|n| Ok(
+            (
                 (
-                    (
-                        value *
-                        m_fac(2 * (n - 1))? *
-                        am_pow(D1 - value, n - 1, &mut acc1)?
-                    ) /
-                    m_pow(
-                        m_fac(n - 1)? *
-                        am_pow(D2, n - 1, &mut acc2)?,
-                        2
-                    )?
-                ).squash()?
-            )
-        )
-        .reduce(|u, d| {
-            let (_u, _d) = (u?, d?);
-            let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
-            Ok(res)
-        })
-        .unwrap_or(Err(Error::IteratorError))
+                    value *
+                    m_fac(2 * (n - 1))? *
+                    am_pow(D1 - value, n - 1, &mut acc1)?
+                ) /
+                m_pow(
+                    m_fac(n - 1)? *
+                    am_pow(D2, n - 1, &mut acc2)?,
+                    2
+                )?
+            ).squash()?
+        ))
+        .reduce(|u, d| Ok(
+            u?.checked_add(d?).ok_or(Error::AddOverflow)?
+        ))
+        .unwrap_or(Ok(D0))
 }
  
 //##########################################################################################################################
@@ -103,12 +99,8 @@ pub fn d_pow(
     power: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
-    match ln(value, terms) {
-        Err(err) => Err(err),
-        Ok(ln_val) => Ok(
-            exp(ln_val * power, terms)?
-        ),
-    }
+    let ln_val = ln(value, terms)?;
+    exp(ln_val * power, terms)
 }
 
 //##########################################################################################################################

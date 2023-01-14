@@ -60,20 +60,15 @@ fn cos_series(
     let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Series
     (0..terms).into_iter()
-        .map(|n|
-            Ok(
-                a_pow(-D1, n, &mut acc1)? * (
-                    am_pow(value, 2 * n, &mut acc2)? /
-                    m_fac(2 * n)?
-                ).squash()?
-            )
-        )
-        .reduce(|u, d| {
-            let (_u, _d) = (u?, d?);
-            let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
-            Ok(res)
-        })
-        .unwrap_or(Err(Error::IteratorError))
+        .map(|n| Ok(
+            a_pow(-D1, n, &mut acc1)? * (
+                am_pow(value, 2 * n, &mut acc2)? / m_fac(2 * n)?
+            ).squash()?
+        ))
+        .reduce(|u, d| Ok(
+            u?.checked_add(d?).ok_or(Error::AddOverflow)?
+        ))
+        .unwrap_or(Ok(D0))
 }
 
 //##########################################################################################################################
@@ -87,20 +82,15 @@ fn sin_series(
     let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Series
     (0..terms).into_iter()
-        .map(|n|
-            Ok(
-                a_pow(-D1, n, &mut acc1)? * (
-                    am_pow(value, (2 * n) + 1, &mut acc2)? /
-                    m_fac((2 * n) + 1)?
-                ).squash()?
-            )
-        )
-        .reduce(|u, d| {
-            let (_u, _d) = (u?, d?);
-            let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
-            Ok(res)
-        })
-        .unwrap_or(Err(Error::IteratorError))
+        .map(|n| Ok(
+            a_pow(-D1, n, &mut acc1)? * (
+                am_pow(value, (2 * n) + 1, &mut acc2)? / m_fac((2 * n) + 1)?
+            ).squash()?
+        ))
+        .reduce(|u, d| Ok(
+            u?.checked_add(d?).ok_or(Error::AddOverflow)?
+        ))
+        .unwrap_or(Ok(D0))
 }
 
 //##########################################################################################################################
@@ -237,20 +227,15 @@ fn atan_series(
     let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Series
     (1..terms).into_iter()
-        .map(|n|
-            Ok(
-                a_pow(-D1, n, &mut acc1)? * (
-                    am_pow(value, (2 * n) + 1, &mut acc2)? /
-                    ((D2 * dec(n)) + D1)
-                ).squash()?
-            )
-        )
-        .reduce(|u, d| {
-            let (_u, _d) = (u?, d?);
-            let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
-            Ok(res)
-        })
-        .unwrap_or(Err(Error::IteratorError))
+        .map(|n| Ok(
+            a_pow(-D1, n, &mut acc1)? * (
+                am_pow(value, (2 * n) + 1, &mut acc2)? / ((D2 * dec(n)) + D1)
+            ).squash()?
+        ))
+        .reduce(|u, d| Ok(
+            u?.checked_add(d?).ok_or(Error::AddOverflow)?
+        ))
+        .unwrap_or(Ok(D0))
 }
 
 //##########################################################################################################################

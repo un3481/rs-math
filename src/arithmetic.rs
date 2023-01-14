@@ -26,20 +26,17 @@ pub fn pos(value: Decimal) -> Decimal {
 
 //##########################################################################################################################
 
+#[inline]
 fn pow_series(
     value: Decimal,
     power: usize
 ) -> Result<Decimal, Error> {
-    Ok(
-        (1..=power).into_iter()
-            .map(|_| Ok(value))
-            .reduce(|u, d| {
-                let (_u, _d) = (u?, d?);
-                let res = _u.checked_mul(_d).ok_or(Error::MultiplyOverflow)?;
-                Ok(res)
-            })
-            .unwrap_or(Err(Error::IteratorError))?
-    )
+    (1..=power).into_iter()
+        .map(|_| Ok(value))
+        .reduce(|u, d| Ok(
+            u?.checked_mul(d?).ok_or(Error::MultiplyOverflow)?
+        ))
+        .unwrap_or(Err(Error::IteratorError))
 }
 
 #[inline]
@@ -62,17 +59,14 @@ pub fn pow(
 
 //##########################################################################################################################
 
+#[inline]
 fn m_pow_series(
     value: Multiplex,
     power: usize
 ) -> Result<Multiplex, Error> {
     (1..=power).into_iter()
         .map(|_| Ok(value.clone()))
-        .reduce(|u, d| {
-            let (_u, _d) = (u?, d?);
-            let res = _u * _d;
-            Ok(res)
-        })
+        .reduce(|u, d| Ok(u? * d?))
         .unwrap_or(Err(Error::IteratorError))
 }
 
@@ -98,11 +92,17 @@ pub fn a_pow(
     power: usize,
     base: &mut (Decimal, usize)
 ) -> Result<Decimal, Error> {
-    if base.1 > power { base.1 = power };
-    let dif = pow(value, power - base.1)?;
-    let result = dif.checked_mul(base.0).ok_or(Error::MultiplyOverflow)?;
-    base.0 = result;
+    // Apply Power
+    let exp = if base.1 > power {power} else {base.1};
+    let dif = pow(value, power - exp)?;
+    // Calculate Result
+    let result = base.0.clone()
+        .checked_mul(dif)
+        .ok_or(Error::MultiplyOverflow)?;
+    // Update Base
+    base.0 = result.clone();
     base.1 = power;
+    // Return Result
     Ok(result)
 }
 
@@ -114,15 +114,19 @@ pub fn am_pow(
     power: usize,
     base: &mut (Multiplex, usize)
 ) -> Result<Multiplex, Error> {
-    if base.1 > power { base.1 = power };
-    let mut dif = m_pow(Multiplex::new() * value, power - base.1)?;
+    // Apply Power
+    let exp = if base.1 > power {power} else {base.1};
+    let mut dif = m_pow(value * Multiplex::new(), power - exp)?;
+    // Calculate Result
     let mut result = base.0.clone();
     match dif.squash() {
         Err(_) => result.mul.append(&mut dif.mul),
         Ok(v) => result.mul.push(v),
     };
+    // Update Base
     base.0 = result.clone();
     base.1 = power;
+    // Return Result
     Ok(result)
 }
 

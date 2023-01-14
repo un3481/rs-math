@@ -33,6 +33,7 @@ pub const TAN_PIDIV36: Decimal = dec!(0.0874886635259240052220186694);
 
 //##########################################################################################################################
 
+const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
 const D4: Decimal = dec!(4);
@@ -50,20 +51,15 @@ fn pi_term(
     let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Series
     (1..=terms).into_iter()
-        .map(|n|
-            Ok(
-                a_pow(-D1, n + 1, &mut acc1)? * (
-                    am_pow(value, (2 * n) - 1, &mut acc2)? /
-                    ((D2 * dec(n)) - D1)
-                ).squash()?
-            )
-        )
-        .reduce(|u, d| {
-            let (_u, _d) = (u?, d?);
-            let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
-            Ok(res)
-        })
-        .unwrap_or(Err(Error::IteratorError))
+        .map(|n| Ok(
+            a_pow(-D1, n + 1, &mut acc1)? * (
+                am_pow(value, (2 * n) - 1, &mut acc2)? / ((D2 * dec(n)) - D1)
+            ).squash()?
+        ))
+        .reduce(|u, d| Ok(
+            u?.checked_add(d?).ok_or(Error::AddOverflow)?
+        ))
+        .unwrap_or(Ok(D0))
 }
 
 /// pi = 4 * ((4 * pi_term(1 / 5)) - pi_term(1 / 239))

@@ -37,7 +37,7 @@ const TEST_ITER: usize = 48;
         assert_eq!(res1, D2);
         // Test POW(4, 1/2)
         let res2 = d_pow(D4, D1DIV2, TEST_ITER)?;
-        assert_eq!(res1, D2);
+        assert_eq!(res2, D2);
         // Test SQRT(4) = POW(4, 1/2)
         assert_eq!(res1, res2);
         // Return Ok

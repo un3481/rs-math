@@ -2,7 +2,7 @@
 // Imports
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
-use rayon::prelude::*;
+use std::thread;
 
 // Modules
 use crate::complex::types::{ Complex };
@@ -22,15 +22,13 @@ pub fn c_exp(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let results = [
-        || exp(value.re, terms),
-        || cos(value.im, terms),
-        || sin(value.im, terms)
-    ].par_iter().map(|f| f()).collect();
+    let p_exp_re = thread::spawn(move || { exp(value.re, terms) });
+    let p_cos_im = thread::spawn(move || { cos(value.im, terms) });
+    let p_sin_im = thread::spawn(move || { sin(value.im, terms) });
     // Extract Variables
-    let exp_re = results[0];
-    let cos_im = results[1];
-    let sin_im = results[2];
+    let exp_re = p_exp_re.join().unwrap();
+    let cos_im = p_cos_im.join().unwrap();
+    let sin_im = p_sin_im.join().unwrap();
     // Calculate Complex
     let re = exp_re * cos_im;
     let im = exp_re * sin_im;
@@ -44,16 +42,13 @@ pub fn c_ln(
     value: Complex,
     terms: usize
 ) -> Complex {
-    let results = [
-        || value.arg(terms),
-        || ln(value.norm_sqr(), terms).unwrap_or(D0)
-    ].par_iter().map(|f| f()).collect();
+    let p_val_arg = thread::spawn(move || { value.arg(terms) });
+    let p_ln_norm = thread::spawn(move || { ln(value.norm_sqr(), terms).unwrap_or(D0) / D2 });
     // Extract Variables
-    let arg = results[0];
-    let ln_norm_sqr = results[1];
+    let val_arg = p_val_arg.join().unwrap();
+    let ln_norm = p_ln_norm.join().unwrap();
     // Calculate Complex
-    let ln_norm = ln_norm_sqr / D2;
-    Complex::new(ln_norm, arg)
+    Complex::new(ln_norm, val_arg)
 }
 
 //##########################################################################################################################

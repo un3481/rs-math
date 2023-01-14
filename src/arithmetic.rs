@@ -4,7 +4,7 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
-use crate::factorial::{ LFAC };
+use crate::multiplex::types::{ Multiplex };
 
 //##########################################################################################################################
 
@@ -21,14 +21,6 @@ pub fn dec(value: usize) -> Decimal {
 #[inline]
 pub fn pos(value: Decimal) -> Decimal {
     if value < D0 {-value} else {value}
-}
-
-//##########################################################################################################################
-
-#[inline]
-pub fn fac(value: usize) -> Decimal {
-    if value > 27 { panic!("factorial too large for: {}", value) };
-    LFAC[value]
 }
 
 //##########################################################################################################################
@@ -61,16 +53,41 @@ pub fn pow(
 
 //##########################################################################################################################
 
+fn m_pow_series(
+    value: Multiplex,
+    power: usize
+) -> Multiplex {
+    (1..=power).into_iter()
+        .map(|_| value.clone())
+        .reduce(|u, d| u * d)
+        .unwrap()
+}
+
+#[inline]
+pub fn m_pow(
+    value: Multiplex,
+    power: usize
+) -> Multiplex {
+    match power {
+        0 => Multiplex::new(),
+        1 => value,
+        _ => { m_pow_series(value, power) },
+    }
+}
+
+//##########################################################################################################################
+
 #[inline]
 pub fn a_pow(
     value: Decimal,
     power: usize,
-    base: mut (Decimal, usize)
+    base: &mut (Decimal, usize)
 ) -> Decimal {
-    if (base.1 > power) { base.1 = power };
+    if base.1 > power { base.1 = power };
     let dif = pow(value, power - base.1);
     let result = dif * base.0;
-    base = (result, power);
+    base.0 = result;
+    base.1 = power;
     result
 }
 

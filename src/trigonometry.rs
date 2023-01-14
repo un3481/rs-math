@@ -7,7 +7,8 @@ use rust_decimal::prelude::*;
 use crate::constants::{ PI, PIDIV2, PI3DIV2, PI2 };
 use crate::constants::{ PIDIV4, PIDIV6, PIDIV18, PIDIV36 };
 use crate::constants::{ TAN_PIDIV6, TAN_PIDIV18, TAN_PIDIV36 };
-use crate::arithmetic::{ dec, fac, pow, a_pow };
+use crate::factorial::{ m_fac };
+use crate::arithmetic::{ dec, a_pow };
 use crate::error::Error;
 
 //##########################################################################################################################
@@ -59,10 +60,10 @@ fn cos_series(
     // Iterate over Series
     (0..terms).into_iter()
         .map(|n|
-            a_pow(-D1, n, acc1) * (
-                a_pow(value, 2 * n, acc2) /
-                fac(2 * n)
-            )
+            a_pow(-D1, n, &mut acc1) * (
+                a_pow(value, 2 * n, &mut acc2) /
+                m_fac(2 * n)
+            ).squash().unwrap()
         )
         .reduce(|u, d| u + d)
         .unwrap_or(D0)
@@ -80,10 +81,10 @@ fn sin_series(
     // Iterate over Series
     (0..terms).into_iter()
         .map(|n|
-            a_pow(-D1, n, acc1) * (
-                a_pow(value, (2 * n) + 1, acc2) /
-                fac((2 * n) + 1)
-            )
+            a_pow(-D1, n, &mut acc1) * (
+                a_pow(value, (2 * n) + 1, &mut acc2) /
+                m_fac((2 * n) + 1)
+            ).squash().unwrap()
         )
         .reduce(|u, d| u + d)
         .unwrap_or(D0)
@@ -220,8 +221,8 @@ fn atan_series(
     // Iterate over Series
     (1..terms).into_iter()
         .map(|n|
-            a_pow(-D1, n, acc1) * (
-                a_pow(value, (2 * n) + 1, acc2) /
+            a_pow(-D1, n, &mut acc1) * (
+                a_pow(value, (2 * n) + 1, &mut acc2) /
                 ((D2 * dec(n)) + D1)
             )
         )

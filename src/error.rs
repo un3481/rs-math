@@ -1,6 +1,7 @@
 
+#[derive(Debug)]
 pub enum Error {
     InputOutOfRange,
     InvalidSineCosinePair,
-    FactorialOverflow
+    DecimalOverflow
 }

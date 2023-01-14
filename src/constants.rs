@@ -3,7 +3,8 @@
 use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
-use crate::arithmetic::{ dec, fac, pow, a_pow };
+use crate::factorial::{ m_fac };
+use crate::arithmetic::{ dec, a_pow, m_pow };
 
 //##########################################################################################################################
 
@@ -44,10 +45,16 @@ const D239: Decimal = dec!(239);
 pub fn euler(
     terms: usize
 ) -> Decimal {
-    (1..=terms).into_iter()
-        .map(|n| D1 / fac(n))
-        .reduce(|u, d| u + d)
-        .unwrap_or(D0)
+    D1 + (
+        (1..=terms).into_iter()
+            .map(|n|
+                (
+                    D1 / m_fac(n)
+                ).squash().unwrap()
+            )
+            .reduce(|u, d| u + d)
+            .unwrap_or(D0)
+    )
 }
 
 //##########################################################################################################################
@@ -62,8 +69,8 @@ fn pi_term(
     // Iterate over Series
     (1..=terms).into_iter()
         .map(|n|
-            a_pow(-D1, n + 1, acc1) * (
-                a_pow(value, (2 * n) - 1, acc2) /
+            a_pow(-D1, n + 1, &mut acc1) * (
+                a_pow(value, (2 * n) - 1, &mut acc2) /
                 ((D2 * dec(n)) - D1)
             )
         )
@@ -94,9 +101,9 @@ pub fn ln_2(
     D1 + (
         (1..=terms).into_iter()
             .map(|n|
-                a_pow(-D1, n + 1, acc1) * (
-                    a_pow(D2 - E, n, acc2) /
-                    (a_pow(E, n, acc3) * dec(n))
+                a_pow(-D1, n + 1, &mut acc1) * (
+                    a_pow(D2 - E, n, &mut acc2) /
+                    (a_pow(E, n, &mut acc3) * dec(n))
                 )
             )
             .reduce(|u, d| u + d)
@@ -116,15 +123,17 @@ pub fn sqrt_3div2(
     (1..=terms).into_iter()
         .map(|n|
             (
-                (D3 / D2) *
-                fac(2 * (n - 1)) *
-                a_pow(D1 / D2, n - 1, acc1)
-            ) /
-            pow(
-                fac(n - 1) *
-                a_pow(D2, n - 1, acc2),
-                2
-            )
+                (
+                    (D3 / D2) *
+                    m_fac(2 * (n - 1)) *
+                    a_pow(D1 / D2, n - 1, &mut acc1)
+                ) /
+                m_pow(
+                    m_fac(n - 1) *
+                    a_pow(D2, n - 1, &mut acc2),
+                    2
+                )
+            ).squash().unwrap()
         )
         .reduce(|u, d| u + d)
         .unwrap_or(D0)

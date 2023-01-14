@@ -5,7 +5,8 @@ use rust_decimal::prelude::*;
 
 // Modules
 use crate::constants::{ E, D1DIVE, LN_2 };
-use crate::arithmetic::{ dec, fac, pow, a_pow };
+use crate::factorial::{ m_fac };
+use crate::arithmetic::{ dec, a_pow };
 use crate::error::Error;
 
 //##########################################################################################################################
@@ -25,13 +26,16 @@ fn power_series(
 ) -> Decimal {
     let mut acc1: (Decimal, usize) = (D1, 0);
     // Iterate over Series
-    (1..=terms).into_iter()
-        .map(|n|
-            a_pow(value, n, acc1) /
-            fac(n)
-        )
-        .reduce(|u, d| u + d)
-        .unwrap_or(D0)
+    D1 + (
+        (1..=terms).into_iter()
+            .map(|n|
+                (
+                    a_pow(value, n, &mut acc1) / m_fac(n)
+                ).squash().unwrap()
+            )
+            .reduce(|u, d| u + d)
+            .unwrap_or(D0)
+    )
 }
 
 //##########################################################################################################################
@@ -83,9 +87,9 @@ fn ln_series(
     D1 + (
         (1..=terms).into_iter()
             .map(|n|
-                a_pow(-D1, n + 1, acc1) * (
-                    a_pow(value - E, n, acc2) /
-                    (a_pow(E, n, acc3) * dec(n))
+                a_pow(-D1, n + 1, &mut acc1) * (
+                    a_pow(value - E, n, &mut acc2) /
+                    (a_pow(E, n, &mut acc3) * dec(n))
                 )
             )
             .reduce(|u, d| u + d)

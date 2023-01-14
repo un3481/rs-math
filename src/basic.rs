@@ -5,7 +5,8 @@ use rust_decimal::prelude::*;
 
 // Modules
 use crate::constants::{ SQRT_3DIV2 };
-use crate::arithmetic::{ fac, pow, a_pow };
+use crate::factorial::{ m_fac };
+use crate::arithmetic::{ a_pow, m_pow };
 use crate::euler::{ exp, ln };
 use crate::error::Error;
 
@@ -52,15 +53,17 @@ fn sqrt_series(
     (1..=terms).into_iter()
         .map(|n|
             (
-                value *
-                fac(2 * (n - 1)) *
-                a_pow(D1 - value, n - 1, acc1)
-            ) /
-            pow(
-                fac(n - 1) *
-                a_pow(D2, n - 1, acc2),
-                2
-            )
+                (
+                    value *
+                    m_fac(2 * (n - 1)) *
+                    a_pow(D1 - value, n - 1, &mut acc1)
+                ) /
+                m_pow(
+                    m_fac(n - 1) *
+                    a_pow(D2, n - 1, &mut acc2),
+                    2
+                )
+            ).squash().unwrap()
         )
         .reduce(|u, d| u + d)
         .unwrap_or(D0)

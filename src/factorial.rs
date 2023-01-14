@@ -9,10 +9,6 @@ use crate::error::Error;
 
 //##########################################################################################################################
 
-const D0: Decimal = dec!(0);
-
-//##########################################################################################################################
-
 const LFAC: [Decimal; 30] = [
     dec!(1),
     dec!(1),
@@ -373,11 +369,10 @@ pub fn m_fac(value: usize) -> Multiplex {
         let next: usize = acc + M_LFAC_LEN[i];
         let cond_next: bool = next <= value;
         let cond_current: bool = (acc <= value) && (value < next);
-        let index = (
+        let index =
             if cond_current {value - acc}
             else if cond_next {M_LFAC_LEN[i] - 1}
-            else {0}
-        );
+            else {0};
         if cond_current || cond_next {
             result = result * M_LFAC[i][index];
         };

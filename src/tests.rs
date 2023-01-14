@@ -28,11 +28,15 @@ const CI1: Complex = Complex{ re: D0, im: D1 };
 #[test]
     fn test_sqrt() -> Result<(), Error> {
         let terms = 48;
+        // Test SQRT(4)
         let res1 = sqrt(D4, terms)?;
+        assert_eq!(res1, D2);
+        // Test POW(4, 1/2)
         let res2 = d_pow(D4, D1DIV2, terms)?;
         assert_eq!(res1, D2);
-        assert_eq!(res1, D2);
+        // Test SQRT(4) = POW(4, 1/2)
         assert_eq!(res1, res2);
+        // Return Ok
         Ok(())
     }
 
@@ -41,11 +45,13 @@ const CI1: Complex = Complex{ re: D0, im: D1 };
 #[test]
     fn test_cc_pow() -> Result<(), Error> {
         let terms = 48;
+        // Test POW(-1, 1/2)
         let res1 = cc_pow(-C1, C1DIV2, terms);
-        let res2 = cc_pow(C4, C1DIV2, terms);
         assert_eq!(res1, CI1);
+        // Test POW(4, 1/2)
+        let res2 = cc_pow(C4, C1DIV2, terms);
         assert_eq!(res2, C2);
-        assert_eq!(res1, res2);
+        // Return Ok
         Ok(())
     }
 

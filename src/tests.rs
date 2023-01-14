@@ -20,8 +20,8 @@ const D1DIV2: Decimal = dec!(0.5);
 const C1: Complex = Complex{ re: D1, im: D0 };
 const C2: Complex = Complex{ re: D2, im: D0 };
 const C4: Complex = Complex{ re: D4, im: D0 };
-const C1DIV2: Complex = Complex{ re: D1DIV2, im: D0 };
 const CI1: Complex = Complex{ re: D0, im: D1 };
+const C1DIV2: Complex = Complex{ re: D1DIV2, im: D0 };
 
 //##########################################################################################################################
 

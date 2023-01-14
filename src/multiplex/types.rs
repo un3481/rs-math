@@ -82,14 +82,10 @@ impl Multiplex {
             // Apply division
             let _mul = mul.pop().unwrap_or(D1);
             let _div = div.pop().unwrap_or(D1);
-            let value = match _mul.checked_div(_div) {
-                None => {break Err(Error::DecimalOverflow)},
-                Some(v) => {v},
-            };
+            let value = _mul.checked_div(_div).ok_or(Error::MultiplyOverflow)?;
             // Check if Multiplex is empty
             if div.is_empty() && mul.is_empty() {break Ok(value)};
-            // Check for Error
-            if div.is_empty() && !(s_mul || s_div) {break Err(Error::DecimalOverflow)};
+            if div.is_empty() && !(s_mul || s_div) {break Err(Error::MultiplyOverflow)};
             // Setup next Iteration
             mul.push(value);
         }

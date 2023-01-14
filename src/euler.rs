@@ -4,9 +4,10 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
+use crate::multiplex::types::{ Multiplex };
 use crate::constants::{ E, D1DIVE, LN_2 };
 use crate::factorial::{ m_fac };
-use crate::arithmetic::{ dec, a_pow };
+use crate::arithmetic::{ dec, a_pow, am_pow };
 use crate::error::Error;
 
 //##########################################################################################################################
@@ -23,18 +24,26 @@ const D4: Decimal = dec!(4);
 fn power_series(
     value: Decimal,
     terms: usize
-) -> Decimal {
-    let mut acc1: (Decimal, usize) = (D1, 0);
+) -> Result<Decimal, Error> {
+    let mut acc1: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Series
-    D1 + (
-        (1..=terms).into_iter()
-            .map(|n|
-                (
-                    a_pow(value, n, &mut acc1) / m_fac(n)
-                ).squash().unwrap()
-            )
-            .reduce(|u, d| u + d)
-            .unwrap_or(D0)
+    Ok(
+        D1 + (
+            (1..=terms).into_iter()
+                .map(|n|
+                    Ok(
+                        (
+                            am_pow(value, n, &mut acc1)? / m_fac(n)?
+                        ).squash()?
+                    )
+                )
+                .reduce(|u, d| {
+                    let (_u, _d) = (u?, d?);
+                    let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
+                    Ok(res)
+                })
+                .unwrap_or(Ok(D0))
+        )?
     )
 }
 
@@ -44,12 +53,14 @@ fn power_series(
 pub fn exp(
     value: Decimal,
     terms: usize
-) -> Decimal {
-         if value == D0  {D1}
-    else if value == D1  {E}
-    else if value == -D1 {D1DIVE}
-    else
-        { power_series(value, terms) }
+) -> Result<Decimal, Error> {
+    Ok(
+             if value == D0  {D1}
+        else if value == D1  {E}
+        else if value == -D1 {D1DIVE}
+        else
+            { power_series(value, terms)? }
+    )
 }
 
 //##########################################################################################################################
@@ -79,21 +90,29 @@ fn ln_prepare(
 fn ln_series(
     value: Decimal,
     terms: usize
-) -> Decimal {
+) -> Result<Decimal, Error> {
     let mut acc1: (Decimal, usize) = (D1, 0);
-    let mut acc2: (Decimal, usize) = (D1, 0);
-    let mut acc3: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
+    let mut acc3: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Series
-    D1 + (
-        (1..=terms).into_iter()
-            .map(|n|
-                a_pow(-D1, n + 1, &mut acc1) * (
-                    a_pow(value - E, n, &mut acc2) /
-                    (a_pow(E, n, &mut acc3) * dec(n))
+    Ok(
+        D1 + (
+            (1..=terms).into_iter()
+                .map(|n|
+                    Ok(
+                        a_pow(-D1, n + 1, &mut acc1)? * (
+                            am_pow(value - E, n, &mut acc2)? /
+                            (am_pow(E, n, &mut acc3)? * dec(n))
+                        ).squash()?
+                    )
                 )
-            )
-            .reduce(|u, d| u + d)
-            .unwrap_or(D0)
+                .reduce(|u, d| {
+                    let (_u, _d) = (u?, d?);
+                    let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
+                    Ok(res)
+                })
+                .unwrap_or(Ok(D0))
+        )?
     )
 }
 
@@ -111,7 +130,7 @@ pub fn ln(
         else if value == D1DIVE {-D1}
         else {
             let (exp, rem) = ln_prepare(value);
-            exp + ln_series(rem, terms)
+            exp + ln_series(rem, terms)?
         }
     )
 }

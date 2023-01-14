@@ -10,6 +10,7 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 use crate::trigonometry::{ cos, sin, atan2 };
 use crate::arithmetic::{ pos };
 use crate::basic::{ sqrt };
+use crate::error::Error;
 
 //##########################################################################################################################
 
@@ -37,13 +38,12 @@ impl Polar {
 
     /// Convert a polar representation into a complex number.
     #[inline]
-    pub fn to_cartesian(&self, terms: usize) -> Complex {
-        let costheta = cos(self.theta.clone(), terms);
-        let sintheta = sin(self.theta.clone(), terms);
-        Complex::new(
-            self.radius.clone() * costheta,
-            self.radius.clone() * sintheta
-        )
+    pub fn to_cartesian(&self, terms: usize) -> Result<Complex, Error> {
+        let costheta = cos(self.theta.clone(), terms)?;
+        let sintheta = sin(self.theta.clone(), terms)?;
+        let re = self.radius.clone().checked_mul(costheta).ok_or(Error::MultiplyOverflow)?;
+        let im = self.radius.clone().checked_mul(sintheta).ok_or(Error::MultiplyOverflow)?;
+        Ok(Complex::new(re, im))
     }
 }
 
@@ -73,11 +73,10 @@ impl Complex {
 
     /// Multiplies `self` by the scalar `t`.
     #[inline]
-    pub fn scale(&self, t: Decimal) -> Complex {
-        Complex::new(
-            self.re.clone() * t.clone(),
-            self.im.clone() * t
-        )
+    pub fn scale(&self, t: Decimal) -> Result<Complex, Error> {
+        let re = self.re.clone().checked_mul(t.clone()).ok_or(Error::MultiplyOverflow)?;
+        let im = self.im.clone().checked_mul(t.clone()).ok_or(Error::MultiplyOverflow)?;
+        Ok(Complex::new(re, im))
     }
 
     /// Divides `self` by the scalar `t`.
@@ -85,48 +84,55 @@ impl Complex {
     pub fn unscale(&self, t: Decimal) -> Complex {
         Complex::new(
             self.re.clone() / t.clone(),
-            self.im.clone() / t
+            self.im.clone() / t.clone()
         )
     }
 
     /// Returns the square of the norm (since `T` doesn't necessarily
     /// have a sqrt function), i.e. `re^2 + im^2`.
     #[inline]
-    pub fn norm_sqr(&self) -> Decimal {
-        (self.re.clone() * self.re.clone()) +
-        (self.im.clone() * self.im.clone())
+    pub fn norm_sqr(&self) -> Result<Decimal, Error> {
+        let re_sqr = self.re.clone().checked_mul(self.re.clone()).ok_or(Error::MultiplyOverflow)?;
+        let im_sqr = self.im.clone().checked_mul(self.im.clone()).ok_or(Error::MultiplyOverflow)?;
+        re_sqr.checked_add(im_sqr).ok_or(Error::AddOverflow)
     }
 
     /// Calculate |self|
     #[inline]
-    pub fn norm(&self, terms: usize) -> Decimal {
-             if self.is_zero() {D0}
-        else if self.im == D0 { pos(self.re.clone()) }
-        else if self.re == D0 { pos(self.im.clone()) }
-        else {
-            let _sqr = self.norm_sqr();
-            sqrt(_sqr, terms).unwrap_or(D0)
-        }
+    pub fn norm(&self, terms: usize) -> Result<Decimal, Error> {
+        Ok(
+                 if self.is_zero() {D0}
+            else if self.im == D0 { pos(self.re.clone()) }
+            else if self.re == D0 { pos(self.im.clone()) }
+            else {
+                let _sqr = self.norm_sqr()?;
+                sqrt(_sqr, terms)?
+            }
+        )
     }
 
     /// Calculate the principal Arg of self.
     #[inline]
-    pub fn arg(&self, terms: usize) -> Decimal {
-        if self.is_zero() {D0}
-        else {
-            let _norm = self.norm(terms);
-            let _cos = self.re.clone() / _norm;
-            let _sin = self.im.clone() / _norm;
-            atan2(_cos, _sin, terms).unwrap_or(D0)
-        }
+    pub fn arg(&self, terms: usize) -> Result<Decimal, Error> {
+        Ok(
+            if self.is_zero() {D0}
+            else {
+                let _norm = self.norm(terms)?;
+                let _cos = self.re.clone() / _norm;
+                let _sin = self.im.clone() / _norm;
+                atan2(_cos, _sin, terms)?
+            }
+        )
     }
 
     /// Convert to polar form (r, theta)
     #[inline]
-    pub fn to_polar(&self, terms: usize) -> Polar {
-        Polar::new(
-            self.norm(terms),
-            self.arg(terms)
+    pub fn to_polar(&self, terms: usize) -> Result<Polar, Error> {
+        Ok(
+            Polar::new(
+                self.norm(terms)?,
+                self.arg(terms)?
+            )
         )
     }
 }
@@ -142,12 +148,11 @@ impl Complex {
 
     /// Returns `1/self`
     #[inline]
-    pub fn inv(&self) -> Complex {
-        let norm_sqr = self.norm_sqr();
-        Complex::new(
-            self.re.clone() / norm_sqr.clone(),
-            -self.im.clone() / norm_sqr
-        )
+    pub fn inv(&self) -> Result<Complex, Error> {
+        let norm_sqr = self.norm_sqr()?;
+        let re = self.re.clone() / norm_sqr.clone();
+        let im = -self.im.clone() / norm_sqr.clone();
+        Ok(Complex::new(re, im))
     }
 }
 
@@ -222,7 +227,7 @@ impl Div<Complex> for Complex {
 
     #[inline]
     fn div(self, other: Complex) -> Complex {
-        let norm_sqr = other.norm_sqr();
+        let norm_sqr = other.norm_sqr().unwrap();
         let re = self.re.clone() * other.re.clone() + self.im.clone() * other.im.clone();
         let im = self.im * other.re - self.re * other.im;
         Complex::new(re / norm_sqr.clone(), im / norm_sqr)

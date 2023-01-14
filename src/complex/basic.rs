@@ -6,6 +6,7 @@ use rust_decimal::prelude::*;
 // Modules
 use crate::complex::types::{ Complex };
 use crate::complex::euler::{ c_exp, c_ln };
+use crate::error::Error;
 
 //##########################################################################################################################
 
@@ -23,7 +24,7 @@ fn c_pow_series(
     (1..=power).into_iter()
         .map(|_| value)
         .reduce(|u, d| u * d)
-        .unwrap()
+        .unwrap_or(C1)
 }
 
 #[inline]
@@ -50,8 +51,8 @@ pub fn cc_pow(
     value: Complex,
     power: Complex,
     terms: usize
-) -> Complex {
-    let ln_val = c_ln(value, terms);
+) -> Result<Complex, Error> {
+    let ln_val = c_ln(value, terms)?;
     c_exp(ln_val * power, terms)
 }
 

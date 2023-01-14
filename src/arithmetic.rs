@@ -5,6 +5,7 @@ use rust_decimal::prelude::*;
 
 // Modules
 use crate::multiplex::types::{ Multiplex };
+use crate::error::Error;
 
 //##########################################################################################################################
 
@@ -28,27 +29,35 @@ pub fn pos(value: Decimal) -> Decimal {
 fn pow_series(
     value: Decimal,
     power: usize
-) -> Decimal {
-    (1..=power).into_iter()
-        .map(|_| value)
-        .reduce(|u, d| u * d)
-        .unwrap()
+) -> Result<Decimal, Error> {
+    Ok(
+        (1..=power).into_iter()
+            .map(|_| Ok(value))
+            .reduce(|u, d| {
+                let (_u, _d) = (u?, d?);
+                let res = _u.checked_mul(_d).ok_or(Error::MultiplyOverflow)?;
+                Ok(res)
+            })
+            .unwrap_or(Err(Error::IteratorError))?
+    )
 }
 
 #[inline]
 pub fn pow(
     value: Decimal,
     power: usize
-) -> Decimal {
-    match power {
-        0 => D1,
-        1 => value,
-        _ => {
-                 if value == D0 {D0}
-            else if value == D1 {D1}
-            else { pow_series(value, power) }
-        },
-    }
+) -> Result<Decimal, Error> {
+    Ok(
+        match power {
+            0 => D1,
+            1 => value,
+            _ => {
+                     if value == D0 {D0}
+                else if value == D1 {D1}
+                else { pow_series(value, power)? }
+            },
+        }
+    )
 }
 
 //##########################################################################################################################
@@ -56,23 +65,29 @@ pub fn pow(
 fn m_pow_series(
     value: Multiplex,
     power: usize
-) -> Multiplex {
+) -> Result<Multiplex, Error> {
     (1..=power).into_iter()
-        .map(|_| value.clone())
-        .reduce(|u, d| u * d)
-        .unwrap()
+        .map(|_| Ok(value.clone()))
+        .reduce(|u, d| {
+            let (_u, _d) = (u?, d?);
+            let res = _u * _d;
+            Ok(res)
+        })
+        .unwrap_or(Err(Error::IteratorError))
 }
 
 #[inline]
 pub fn m_pow(
     value: Multiplex,
     power: usize
-) -> Multiplex {
-    match power {
-        0 => Multiplex::new(),
-        1 => value,
-        _ => { m_pow_series(value, power) },
-    }
+) -> Result<Multiplex, Error> {
+    Ok(
+        match power {
+            0 => Multiplex::new(),
+            1 => value,
+            _ => { m_pow_series(value, power)? },
+        }
+    )
 }
 
 //##########################################################################################################################
@@ -82,13 +97,33 @@ pub fn a_pow(
     value: Decimal,
     power: usize,
     base: &mut (Decimal, usize)
-) -> Decimal {
+) -> Result<Decimal, Error> {
     if base.1 > power { base.1 = power };
-    let dif = pow(value, power - base.1);
-    let result = dif * base.0;
+    let dif = pow(value, power - base.1)?;
+    let result = dif.checked_mul(base.0).ok_or(Error::MultiplyOverflow)?;
     base.0 = result;
     base.1 = power;
-    result
+    Ok(result)
+}
+
+//##########################################################################################################################
+
+#[inline]
+pub fn am_pow(
+    value: Decimal,
+    power: usize,
+    base: &mut (Multiplex, usize)
+) -> Result<Multiplex, Error> {
+    if base.1 > power { base.1 = power };
+    let mut dif = m_pow(Multiplex::new() * value, power - base.1)?;
+    let mut result = base.0.clone();
+    match dif.squash() {
+        Err(_) => result.mul.append(&mut dif.mul),
+        Ok(v) => result.mul.push(v),
+    };
+    base.0 = result.clone();
+    base.1 = power;
+    Ok(result)
 }
 
 //##########################################################################################################################

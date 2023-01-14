@@ -26,17 +26,17 @@ const CI1: Complex = Complex{ re: D0, im: D1 };
 const C1DIV2: Complex = Complex{ re: D1DIV2, im: D0 };
 
 // Iteration Terms
-const TEST_ITER: usize = 48;
+const TEST_ITER: usize = 32;
 
 //##########################################################################################################################
 
 #[test]
     fn test_sqrt() -> Result<(), Error> {
-        // Test SQRT(4)
-        let res1 = sqrt(D4, TEST_ITER)?;
-        assert_eq!(res1, D2);
         // Test POW(4, 1/2)
-        let res2 = d_pow(D4, D1DIV2, TEST_ITER)?;
+        let res1 = d_pow(D4, D1DIV2, TEST_ITER)?;
+        assert_eq!(res1, D2);
+        // Test SQRT(4)
+        let res2 = sqrt(D4, TEST_ITER)?;
         assert_eq!(res2, D2);
         // Test SQRT(4) = POW(4, 1/2)
         assert_eq!(res1, res2);
@@ -49,10 +49,10 @@ const TEST_ITER: usize = 48;
 #[test]
     fn test_cc_pow() -> Result<(), Error> {
         // Test POW(-1, 1/2)
-        let res1 = cc_pow(-C1, C1DIV2, TEST_ITER);
+        let res1 = cc_pow(-C1, C1DIV2, TEST_ITER)?;
         assert_eq!(res1, CI1);
         // Test POW(4, 1/2)
-        let res2 = cc_pow(C4, C1DIV2, TEST_ITER);
+        let res2 = cc_pow(C4, C1DIV2, TEST_ITER)?;
         assert_eq!(res2, C2);
         // Return Ok
         Ok(())

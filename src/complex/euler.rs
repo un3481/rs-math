@@ -8,11 +8,11 @@ use std::thread::{ spawn };
 use crate::complex::types::{ Complex };
 use crate::trigonometry::{ cos, sin };
 use crate::euler::{ exp, ln };
+use crate::error::Error;
 
 //##########################################################################################################################
 
 // Constants
-const D0: Decimal = dec!(0);
 const D2: Decimal = dec!(2);
 
 //##########################################################################################################################
@@ -21,18 +21,19 @@ const D2: Decimal = dec!(2);
 pub fn c_exp(
     value: Complex,
     terms: usize
-) -> Complex {
-    let p_exp_re = spawn(move || { exp(value.re, terms) });
-    let p_cos_im = spawn(move || { cos(value.im, terms) });
-    let p_sin_im = spawn(move || { sin(value.im, terms) });
+) -> Result<Complex, Error> {
+    // Execute Parallel
+    let p_exp_re = spawn(move || exp(value.re, terms));
+    let p_cos_im = spawn(move || cos(value.im, terms));
+    let p_sin_im = spawn(move || sin(value.im, terms));
     // Extract Variables
-    let exp_re = p_exp_re.join().unwrap();
-    let cos_im = p_cos_im.join().unwrap();
-    let sin_im = p_sin_im.join().unwrap();
+    let exp_re = p_exp_re.join().unwrap()?;
+    let cos_im = p_cos_im.join().unwrap()?;
+    let sin_im = p_sin_im.join().unwrap()?;
     // Calculate Complex
     let re = exp_re * cos_im;
     let im = exp_re * sin_im;
-    Complex::new(re, im)
+    Ok(Complex::new(re, im))
 }
 
 //##########################################################################################################################
@@ -41,14 +42,20 @@ pub fn c_exp(
 pub fn c_ln(
     value: Complex,
     terms: usize
-) -> Complex {
-    let p_val_arg = spawn(move || { value.arg(terms) });
-    let p_ln_norm = spawn(move || { ln(value.norm_sqr(), terms).unwrap_or(D0) / D2 });
+) -> Result<Complex, Error> {
+    /*
+    // Execute Parallel
+    let p_ln_norm = spawn(move || Ok(ln(value.norm_sqr()?, terms)? / D2));
+    let p_val_arg = spawn(move || value.arg(terms));
     // Extract Variables
-    let val_arg = p_val_arg.join().unwrap();
-    let ln_norm = p_ln_norm.join().unwrap();
+    let re = p_ln_norm.join().unwrap()?;
+    let im = p_val_arg.join().unwrap()?;
+    */
+    // Execute Sync
+    let re = ln(value.norm_sqr()?, terms)? / D2;
+    let im = value.arg(terms)?;
     // Calculate Complex
-    Complex::new(ln_norm, val_arg)
+    Ok(Complex::new(re, im))
 }
 
 //##########################################################################################################################

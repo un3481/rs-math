@@ -4,11 +4,12 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
+use crate::multiplex::types::{ Multiplex };
 use crate::constants::{ PI, PIDIV2, PI3DIV2, PI2 };
 use crate::constants::{ PIDIV4, PIDIV6, PIDIV18, PIDIV36 };
 use crate::constants::{ TAN_PIDIV6, TAN_PIDIV18, TAN_PIDIV36 };
 use crate::factorial::{ m_fac };
-use crate::arithmetic::{ dec, a_pow };
+use crate::arithmetic::{ dec, a_pow, am_pow };
 use crate::error::Error;
 
 //##########################################################################################################################
@@ -54,19 +55,25 @@ fn trig_prepare(
 fn cos_series(
     value: Decimal,
     terms: usize
-) -> Decimal {
+) -> Result<Decimal, Error> {
     let mut acc1: (Decimal, usize) = (D1, 0);
-    let mut acc2: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Series
     (0..terms).into_iter()
         .map(|n|
-            a_pow(-D1, n, &mut acc1) * (
-                a_pow(value, 2 * n, &mut acc2) /
-                m_fac(2 * n)
-            ).squash().unwrap()
+            Ok(
+                a_pow(-D1, n, &mut acc1)? * (
+                    am_pow(value, 2 * n, &mut acc2)? /
+                    m_fac(2 * n)?
+                ).squash()?
+            )
         )
-        .reduce(|u, d| u + d)
-        .unwrap_or(D0)
+        .reduce(|u, d| {
+            let (_u, _d) = (u?, d?);
+            let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
+            Ok(res)
+        })
+        .unwrap_or(Err(Error::IteratorError))
 }
 
 //##########################################################################################################################
@@ -75,19 +82,25 @@ fn cos_series(
 fn sin_series(
     value: Decimal,
     terms: usize
-) -> Decimal {
+) -> Result<Decimal, Error> {
     let mut acc1: (Decimal, usize) = (D1, 0);
-    let mut acc2: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Series
     (0..terms).into_iter()
         .map(|n|
-            a_pow(-D1, n, &mut acc1) * (
-                a_pow(value, (2 * n) + 1, &mut acc2) /
-                m_fac((2 * n) + 1)
-            ).squash().unwrap()
+            Ok(
+                a_pow(-D1, n, &mut acc1)? * (
+                    am_pow(value, (2 * n) + 1, &mut acc2)? /
+                    m_fac((2 * n) + 1)?
+                ).squash()?
+            )
         )
-        .reduce(|u, d| u + d)
-        .unwrap_or(D0)
+        .reduce(|u, d| {
+            let (_u, _d) = (u?, d?);
+            let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
+            Ok(res)
+        })
+        .unwrap_or(Err(Error::IteratorError))
 }
 
 //##########################################################################################################################
@@ -96,15 +109,17 @@ fn sin_series(
 pub fn cos(
     value: Decimal,
     terms: usize
-) -> Decimal {
+) -> Result<Decimal, Error> {
     let rem: Decimal = trig_prepare(value);
-         if rem == PI      {-D1}
-    else if rem == PIDIV2  {D0}
-    else if rem == D0      {D1}
-    else if rem == -PIDIV2 {D0}
-    else if rem == -PI     {-D1}
-    else
-        { cos_series(rem, terms) }
+    Ok(
+             if rem == PI      {-D1}
+        else if rem == PIDIV2  {D0}
+        else if rem == D0      {D1}
+        else if rem == -PIDIV2 {D0}
+        else if rem == -PI     {-D1}
+        else
+            { cos_series(rem, terms)? }
+    )
 }
 
 //##########################################################################################################################
@@ -113,15 +128,17 @@ pub fn cos(
 pub fn sin(
     value: Decimal,
     terms: usize
-) -> Decimal {
+) -> Result<Decimal, Error> {
     let rem: Decimal = trig_prepare(value);
-         if rem == PI      {D0}
-    else if rem == PIDIV2  {D1}
-    else if rem == D0      {D0}
-    else if rem == -PIDIV2 {-D1}
-    else if rem == -PI     {D0}
-    else
-        { sin_series(rem, terms) }
+    Ok(
+             if rem == PI      {D0}
+        else if rem == PIDIV2  {D1}
+        else if rem == D0      {D0}
+        else if rem == -PIDIV2 {-D1}
+        else if rem == -PI     {D0}
+        else
+            { sin_series(rem, terms)? }
+    )
 }
 
 //##########################################################################################################################
@@ -215,19 +232,25 @@ fn tan2_prepare(
 fn atan_series(
     value: Decimal,
     terms: usize
-) -> Decimal {
+) -> Result<Decimal, Error> {
     let mut acc1: (Decimal, usize) = (D1, 0);
-    let mut acc2: (Decimal, usize) = (D1, 0);
+    let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Series
     (1..terms).into_iter()
         .map(|n|
-            a_pow(-D1, n, &mut acc1) * (
-                a_pow(value, (2 * n) + 1, &mut acc2) /
-                ((D2 * dec(n)) + D1)
+            Ok(
+                a_pow(-D1, n, &mut acc1)? * (
+                    am_pow(value, (2 * n) + 1, &mut acc2)? /
+                    ((D2 * dec(n)) + D1)
+                ).squash()?
             )
         )
-        .reduce(|u, d| u + d)
-        .unwrap_or(D0)
+        .reduce(|u, d| {
+            let (_u, _d) = (u?, d?);
+            let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
+            Ok(res)
+        })
+        .unwrap_or(Err(Error::IteratorError))
 }
 
 //##########################################################################################################################
@@ -236,14 +259,16 @@ fn atan_series(
 pub fn atan(
     itan: Decimal,
     terms: usize
-) -> Decimal {
-         if itan == D0  {D0}
-    else if itan == D1  {PIDIV4}
-    else if itan == -D1 {-PIDIV4}
-    else {
-        let (tan, rem) = tan_prepare(itan);
-        rem + atan_series(tan, terms)
-    }
+) -> Result<Decimal, Error> {
+    Ok(
+             if itan == D0  {D0}
+        else if itan == D1  {PIDIV4}
+        else if itan == -D1 {-PIDIV4}
+        else {
+            let (tan, rem) = tan_prepare(itan);
+            rem + atan_series(tan, terms)?
+        }
+    )
 }
 
 //##########################################################################################################################
@@ -262,7 +287,7 @@ pub fn atan2(
         else if (icos == D0) && (isin < D0) {-PIDIV2}
         else {
             let (tan, rem) = tan2_prepare(icos, isin);
-            let arg = rem + atan_series(tan, terms);
+            let arg = rem + atan_series(tan, terms)?;
             if arg <= PI {arg} else {arg - PI2}
         }
     )

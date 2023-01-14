@@ -6,6 +6,7 @@ use rust_decimal::prelude::*;
 // Modules
 use crate::complex::types::{ Complex };
 use crate::complex::euler::{ c_exp, c_ln };
+use crate::error::Error;
 
 //##########################################################################################################################
 
@@ -24,10 +25,10 @@ const CI2: Complex = Complex{ re: D0, im: D2 };
 pub fn c_cos(
     value: Complex,
     terms: usize
-) -> Complex {
-    let ei = c_exp(value * CI, terms);
+) -> Result<Complex, Error> {
+    let ei = c_exp(value * CI, terms)?;
     let ein = C1 / ei;
-    (ei + ein) / C2
+    Ok((ei + ein) / C2)
 }
 
 //##########################################################################################################################
@@ -37,10 +38,10 @@ pub fn c_cos(
 pub fn c_sin(
     value: Complex,
     terms: usize
-) -> Complex {
-    let ei = c_exp(value * CI, terms);
+) -> Result<Complex, Error> {
+    let ei = c_exp(value * CI, terms)?;
     let ein = C1 / ei;
-    (ei - ein) / CI2
+    Ok((ei - ein) / CI2)
 }
 
 //##########################################################################################################################
@@ -50,10 +51,13 @@ pub fn c_sin(
 pub fn c_tan(
     value: Complex,
     terms: usize
-) -> Complex {
-    let ei = c_exp(value * CI, terms);
+) -> Result<Complex, Error> {
+    let ei = c_exp(value * CI, terms)?;
     let ein = C1 / ei;
-    ((ei - ein) / CI2) / ((ei + ein) / C2)
+    Ok(
+        ((ei - ein) / CI2) /
+        ((ei + ein) / C2)
+    )
 }
 
 //##########################################################################################################################
@@ -63,11 +67,11 @@ pub fn c_tan(
 pub fn c_atan(
     value: Complex,
     terms: usize
-) -> Complex {
+) -> Result<Complex, Error> {
     let term1 = C1 + (CI * value);
     let term2 = C1 - (CI * value);
-    let ln_term = c_ln(term1 / term2, terms);
-    ln_term / CI2
+    let ln_term = c_ln(term1 / term2, terms)?;
+    Ok(ln_term / CI2)
 }
 
 //##########################################################################################################################

@@ -4,9 +4,10 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
+use crate::multiplex::types::{ Multiplex };
 use crate::constants::{ SQRT_3DIV2 };
 use crate::factorial::{ m_fac };
-use crate::arithmetic::{ a_pow, m_pow };
+use crate::arithmetic::{ m_pow, am_pow };
 use crate::euler::{ exp, ln };
 use crate::error::Error;
 
@@ -46,27 +47,33 @@ fn sqrt_prepare(
 fn sqrt_series(
     value: Decimal,
     terms: usize
-) -> Decimal {
-    let mut acc1: (Decimal, usize) = (D1, 0);
-    let mut acc2: (Decimal, usize) = (D1, 0);
+) -> Result<Decimal, Error> {
+    let mut acc1: (Multiplex, usize) = (Multiplex::new(), 0);
+    let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Taylor Series
     (1..=terms).into_iter()
         .map(|n|
-            (
+            Ok(
                 (
-                    value *
-                    m_fac(2 * (n - 1)) *
-                    a_pow(D1 - value, n - 1, &mut acc1)
-                ) /
-                m_pow(
-                    m_fac(n - 1) *
-                    a_pow(D2, n - 1, &mut acc2),
-                    2
-                )
-            ).squash().unwrap()
+                    (
+                        value *
+                        m_fac(2 * (n - 1))? *
+                        am_pow(D1 - value, n - 1, &mut acc1)?
+                    ) /
+                    m_pow(
+                        m_fac(n - 1)? *
+                        am_pow(D2, n - 1, &mut acc2)?,
+                        2
+                    )?
+                ).squash()?
+            )
         )
-        .reduce(|u, d| u + d)
-        .unwrap_or(D0)
+        .reduce(|u, d| {
+            let (_u, _d) = (u?, d?);
+            let res = _u.checked_add(_d).ok_or(Error::AddOverflow)?;
+            Ok(res)
+        })
+        .unwrap_or(Err(Error::IteratorError))
 }
  
 //##########################################################################################################################
@@ -82,7 +89,7 @@ pub fn sqrt(
         else if value == D1 {D1}
         else {
             let (ratio, rem) = sqrt_prepare(value);
-            ratio * sqrt_series(rem, terms)
+            ratio * sqrt_series(rem, terms)?
         }
     )
 }
@@ -99,7 +106,7 @@ pub fn d_pow(
     match ln(value, terms) {
         Err(err) => Err(err),
         Ok(ln_val) => Ok(
-            exp(ln_val * power, terms)
+            exp(ln_val * power, terms)?
         ),
     }
 }

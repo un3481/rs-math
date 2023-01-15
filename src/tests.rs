@@ -64,7 +64,8 @@ fn test_sqrt() -> Result<(), Error> {
 fn test_euler() -> Result<(), Error> {
     // exp(2)
     let res1 = exp(D2, STD_ITER_LONG)?.round_dp(STD_DEC);
-    assert_eq!(res1, E_SQR.round_dp(STD_DEC));
+    let e_sqr_std = E_SQR.round_dp(STD_DEC);
+    assert_eq!(res1, e_sqr_std);
     // ln(e ^ 2)
     let res2 = ln(E_SQR, STD_ITER)?.round_dp(STD_DEC);
     assert_eq!(res2, D2);

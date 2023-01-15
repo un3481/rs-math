@@ -30,7 +30,7 @@ const C4: Complex = Complex{ re: D4, im: D0 };
 const CI1: Complex = Complex{ re: D0, im: D1 };
 const C1DIV2: Complex = Complex{ re: D1DIV2, im: D0 };
 
-// Min Decimal
+// Decimal Precision
 const STD_DEC: u32 = 16;
 
 // Iteration Terms

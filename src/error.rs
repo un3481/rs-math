@@ -5,5 +5,4 @@ pub enum Error {
     MultiplyOverflow,
     InputOutOfRange,
     IteratorError,
-    InvalidSineCosinePair,
 }

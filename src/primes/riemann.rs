@@ -18,7 +18,7 @@ const D1NEG: Decimal = dec!(-1);
 fn mobius(
     value: usize
 ) -> Result<Decimal, Error> {
-    if value <= 0 { return Err(Error::InputOutOfRange) };
+    if value <= 0 { Err(Error::InputOutOfRange)? };
     // Set Variables
     let mut acc: usize = value;
     let mut primes: usize = 0;

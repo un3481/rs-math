@@ -100,7 +100,7 @@ pub fn sqrt(
     value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
-    if value < D0 { return Err(Error::InputOutOfRange) };
+    if value < D0 { Err(Error::InputOutOfRange)? };
     Ok(
              if value == D0 {D0}
         else if value == D1 {D1}
@@ -136,6 +136,8 @@ fn int_sqrt_100(
     )
 }
 
+//##########################################################################################################################
+
 #[inline]
 fn int_sqrt_helper(
     value: Decimal
@@ -165,7 +167,7 @@ fn int_sqrt_helper(
 pub fn int_sqrt(
     value: Decimal
 ) -> Result<Decimal, Error> {
-    if value.fract() != D0 { return Err(Error::InputOutOfRange) };
+    if value.fract() != D0 { Err(Error::InputOutOfRange)? };
     if value <= D100 { int_sqrt_100(value) }
     else { int_sqrt_helper(value) }
 }

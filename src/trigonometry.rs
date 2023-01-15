@@ -263,7 +263,7 @@ pub fn atan2(
     isin: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
-    if !is_valid_pair(icos, isin) { return Err(Error::InvalidSineCosinePair) };
+    if !is_valid_pair(icos, isin) { Err(Error::InputOutOfRange)? };
     Ok(
              if (icos >  D0) && (isin == D0) {D0}
         else if (icos == D0) && (isin >  D0) {PIDIV2}

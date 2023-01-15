@@ -294,7 +294,7 @@ const LFAC: [Decimal; 274] = [
 
 #[inline]
 pub fn fac(value: usize) -> Result<Decimal, Error> {
-    if value > 27 { return Err(Error::InputOutOfRange) };
+    if value > 27 { Err(Error::InputOutOfRange)? };
     Ok(LFAC[value])
 }
 
@@ -302,7 +302,7 @@ pub fn fac(value: usize) -> Result<Decimal, Error> {
 
 #[inline]
 pub fn m_fac(value: usize) -> Result<Multiplex, Error> {
-    if value > 255 { return Err(Error::InputOutOfRange) };
+    if value > 255 { Err(Error::InputOutOfRange)? };
     // Set Variables
     let mut result = Multiplex::new();
     let mut acc: usize = 0;

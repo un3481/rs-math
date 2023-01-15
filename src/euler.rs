@@ -126,7 +126,7 @@ pub fn ln(
     value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
-    if value <= D0 { return Err(Error::InputOutOfRange) };
+    if value <= D0 { Err(Error::InputOutOfRange)? };
     Ok(
              if value == D1     {D0}
         else if value == E      {D1}

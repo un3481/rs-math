@@ -170,8 +170,8 @@ fn tan_lower(
     let mut rem: Decimal = value;
     let mut base: Decimal = offset;
     loop {
-        if rem < D1DIV5 {break};
-             if rem > D1     { base = base + PIDIV6;  rem = tan_sub(rem, TAN_PIDIV6);  }
+             if rem < D1DIV5 { break;                                                  }
+        else if rem > D1     { base = base + PIDIV6;  rem = tan_sub(rem, TAN_PIDIV6);  }
         else if rem > D2DIV5 { base = base + PIDIV18; rem = tan_sub(rem, TAN_PIDIV18); }
         else                 { base = base + PIDIV36; rem = tan_sub(rem, TAN_PIDIV36); };
     };
@@ -195,15 +195,15 @@ fn tan_prepare(
 
 #[inline]
 fn tan2_prepare(
-    icos: Decimal,
-    isin: Decimal
+    _cos: Decimal,
+    _sin: Decimal
 ) -> (Decimal, Decimal) {
-    let mut rem: Decimal = isin / icos;
+    let mut rem: Decimal = _sin / _cos;
     let mut base: Decimal = D0;
-    let pair: (Decimal, Decimal) = (icos, isin);
-         if (isin <  D0) && (icos >  D0) { base = PI3DIV2; rem = tan_sub2(pair, PI3DIV2_PAIR); }
-    else if (isin <  D0) && (icos <= D0) { base = PI;      rem = tan_sub2(pair, PI_PAIR);      }
-    else if (isin >= D0) && (icos >  D0) { base = PIDIV2;  rem = tan_sub2(pair, PIDIV2_PAIR);  };
+    let pair: (Decimal, Decimal) = (_cos, _sin);
+         if (_sin <  D0) && (_cos >  D0) { base = PI3DIV2; rem = tan_sub2(pair, PI3DIV2_PAIR); }
+    else if (_sin <  D0) && (_cos <= D0) { base = PI;      rem = tan_sub2(pair, PI_PAIR);      }
+    else if (_sin >= D0) && (_cos >  D0) { base = PIDIV2;  rem = tan_sub2(pair, PIDIV2_PAIR);  };
     tan_lower(rem, base)
 }
 
@@ -234,15 +234,15 @@ fn atan_series(
 
 #[inline]
 pub fn atan(
-    itan: Decimal,
+    value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
     Ok(
-             if itan == D0  {D0}
-        else if itan == D1  {PIDIV4}
-        else if itan == -D1 {-PIDIV4}
+             if value == D0  {D0}
+        else if value == D1  {PIDIV4}
+        else if value == -D1 {-PIDIV4}
         else {
-            let (rem, base) = tan_prepare(itan);
+            let (rem, base) = tan_prepare(value);
             base + atan_series(rem, terms)?
         }
     )
@@ -252,20 +252,20 @@ pub fn atan(
 
 #[inline]
 pub fn atan2(
-    icos: Decimal,
-    isin: Decimal,
+    _cos: Decimal,
+    _sin: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
-    if !is_valid_pair(icos, isin) { Err(Error::InputOutOfRange)? };
+    if !is_valid_pair(_cos, _sin) { Err(Error::InputOutOfRange)? };
     Ok(
-             if (icos >  D0) && (isin == D0) {D0}
-        else if (icos == D0) && (isin >  D0) {PIDIV2}
-        else if (icos <  D0) && (isin == D0) {PI}
-        else if (icos == D0) && (isin <  D0) {-PIDIV2}
+             if (_cos >  D0) && (_sin == D0) {D0}
+        else if (_cos == D0) && (_sin >  D0) {PIDIV2}
+        else if (_cos <  D0) && (_sin == D0) {PI}
+        else if (_cos == D0) && (_sin <  D0) {-PIDIV2}
         else {
-            let (rem, base) = tan2_prepare(icos, isin);
-            let res = base + atan_series(rem, terms)?;
-            if res <= PI {res} else {res - PI2}
+            let (rem, base) = tan2_prepare(_cos, _sin);
+            let arg = base + atan_series(rem, terms)?;
+            if arg <= PI {arg} else {arg - PI2}
         }
     )
 }

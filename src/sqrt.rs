@@ -35,30 +35,30 @@ fn sqrt_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
     let mut rem: Decimal = value;
-    let mut exp: Decimal = D1;
+    let mut base: Decimal = D1;
     loop {
         if rem > D4 {
             rem = rem / D4;
-            exp = exp * D2;
+            base = base * D2;
         }
         else if rem < D1DIV4 {
             rem = rem * D4;
-            exp = exp / D2;
+            base = base / D2;
         }
         else {break}
     };
     loop {
         if rem > SQRT_UPPER_BD {
             rem = rem / SQRT_UPPER_BD;
-            exp = exp * SQRT_UPPER_VAL;
+            base = base * SQRT_UPPER_VAL;
         }
         else if rem < SQRT_LOWER_BD {
             rem = rem / SQRT_LOWER_BD;
-            exp = exp * SQRT_LOWER_VAL;
+            base = base * SQRT_LOWER_VAL;
         }
         else {break}
     };
-    (exp, rem)
+    (rem, base)
 }
 
 //##########################################################################################################################
@@ -105,8 +105,8 @@ pub fn sqrt(
              if value == D0 {D0}
         else if value == D1 {D1}
         else {
-            let (exp, rem) = sqrt_prepare(value);
-            exp * sqrt_series(rem, terms)?
+            let (rem, base) = sqrt_prepare(value);
+            base * sqrt_series(rem, terms)?
         }
     )
 }

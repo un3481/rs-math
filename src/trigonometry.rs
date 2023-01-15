@@ -164,36 +164,31 @@ fn tan_sub(arg: Decimal, sub: Decimal) -> Decimal {
 
 #[inline]
 fn tan_lower(
-    itan: Decimal,
+    value: Decimal,
     offset: Decimal
 ) -> (Decimal, Decimal) {
-    let mut rem: Decimal = offset;
-    let mut tansub: Decimal = itan;
+    let mut rem: Decimal = value;
+    let mut base: Decimal = offset;
     loop {
-        if tansub < D1DIV5 {break};
-        tansub =
-                 if tansub > D1     { rem = rem + PIDIV6;  tan_sub(tansub, TAN_PIDIV6)  }
-            else if tansub > D2DIV5 { rem = rem + PIDIV18; tan_sub(tansub, TAN_PIDIV18) }
-            else                    { rem = rem + PIDIV36; tan_sub(tansub, TAN_PIDIV36) }
-        ;
+        if rem < D1DIV5 {break};
+             if rem > D1     { base = base + PIDIV6;  rem = tan_sub(rem, TAN_PIDIV6);  }
+        else if rem > D2DIV5 { base = base + PIDIV18; rem = tan_sub(rem, TAN_PIDIV18); }
+        else                 { base = base + PIDIV36; rem = tan_sub(rem, TAN_PIDIV36); };
     };
-    (tansub, rem)
+    (rem, base)
 }
 
 //##########################################################################################################################
 
 #[inline]
 fn tan_prepare(
-    itan: Decimal
+    value: Decimal
 ) -> (Decimal, Decimal) {
-    let rem: Decimal;
-    let tansub: Decimal =
-             if itan >= D0  { rem = D0;      itan                             }
-        else if itan >  -D1 { rem = -PIDIV4; tan_sub(itan, -D1)               }
-        else if itan <= -D1 { rem = -PIDIV2; tan_sub(tan_sub(itan, -D1), -D1) }
-        else                { rem = D0;      itan                             }
-    ;
-    tan_lower(tansub, rem)
+    let mut rem: Decimal = value;
+    let mut base: Decimal = D0;
+         if rem >  -D1 { base = -PIDIV4; rem = tan_sub(rem, -D1);               }
+    else if rem <= -D1 { base = -PIDIV2; rem = tan_sub(tan_sub(rem, -D1), -D1); };
+    tan_lower(rem, base)
 }
 
 //##########################################################################################################################
@@ -203,15 +198,13 @@ fn tan2_prepare(
     icos: Decimal,
     isin: Decimal
 ) -> (Decimal, Decimal) {
-    let pair = (icos, isin);
-    let rem: Decimal;
-    let tansub: Decimal =
-             if (isin <  D0) && (icos >  D0) { rem = PI3DIV2; tan_sub2(pair, PI3DIV2_PAIR) }
-        else if (isin <  D0) && (icos <= D0) { rem = PI;      tan_sub2(pair, PI_PAIR)      }
-        else if (isin >= D0) && (icos >  D0) { rem = PIDIV2;  tan_sub2(pair, PIDIV2_PAIR)  }
-        else                                 { rem = D0;      isin / icos                  }
-    ;
-    tan_lower(tansub, rem)
+    let mut rem: Decimal = isin / icos;
+    let mut base: Decimal = D0;
+    let pair: (Decimal, Decimal) = (icos, isin);
+         if (isin <  D0) && (icos >  D0) { base = PI3DIV2; rem = tan_sub2(pair, PI3DIV2_PAIR); }
+    else if (isin <  D0) && (icos <= D0) { base = PI;      rem = tan_sub2(pair, PI_PAIR);      }
+    else if (isin >= D0) && (icos >  D0) { base = PIDIV2;  rem = tan_sub2(pair, PIDIV2_PAIR);  };
+    tan_lower(rem, base)
 }
 
 //##########################################################################################################################
@@ -249,8 +242,8 @@ pub fn atan(
         else if itan == D1  {PIDIV4}
         else if itan == -D1 {-PIDIV4}
         else {
-            let (tan, rem) = tan_prepare(itan);
-            rem + atan_series(tan, terms)?
+            let (rem, base) = tan_prepare(itan);
+            base + atan_series(rem, terms)?
         }
     )
 }
@@ -270,9 +263,9 @@ pub fn atan2(
         else if (icos <  D0) && (isin == D0) {PI}
         else if (icos == D0) && (isin <  D0) {-PIDIV2}
         else {
-            let (tan, rem) = tan2_prepare(icos, isin);
-            let arg = rem + atan_series(tan, terms)?;
-            if arg <= PI {arg} else {arg - PI2}
+            let (rem, base) = tan2_prepare(icos, isin);
+            let res = base + atan_series(rem, terms)?;
+            if res <= PI {res} else {res - PI2}
         }
     )
 }

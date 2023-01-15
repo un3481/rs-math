@@ -65,30 +65,30 @@ fn ln_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
     let mut rem: Decimal = value;
-    let mut exp: Decimal = D0;
+    let mut base: Decimal = D0;
     loop {
         if rem > E_SQR {
             rem = rem / E;
-            exp = exp + D1;
+            base = base + D1;
         }
         else if rem < D1 {
             rem = rem * E;
-            exp = exp - D1;
+            base = base - D1;
         }
         else {break}
     };
     loop {
         if rem > LN_UPPER_BD {
             rem = rem / LN_UPPER_BD;
-            exp = exp + LN_UPPER_VAL;
+            base = base + LN_UPPER_VAL;
         }
         else if rem < LN_LOWER_BD {
             rem = rem * LN_LOWER_BD;
-            exp = exp - LN_LOWER_VAL;
+            base = base - LN_LOWER_VAL;
         }
         else {break}
     };
-    (exp, rem)
+    (rem, base)
 }
 
 //##########################################################################################################################
@@ -132,8 +132,8 @@ pub fn ln(
         else if value == E      {D1}
         else if value == D1DIVE {-D1}
         else {
-            let (exp, rem) = ln_prepare(value);
-            exp + ln_series(rem, terms)?
+            let (rem, base) = ln_prepare(value);
+            base + ln_series(rem, terms)?
         }
     )
 }

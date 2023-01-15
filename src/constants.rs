@@ -21,8 +21,8 @@ pub const SQRT_LOWER_VAL: Decimal = dec!(0.9); // sqrt(0.9 ^ 2)
 
 pub const LN_UPPER_BD: Decimal = dec!(3.0041660239464331120584079536); // (e ^ 1.1)
 pub const LN_LOWER_BD: Decimal = dec!(2.4596031111569496638001265636); // (e ^ 0.9)
-pub const LN_UPPER_EXP_VAL: Decimal = dec!(1.1); // ln(e ^ 1.1)
-pub const LN_LOWER_EXP_VAL: Decimal = dec!(0.9); // ln(e ^ 0.9)
+pub const LN_UPPER_VAL: Decimal = dec!(1.1); // ln(e ^ 1.1)
+pub const LN_LOWER_VAL: Decimal = dec!(0.9); // ln(e ^ 0.9)
 
 pub const PI: Decimal = dec!(3.1415926535897932384626433833);
 pub const PI2: Decimal = dec!(6.2831853071795864769252867666);

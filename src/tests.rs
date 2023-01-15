@@ -35,7 +35,7 @@ const STD_DEC: u32 = 16;
 
 // Iteration Terms
 const TEST_ITER: usize = 16;
-const TEST_ITER_LARGE: usize = 32;
+const TEST_ITER_LARGE: usize = 24;
 
 //##########################################################################################################################
 

@@ -7,10 +7,10 @@ use std::fmt;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 // Modules
-use crate::trigonometry::{ cos, sin, atan2 };
-use crate::arithmetic::{ pos };
-use crate::basic::{ sqrt };
 use crate::error::Error;
+use crate::basic::{ pos };
+use crate::sqrt::{ sqrt };
+use crate::trigonometry::{ cos, sin, atan2 };
 
 //##########################################################################################################################
 

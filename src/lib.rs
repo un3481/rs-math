@@ -1,12 +1,12 @@
 
 pub mod error;
-pub mod multiplex;
-pub mod factorial;
-pub mod arithmetic;
 pub mod constants;
+pub mod basic;
+pub mod sqrt;
+pub mod factorial;
 pub mod trigonometry;
 pub mod euler;
-pub mod basic;
+pub mod multiplex;
 pub mod complex;
 //pub mod primes;
 

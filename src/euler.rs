@@ -4,12 +4,13 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
-use crate::multiplex::types::{ Multiplex };
 use crate::constants::{ E, D1DIVE, E_SQR };
 use crate::constants::{ LN_UPPER_BD, LN_LOWER_BD, LN_UPPER_EXP_VAL, LN_LOWER_EXP_VAL };
-use crate::factorial::{ m_fac };
-use crate::arithmetic::{ dec, a_pow, am_pow };
+
 use crate::error::Error;
+use crate::multiplex::types::{ Multiplex };
+use crate::factorial::{ m_fac };
+use crate::basic::{ dec, a_pow, am_pow };
 
 //##########################################################################################################################
 

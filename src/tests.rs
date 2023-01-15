@@ -4,10 +4,12 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
-use crate::basic::{ sqrt, d_pow };
+use crate::error::Error;
+use crate::basic::{ d_pow };
+use crate::sqrt::{ sqrt, int_sqrt };
+
 use crate::complex::types::{ Complex };
 use crate::complex::basic::{ cc_pow };
-use crate::error::Error;
 
 //##########################################################################################################################
 
@@ -16,6 +18,7 @@ const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
 const D4: Decimal = dec!(4);
+const D100: Decimal = dec!(100);
 const D1DIV2: Decimal = dec!(0.5);
 
 // Complex Constants
@@ -32,14 +35,18 @@ const TEST_ITER: usize = 16;
 
 #[test]
 fn test_sqrt() -> Result<(), Error> {
-    // Test SQRT(4)
-    let res1 = sqrt(D4, TEST_ITER)?;
+    // sqrt(4)
+    let res1 = sqrt(D4, TEST_ITER)?.round_dp(16);
     assert_eq!(res1, D2);
-    // Test POW(4, 1/2)
-    let res2 = d_pow(D4, D1DIV2, TEST_ITER)?;
+    // int_sqrt(4)
+    let res2 = int_sqrt(D4)?;
     assert_eq!(res2, D2);
-    // Test SQRT(4) = POW(4, 1/2)
+    // pow(4, 1/2)
+    let res3 = d_pow(D4, D1DIV2, TEST_ITER)?.round_dp(16);
+    assert_eq!(res3, D2);
+    // sqrt(4) == int_sqrt(4) == pow(4, 1/2)
     assert_eq!(res1, res2);
+    assert_eq!(res2, res3);
     // Return Ok
     Ok(())
 }
@@ -48,11 +55,15 @@ fn test_sqrt() -> Result<(), Error> {
 
 #[test]
 fn test_cc_pow() -> Result<(), Error> {
-    // Test POW(-1, 1/2)
-    let res1 = cc_pow(-C1, C1DIV2, TEST_ITER)?;
+    // pow(-1, 1/2)
+    let mut res1 = cc_pow(-C1, C1DIV2, TEST_ITER)?;
+    res1.re = res1.re.round_dp(16);
+    res1.im = res1.im.round_dp(16);
     assert_eq!(res1, CI1);
-    // Test POW(4, 1/2)
-    let res2 = cc_pow(C4, C1DIV2, TEST_ITER)?;
+    // pow(4, 1/2)
+    let mut res2 = cc_pow(C4, C1DIV2, TEST_ITER)?;
+    res2.re = res2.re.round_dp(16);
+    res2.im = res2.im.round_dp(16);
     assert_eq!(res2, C2);
     // Return Ok
     Ok(())

@@ -4,9 +4,9 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
-use crate::multiplex::types::{ Multiplex };
-use crate::arithmetic::{ dec, a_pow, am_pow };
 use crate::error::Error;
+use crate::multiplex::types::{ Multiplex };
+use crate::basic::{ dec, a_pow, am_pow };
 
 //##########################################################################################################################
 

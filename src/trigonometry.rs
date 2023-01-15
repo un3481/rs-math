@@ -4,13 +4,14 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
-use crate::multiplex::types::{ Multiplex };
 use crate::constants::{ PI, PIDIV2, PI3DIV2, PI2 };
 use crate::constants::{ PIDIV4, PIDIV6, PIDIV18, PIDIV36 };
 use crate::constants::{ TAN_PIDIV6, TAN_PIDIV18, TAN_PIDIV36 };
-use crate::factorial::{ m_fac };
-use crate::arithmetic::{ dec, a_pow, am_pow };
+
 use crate::error::Error;
+use crate::multiplex::types::{ Multiplex };
+use crate::factorial::{ m_fac };
+use crate::basic::{ dec, a_pow, am_pow };
 
 //##########################################################################################################################
 

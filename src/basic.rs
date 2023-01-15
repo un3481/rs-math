@@ -4,21 +4,132 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
-use crate::multiplex::types::{ Multiplex };
-use crate::constants::{ SQRT_EXP_VAL, SQRT_EXP_BD, SQRT_UPPER_BD, SQRT_LOWER_BD };
-use crate::factorial::{ m_fac };
-use crate::arithmetic::{ m_pow, am_pow };
-use crate::euler::{ exp, ln };
 use crate::error::Error;
+use crate::multiplex::types::{ Multiplex };
+use crate::euler::{ exp, ln };
 
 //##########################################################################################################################
 
-// Constants
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
-const D2: Decimal = dec!(2);
-const D4: Decimal = dec!(4);
-const D1DIV4: Decimal = dec!(0.25);
+
+//##########################################################################################################################
+
+#[inline]
+pub fn dec(value: usize) -> Decimal {
+    Decimal::new(value as i64, 0)
+}
+
+#[inline]
+pub fn pos(value: Decimal) -> Decimal {
+    if value < D0 {-value} else {value}
+}
+
+//##########################################################################################################################
+
+#[inline]
+fn pow_series(
+    value: Decimal,
+    power: usize
+) -> Result<Decimal, Error> {
+    (1..=power).into_iter()
+        .map(|_| Ok(value))
+        .reduce(|u, d| Ok(
+            u?.checked_mul(d?).ok_or(Error::MultiplyOverflow)?
+        ))
+        .unwrap_or(Err(Error::IteratorError))
+}
+
+#[inline]
+pub fn pow(
+    value: Decimal,
+    power: usize
+) -> Result<Decimal, Error> {
+    Ok(
+        match power {
+            0 => D1,
+            1 => value,
+            _ => {
+                     if value == D0 {D0}
+                else if value == D1 {D1}
+                else { pow_series(value, power)? }
+            },
+        }
+    )
+}
+
+//##########################################################################################################################
+
+#[inline]
+fn m_pow_series(
+    value: Multiplex,
+    power: usize
+) -> Result<Multiplex, Error> {
+    (1..=power).into_iter()
+        .map(|_| Ok(value.clone()))
+        .reduce(|u, d| Ok(u? * d?))
+        .unwrap_or(Err(Error::IteratorError))
+}
+
+#[inline]
+pub fn m_pow(
+    value: Multiplex,
+    power: usize
+) -> Result<Multiplex, Error> {
+    Ok(
+        match power {
+            0 => Multiplex::new(),
+            1 => value,
+            _ => { m_pow_series(value, power)? },
+        }
+    )
+}
+
+//##########################################################################################################################
+
+#[inline]
+pub fn a_pow(
+    value: Decimal,
+    power: usize,
+    base: &mut (Decimal, usize)
+) -> Result<Decimal, Error> {
+    // Apply Power
+    let exp = if base.1 > power {power} else {base.1};
+    let dif = pow(value, power - exp)?;
+    // Calculate Result
+    let result = base.0.clone()
+        .checked_mul(dif)
+        .ok_or(Error::MultiplyOverflow)?;
+    // Update Base
+    base.0 = result.clone();
+    base.1 = power;
+    // Return Result
+    Ok(result)
+}
+
+//##########################################################################################################################
+
+#[inline]
+pub fn am_pow(
+    value: Decimal,
+    power: usize,
+    base: &mut (Multiplex, usize)
+) -> Result<Multiplex, Error> {
+    // Apply Power
+    let exp = if base.1 > power {power} else {base.1};
+    let mut dif = m_pow(value * Multiplex::new(), power - exp)?;
+    // Calculate Result
+    let mut result = base.0.clone();
+    match dif.squash() {
+        Err(_) => result.mul.append(&mut dif.mul),
+        Ok(v) => result.mul.push(v),
+    };
+    // Update Base
+    base.0 = result.clone();
+    base.1 = power;
+    // Return Result
+    Ok(result)
+}
 
 //##########################################################################################################################
 
@@ -31,89 +142,6 @@ pub fn d_pow(
 ) -> Result<Decimal, Error> {
     let ln_val = ln(value, terms)?;
     exp(ln_val * power, terms)
-}
-
-//##########################################################################################################################
-
-#[inline]
-fn sqrt_prepare(
-    value: Decimal
-) -> (Decimal, Decimal) {
-    let mut rem: Decimal = value;
-    let mut exp: Decimal = D1;
-    loop {
-        if rem > D4 {
-            rem = rem / D4;
-            exp = exp * D2;
-        }
-        else if rem < D1DIV4 {
-            rem = rem * D4;
-            exp = exp / D2;
-        }
-        else {break}
-    };
-    loop {
-        if rem > SQRT_UPPER_BD {
-            rem = rem / SQRT_EXP_BD;
-            exp = exp * SQRT_EXP_VAL;
-        }
-        else if rem < SQRT_LOWER_BD {
-            rem = rem * SQRT_EXP_BD;
-            exp = exp / SQRT_EXP_VAL;
-        }
-        else {break}
-    };
-    (exp, rem)
-}
-
-//##########################################################################################################################
-
-/// sqrt(x) = sum(n=1; (x * (2 * (n - 1))! * (1 - x)^(n - 1)) / ((n - 1)! * 2^(n - 1))^2)
-#[inline]
-fn sqrt_series(
-    value: Decimal,
-    terms: usize
-) -> Result<Decimal, Error> {
-    let mut acc1: (Multiplex, usize) = (Multiplex::new(), 0);
-    let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
-    // Iterate over Taylor Series
-    (1..=terms).into_iter()
-        .map(|n| Ok(
-            (
-                (
-                    value *
-                    m_fac(2 * (n - 1))? *
-                    am_pow(D1 - value, n - 1, &mut acc1)?
-                ) /
-                m_pow(
-                    m_fac(n - 1)? *
-                    am_pow(D2, n - 1, &mut acc2)?,
-                    2
-                )?
-            ).squash()?
-        ))
-        .reduce(|u, d| Ok(
-            u?.checked_add(d?).ok_or(Error::AddOverflow)?
-        ))
-        .unwrap_or(Ok(D0))
-}
- 
-//##########################################################################################################################
-
-#[inline]
-pub fn sqrt(
-    value: Decimal,
-    terms: usize
-) -> Result<Decimal, Error> {
-    if value < D0 { return Err(Error::InputOutOfRange) };
-    Ok(
-             if value == D0 {D0}
-        else if value == D1 {D1}
-        else {
-            let (exp, rem) = sqrt_prepare(value);
-            exp * sqrt_series(rem, terms)?
-        }
-    )
 }
 
 //##########################################################################################################################

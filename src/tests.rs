@@ -18,7 +18,6 @@ const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
 const D4: Decimal = dec!(4);
-const D100: Decimal = dec!(100);
 const D1DIV2: Decimal = dec!(0.5);
 
 // Complex Constants
@@ -35,11 +34,11 @@ const TEST_ITER: usize = 16;
 
 #[test]
 fn test_sqrt() -> Result<(), Error> {
-    // sqrt(4)
-    let res1 = sqrt(D4, TEST_ITER)?.round_dp(16);
-    assert_eq!(res1, D2);
     // int_sqrt(4)
-    let res2 = int_sqrt(D4)?;
+    let res1 = int_sqrt(D4)?;
+    assert_eq!(res1, D2);
+    // sqrt(4)
+    let res2 = sqrt(D4, TEST_ITER)?.round_dp(16);
     assert_eq!(res2, D2);
     // pow(4, 1/2)
     let res3 = d_pow(D4, D1DIV2, TEST_ITER)?.round_dp(16);
@@ -55,16 +54,13 @@ fn test_sqrt() -> Result<(), Error> {
 
 #[test]
 fn test_cc_pow() -> Result<(), Error> {
-    // pow(-1, 1/2)
-    let mut res1 = cc_pow(-C1, C1DIV2, TEST_ITER)?;
-    res1.re = res1.re.round_dp(16);
-    res1.im = res1.im.round_dp(16);
-    assert_eq!(res1, CI1);
     // pow(4, 1/2)
-    let mut res2 = cc_pow(C4, C1DIV2, TEST_ITER)?;
-    res2.re = res2.re.round_dp(16);
-    res2.im = res2.im.round_dp(16);
-    assert_eq!(res2, C2);
+    let mut res1 = cc_pow(C4, C1DIV2, TEST_ITER)?;
+    res1.re = res1.re.round_dp(16);
+    assert_eq!(res1, C2);
+    // pow(-1, 1/2)
+    let res2 = cc_pow(-C1, C1DIV2, TEST_ITER)?;
+    assert_eq!(res2, CI1);
     // Return Ok
     Ok(())
 }

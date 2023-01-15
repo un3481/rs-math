@@ -25,15 +25,8 @@ const D7: Decimal = dec!(7);
 const D8: Decimal = dec!(8);
 const D9: Decimal = dec!(9);
 const D10: Decimal = dec!(10);
-const D1DIV4: Decimal = dec!(0.25);
-
-const D16: Decimal = dec!(16);
-const D25: Decimal = dec!(25);
-const D36: Decimal = dec!(36);
-const D49: Decimal = dec!(49);
-const D64: Decimal = dec!(64);
-const D81: Decimal = dec!(81);
 const D100: Decimal = dec!(100);
+const D1DIV4: Decimal = dec!(0.25);
 
 //##########################################################################################################################
 
@@ -124,18 +117,23 @@ pub fn sqrt(
 fn int_sqrt_100(
     value: Decimal
 ) -> Result<Decimal, Error> {
-         if value == D0   {Ok(D0 )}
-    else if value == D1   {Ok(D1 )}
-    else if value == D4   {Ok(D2 )}
-    else if value == D9   {Ok(D3 )}
-    else if value == D16  {Ok(D4 )}
-    else if value == D25  {Ok(D5 )}
-    else if value == D36  {Ok(D6 )}
-    else if value == D49  {Ok(D7 )}
-    else if value == D64  {Ok(D8 )}
-    else if value == D81  {Ok(D9 )}
-    else if value == D100 {Ok(D10)}
-    else { Err(Error::InputOutOfRange) }
+    let vu: u8 = value.to_u8().ok_or(Error::InputOutOfRange)?;
+    Ok(
+        match vu {
+              0 => { D0  },
+              1 => { D1  },
+              4 => { D2  },
+              9 => { D3  },
+             16 => { D4  },
+             25 => { D5  },
+             36 => { D6  },
+             49 => { D7  },
+             64 => { D8  },
+             81 => { D9  },
+            100 => { D10 },
+              _ => { Err(Error::InputOutOfRange)? },
+        }
+    )
 }
 
 #[inline]

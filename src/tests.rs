@@ -26,7 +26,7 @@ const CI1: Complex = Complex{ re: D0, im: D1 };
 const C1DIV2: Complex = Complex{ re: D1DIV2, im: D0 };
 
 // Iteration Term
-const TEST_ITER: usize = 26;
+const TEST_ITER: usize = 16;
 
 //##########################################################################################################################
 

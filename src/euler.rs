@@ -6,7 +6,7 @@ use rust_decimal::prelude::*;
 // Modules
 use crate::multiplex::types::{ Multiplex };
 use crate::constants::{ E, D1DIVE, LN_2 };
-use crate::constants::{ LN_UPPER_BD, LN_UPPER_VAL, LN_LOWER_BD, LN_LOWER_VAL };
+use crate::constants::{ LN_UPPER_BD, LN_LOWER_BD, LN_UPPER_EXP_VAL, LN_LOWER_EXP_VAL };
 use crate::factorial::{ m_fac };
 use crate::arithmetic::{ dec, a_pow, am_pow };
 use crate::error::Error;
@@ -81,11 +81,11 @@ fn ln_prepare(
     loop {
         if rem > LN_UPPER_BD {
             rem = rem / LN_UPPER_BD;
-            exp = exp + LN_UPPER_VAL;
+            exp = exp + LN_UPPER_EXP_VAL;
         }
         else if rem < LN_LOWER_BD {
             rem = rem * LN_LOWER_BD;
-            exp = exp - LN_LOWER_VAL;
+            exp = exp - LN_LOWER_EXP_VAL;
         }
         else {break}
     };

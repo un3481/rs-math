@@ -10,16 +10,19 @@ use crate::error::Error;
 
 //##########################################################################################################################
 
-pub const E: Decimal = dec!(2.7182818284590452353602874714);
-pub const D1DIVE: Decimal = dec!(0.3678794411714423215955237702);
-pub const LN_2: Decimal = dec!(0.6931471805599453094172321215);
-pub const SQRT_2: Decimal = dec!(1.4142135623730950488016887242);
-pub const SQRT_5DIV4: Decimal = dec!(1.1180339887498948482045868344);
+pub const E: Decimal = dec!(2.7182818284590452353602874714); // (e)
+pub const D1DIVE: Decimal = dec!(0.3678794411714423215955237702); // (1 / e)
+pub const LN_2: Decimal = dec!(0.6931471805599453094172321215); // ln(2)
+pub const SQRT_2: Decimal = dec!(1.4142135623730950488016887242); // sqrt(2)
 
-pub const LN_UPPER_BD: Decimal = dec!(3.1260241027279020206643305921);
-pub const LN_LOWER_BD: Decimal = dec!(2.3105395541901884500562443507);
-pub const LN_UPPER_VAL: Decimal = dec!(1.1397619423751586973715292557);
-pub const LN_LOWER_VAL: Decimal = dec!(0.8374810705022250868143110417);
+pub const SQRT_UPPER_BD: Decimal = dec!(1.25); // (1.25)
+pub const SQRT_LOWER_BD: Decimal = dec!(0.75); // (0.75)
+pub const SQRT_EXP_VAL: Decimal = dec!(1.1180339887498948482045868344); // sqrt(1.25)
+
+pub const LN_UPPER_BD: Decimal = dec!(3.1260241027279020206643305921); // (1.15 * e)
+pub const LN_LOWER_BD: Decimal = dec!(2.3105395541901884500562443507); // (0.85 * e)
+pub const LN_UPPER_EXP_VAL: Decimal = dec!(1.1397619423751586973715292557); // ln(1.15 * e)
+pub const LN_LOWER_EXP_VAL: Decimal = dec!(0.8374810705022250868143110417); // ln(0.85 * e)
 
 pub const PI: Decimal = dec!(3.1415926535897932384626433833);
 pub const PI2: Decimal = dec!(6.2831853071795864769252867666);

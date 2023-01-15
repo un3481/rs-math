@@ -5,7 +5,7 @@ use rust_decimal::prelude::*;
 
 // Modules
 use crate::multiplex::types::{ Multiplex };
-use crate::constants::{ SQRT_2, SQRT_5DIV4 };
+use crate::constants::{ SQRT_2, SQRT_EXP_VAL, SQRT_UPPER_BD, SQRT_LOWER_BD };
 use crate::factorial::{ m_fac };
 use crate::arithmetic::{ m_pow, am_pow };
 use crate::euler::{ exp, ln };
@@ -18,8 +18,6 @@ const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
 const D4: Decimal = dec!(4);
-const D3DIV4: Decimal = dec!(0.75);
-const D5DIV4: Decimal = dec!(1.25);
 
 //##########################################################################################################################
 
@@ -54,13 +52,13 @@ fn sqrt_prepare(
         else {break}
     };
     loop {
-        if rem > D5DIV4 {
-            rem = rem / D5DIV4;
-            exp = exp * SQRT_5DIV4;
+        if rem > SQRT_UPPER_BD {
+            rem = rem / SQRT_UPPER_BD;
+            exp = exp * SQRT_EXP_VAL;
         }
-        else if rem < D3DIV4 {
-            rem = rem * D5DIV4;
-            exp = exp / SQRT_5DIV4;
+        else if rem < SQRT_LOWER_BD {
+            rem = rem * SQRT_UPPER_BD;
+            exp = exp / SQRT_EXP_VAL;
         }
         else {break}
     };

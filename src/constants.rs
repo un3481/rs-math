@@ -19,10 +19,10 @@ pub const SQRT_LOWER_BD: Decimal = dec!(0.79);
 pub const SQRT_EXP_BD: Decimal = dec!(1.21); // (1.21)
 pub const SQRT_EXP_VAL: Decimal = dec!(1.1); // sqrt(1.21)
 
-pub const LN_UPPER_BD: Decimal = dec!(3.3201169227365474895307674296); // (e ^ 1.2)
-pub const LN_LOWER_BD: Decimal = dec!(2.2255409284924676045795375314); // (e ^ 0.8)
-pub const LN_UPPER_EXP_VAL: Decimal = dec!(1.2); // ln(e ^ 1.2)
-pub const LN_LOWER_EXP_VAL: Decimal = dec!(0.8); // ln(e ^ 0.8)
+pub const LN_UPPER_BD: Decimal = dec!(3.0041660239464331120584079536); // (e ^ 1.1)
+pub const LN_LOWER_BD: Decimal = dec!(2.4596031111569496638001265636); // (e ^ 0.9)
+pub const LN_UPPER_EXP_VAL: Decimal = dec!(1.1); // ln(e ^ 1.1)
+pub const LN_LOWER_EXP_VAL: Decimal = dec!(0.9); // ln(e ^ 0.9)
 
 pub const PI: Decimal = dec!(3.1415926535897932384626433833);
 pub const PI2: Decimal = dec!(6.2831853071795864769252867666);

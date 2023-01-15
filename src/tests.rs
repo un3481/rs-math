@@ -34,8 +34,9 @@ const C1DIV2: Complex = Complex{ re: D1DIV2, im: D0 };
 const STD_DEC: u32 = 16;
 
 // Iteration Terms
-const TEST_ITER: usize = 16;
-const TEST_ITER_LARGE: usize = 24;
+const STD_ITER: usize = 16;
+const STD_ITER_LONG: usize = 24;
+// const STD_ITER_DOUBLE: usize = 32;
 
 //##########################################################################################################################
 
@@ -45,10 +46,10 @@ fn test_sqrt() -> Result<(), Error> {
     let res1 = int_sqrt(D4)?;
     assert_eq!(res1, D2);
     // sqrt(4)
-    let res2 = sqrt(D4, TEST_ITER)?.round_dp(STD_DEC);
+    let res2 = sqrt(D4, STD_ITER)?.round_dp(STD_DEC);
     assert_eq!(res2, D2);
     // pow(4, 1/2)
-    let res3 = d_pow(D4, D1DIV2, TEST_ITER)?.round_dp(STD_DEC);
+    let res3 = d_pow(D4, D1DIV2, STD_ITER)?.round_dp(STD_DEC);
     assert_eq!(res3, D2);
     // sqrt(4) == int_sqrt(4) == pow(4, 1/2)
     assert_eq!(res1, res2);
@@ -62,10 +63,10 @@ fn test_sqrt() -> Result<(), Error> {
 #[test]
 fn test_euler() -> Result<(), Error> {
     // exp(2)
-    let res1 = exp(D2, TEST_ITER_LARGE)?.round_dp(STD_DEC);
+    let res1 = exp(D2, STD_ITER_LONG)?.round_dp(STD_DEC);
     assert_eq!(res1, E_SQR.round_dp(STD_DEC));
     // ln(e ^ 2)
-    let res2 = ln(E_SQR, TEST_ITER)?.round_dp(STD_DEC);
+    let res2 = ln(E_SQR, STD_ITER)?.round_dp(STD_DEC);
     assert_eq!(res2, D2);
     // Return Ok
     Ok(())
@@ -76,11 +77,11 @@ fn test_euler() -> Result<(), Error> {
 #[test]
 fn test_complex() -> Result<(), Error> {
     // cc_pow(4, 1/2)
-    let mut res1 = cc_pow(C4, C1DIV2, TEST_ITER)?;
+    let mut res1 = cc_pow(C4, C1DIV2, STD_ITER)?;
     res1.re = res1.re.round_dp(STD_DEC);
     assert_eq!(res1, C2);
     // cc_pow(-1, 1/2)
-    let res2 = cc_pow(-C1, C1DIV2, TEST_ITER)?;
+    let res2 = cc_pow(-C1, C1DIV2, STD_ITER)?;
     assert_eq!(res2, CI1);
     // Return Ok
     Ok(())

@@ -8,7 +8,7 @@ pub mod trigonometry;
 pub mod euler;
 pub mod multiplex;
 pub mod complex;
-//pub mod primes;
+// pub mod primes;
 
 #[cfg(test)]
 mod tests;

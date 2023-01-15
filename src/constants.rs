@@ -14,10 +14,10 @@ pub const E: Decimal = dec!(2.7182818284590452353602874714); // (e)
 pub const D1DIVE: Decimal = dec!(0.3678794411714423215955237702); // (1 / e)
 pub const E_SQR: Decimal = dec!(7.3890560989306502272304274606); // (e ^ 2)
 
-pub const SQRT_UPPER_BD: Decimal = dec!(1.21);
-pub const SQRT_LOWER_BD: Decimal = dec!(0.79);
-pub const SQRT_EXP_BD: Decimal = dec!(1.21); // (1.21)
-pub const SQRT_EXP_VAL: Decimal = dec!(1.1); // sqrt(1.21)
+pub const SQRT_UPPER_BD: Decimal = dec!(1.21); // (1.1 ^ 2)
+pub const SQRT_LOWER_BD: Decimal = dec!(0.81); // (0.9 ^ 2)
+pub const SQRT_UPPER_VAL: Decimal = dec!(1.1); // sqrt(1.1 ^ 2)
+pub const SQRT_LOWER_VAL: Decimal = dec!(0.9); // sqrt(0.9 ^ 2)
 
 pub const LN_UPPER_BD: Decimal = dec!(3.0041660239464331120584079536); // (e ^ 1.1)
 pub const LN_LOWER_BD: Decimal = dec!(2.4596031111569496638001265636); // (e ^ 0.9)

@@ -4,7 +4,7 @@ use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
-use crate::constants::{ SQRT_EXP_VAL, SQRT_EXP_BD, SQRT_UPPER_BD, SQRT_LOWER_BD };
+use crate::constants::{ SQRT_UPPER_BD, SQRT_UPPER_VAL, SQRT_LOWER_BD, SQRT_LOWER_VAL };
 
 use crate::error::Error;
 use crate::multiplex::types::{ Multiplex };
@@ -49,12 +49,12 @@ fn sqrt_prepare(
     };
     loop {
         if rem > SQRT_UPPER_BD {
-            rem = rem / SQRT_EXP_BD;
-            exp = exp * SQRT_EXP_VAL;
+            rem = rem / SQRT_UPPER_BD;
+            exp = exp * SQRT_UPPER_VAL;
         }
         else if rem < SQRT_LOWER_BD {
-            rem = rem * SQRT_EXP_BD;
-            exp = exp / SQRT_EXP_VAL;
+            rem = rem / SQRT_LOWER_BD;
+            exp = exp * SQRT_LOWER_VAL;
         }
         else {break}
     };

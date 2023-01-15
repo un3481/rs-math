@@ -5,7 +5,7 @@ use rust_decimal::prelude::*;
 
 // Modules
 use crate::multiplex::types::{ Multiplex };
-use crate::constants::{ SQRT_2, SQRT_EXP_VAL, SQRT_UPPER_BD, SQRT_LOWER_BD };
+use crate::constants::{ SQRT_EXP_VAL, SQRT_EXP_BD, SQRT_UPPER_BD, SQRT_LOWER_BD };
 use crate::factorial::{ m_fac };
 use crate::arithmetic::{ m_pow, am_pow };
 use crate::euler::{ exp, ln };
@@ -18,6 +18,7 @@ const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
 const D4: Decimal = dec!(4);
+const D1DIV4: Decimal = dec!(0.25);
 
 //##########################################################################################################################
 
@@ -42,22 +43,22 @@ fn sqrt_prepare(
     let mut exp: Decimal = D1;
     loop {
         if rem > D4 {
-            rem = rem / D2;
-            exp = exp * SQRT_2;
+            rem = rem / D4;
+            exp = exp * D2;
         }
-        else if rem < D2 {
-            rem = rem * D2;
-            exp = exp / SQRT_2;
+        else if rem < D1DIV4 {
+            rem = rem * D4;
+            exp = exp / D2;
         }
         else {break}
     };
     loop {
         if rem > SQRT_UPPER_BD {
-            rem = rem / SQRT_UPPER_BD;
+            rem = rem / SQRT_EXP_BD;
             exp = exp * SQRT_EXP_VAL;
         }
         else if rem < SQRT_LOWER_BD {
-            rem = rem * SQRT_UPPER_BD;
+            rem = rem * SQRT_EXP_BD;
             exp = exp / SQRT_EXP_VAL;
         }
         else {break}
@@ -109,8 +110,8 @@ pub fn sqrt(
              if value == D0 {D0}
         else if value == D1 {D1}
         else {
-            let (ratio, rem) = sqrt_prepare(value);
-            ratio * sqrt_series(rem, terms)?
+            let (exp, rem) = sqrt_prepare(value);
+            exp * sqrt_series(rem, terms)?
         }
     )
 }

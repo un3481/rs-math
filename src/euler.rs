@@ -5,7 +5,7 @@ use rust_decimal::prelude::*;
 
 // Modules
 use crate::multiplex::types::{ Multiplex };
-use crate::constants::{ E, D1DIVE, LN_2 };
+use crate::constants::{ E, D1DIVE, E_SQR };
 use crate::constants::{ LN_UPPER_BD, LN_LOWER_BD, LN_UPPER_EXP_VAL, LN_LOWER_EXP_VAL };
 use crate::factorial::{ m_fac };
 use crate::arithmetic::{ dec, a_pow, am_pow };
@@ -16,8 +16,6 @@ use crate::error::Error;
 // Constants
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
-const D2: Decimal = dec!(2);
-const D4: Decimal = dec!(4);
 
 //##########################################################################################################################
 
@@ -68,13 +66,13 @@ fn ln_prepare(
     let mut rem: Decimal = value;
     let mut exp: Decimal = D0;
     loop {
-        if rem > D4 {
-            rem = rem / D2;
-            exp = exp + LN_2;
+        if rem > E_SQR {
+            rem = rem / E;
+            exp = exp + D1;
         }
-        else if rem < D2 {
-            rem = rem * D2;
-            exp = exp - LN_2;
+        else if rem < D1 {
+            rem = rem * E;
+            exp = exp - D1;
         }
         else {break}
     };

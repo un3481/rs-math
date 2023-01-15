@@ -54,11 +54,11 @@ fn test_sqrt() -> Result<(), Error> {
 
 #[test]
 fn test_cc_pow() -> Result<(), Error> {
-    // pow(4, 1/2)
+    // cc_pow(4, 1/2)
     let mut res1 = cc_pow(C4, C1DIV2, TEST_ITER)?;
     res1.re = res1.re.round_dp(16);
     assert_eq!(res1, C2);
-    // pow(-1, 1/2)
+    // cc_pow(-1, 1/2)
     let res2 = cc_pow(-C1, C1DIV2, TEST_ITER)?;
     assert_eq!(res2, CI1);
     // Return Ok

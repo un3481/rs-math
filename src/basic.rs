@@ -5,7 +5,7 @@ use rust_decimal::prelude::*;
 
 // Modules
 use crate::multiplex::types::{ Multiplex };
-use crate::constants::{ SQRT_3DIV2 };
+use crate::constants::{ SQRT_2, SQRT_5DIV4 };
 use crate::factorial::{ m_fac };
 use crate::arithmetic::{ m_pow, am_pow };
 use crate::euler::{ exp, ln };
@@ -17,33 +17,60 @@ use crate::error::Error;
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
-const D1DIV2: Decimal = dec!(0.5);
-const D3DIV2: Decimal = dec!(1.5);
+const D4: Decimal = dec!(4);
+const D3DIV4: Decimal = dec!(0.75);
+const D5DIV4: Decimal = dec!(1.25);
 
 //##########################################################################################################################
 
+/// a^b = e^(ln(a) * b)
+#[inline]
+pub fn d_pow(
+    value: Decimal,
+    power: Decimal,
+    terms: usize
+) -> Result<Decimal, Error> {
+    let ln_val = ln(value, terms)?;
+    exp(ln_val * power, terms)
+}
+
+//##########################################################################################################################
+
+#[inline]
 fn sqrt_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
     let mut rem: Decimal = value;
-    let mut ratio: Decimal = D1;
+    let mut exp: Decimal = D1;
     loop {
-        if rem > D3DIV2 {
-            rem = rem / D3DIV2;
-            ratio = ratio * SQRT_3DIV2;
+        if rem > D4 {
+            rem = rem / D2;
+            exp = exp * SQRT_2;
         }
-        else if rem < D1DIV2 {
-            rem = rem * D3DIV2;
-            ratio = ratio / SQRT_3DIV2;
+        else if rem < D2 {
+            rem = rem * D2;
+            exp = exp / SQRT_2;
         }
         else {break}
     };
-    (ratio, rem)
+    loop {
+        if rem > D5DIV4 {
+            rem = rem / D5DIV4;
+            exp = exp * SQRT_5DIV4;
+        }
+        else if rem < D3DIV4 {
+            rem = rem * D5DIV4;
+            exp = exp / SQRT_5DIV4;
+        }
+        else {break}
+    };
+    (exp, rem)
 }
 
 //##########################################################################################################################
 
 /// sqrt(x) = sum(n=1; (x * (2 * (n - 1))! * (1 - x)^(n - 1)) / ((n - 1)! * 2^(n - 1))^2)
+#[inline]
 fn sqrt_series(
     value: Decimal,
     terms: usize
@@ -88,19 +115,6 @@ pub fn sqrt(
             ratio * sqrt_series(rem, terms)?
         }
     )
-}
-
-//##########################################################################################################################
-
-/// a^b = e^(ln(a) * b)
-#[inline]
-pub fn d_pow(
-    value: Decimal,
-    power: Decimal,
-    terms: usize
-) -> Result<Decimal, Error> {
-    let ln_val = ln(value, terms)?;
-    exp(ln_val * power, terms)
 }
 
 //##########################################################################################################################

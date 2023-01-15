@@ -6,6 +6,7 @@ use rust_decimal::prelude::*;
 // Modules
 use crate::multiplex::types::{ Multiplex };
 use crate::constants::{ E, D1DIVE, LN_2 };
+use crate::constants::{ LN_UPPER_BD, LN_UPPER_VAL, LN_LOWER_BD, LN_LOWER_VAL };
 use crate::factorial::{ m_fac };
 use crate::arithmetic::{ dec, a_pow, am_pow };
 use crate::error::Error;
@@ -21,6 +22,7 @@ const D4: Decimal = dec!(4);
 //##########################################################################################################################
 
 /// e^x = sum(n=0; x^n / n!)
+#[inline]
 fn power_series(
     value: Decimal,
     terms: usize
@@ -59,6 +61,7 @@ pub fn exp(
 
 //##########################################################################################################################
 
+#[inline]
 fn ln_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
@@ -75,12 +78,24 @@ fn ln_prepare(
         }
         else {break}
     };
+    loop {
+        if rem > LN_UPPER_BD {
+            rem = rem / LN_UPPER_BD;
+            exp = exp + LN_UPPER_VAL;
+        }
+        else if rem < LN_LOWER_BD {
+            rem = rem * LN_LOWER_BD;
+            exp = exp - LN_LOWER_VAL;
+        }
+        else {break}
+    };
     (exp, rem)
 }
 
 //##########################################################################################################################
 
 /// ln(x) = 1 + sum(n=0; -1^(n + 1) * ((x - e)^n / (n * e^n)))
+#[inline]
 fn ln_series(
     value: Decimal,
     terms: usize

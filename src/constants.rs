@@ -10,15 +10,19 @@ use crate::error::Error;
 
 //##########################################################################################################################
 
-pub const STD_ITER: usize = 64;
+pub const E: Decimal = dec!(2.7182818284590452353602874714);
+pub const D1DIVE: Decimal = dec!(0.3678794411714423215955237702);
+pub const LN_2: Decimal = dec!(0.6931471805599453094172321215);
+pub const SQRT_2: Decimal = dec!(1.4142135623730950488016887242);
+pub const SQRT_5DIV4: Decimal = dec!(1.1180339887498948482045868344);
 
-pub const E: Decimal = dec!(2.7182818284590452353602874713);
-pub const D1DIVE: Decimal = dec!(0.3678794411714423215955237701);
-pub const LN_2: Decimal = dec!(0.6931471805599453094172321214);
-pub const SQRT_3DIV2: Decimal = dec!(1.2247448713915890490986420373);
+pub const LN_UPPER_BD: Decimal = dec!(3.1260241027279020206643305921);
+pub const LN_LOWER_BD: Decimal = dec!(2.3105395541901884500562443507);
+pub const LN_UPPER_VAL: Decimal = dec!(1.1397619423751586973715292557);
+pub const LN_LOWER_VAL: Decimal = dec!(0.8374810705022250868143110417);
 
-pub const PI: Decimal = dec!(3.1415926535897932384626433832);
-pub const PI2: Decimal = dec!(6.2831853071795864769252867665);
+pub const PI: Decimal = dec!(3.1415926535897932384626433833);
+pub const PI2: Decimal = dec!(6.2831853071795864769252867666);
 pub const PIDIV2: Decimal = dec!(1.5707963267948966192313216916);
 pub const PI3DIV2: Decimal = dec!(4.7123889803846898576939650749);
 pub const PIDIV4: Decimal = dec!(0.7853981633974483096156608458);
@@ -28,7 +32,7 @@ pub const PIDIV18: Decimal = dec!(0.1745329251994329576923690768);
 pub const PIDIV36: Decimal = dec!(0.0872664625997164788461845384);
 
 pub const TAN_PIDIV6: Decimal = dec!(0.5773502691896257645091487805);
-pub const TAN_PIDIV18: Decimal = dec!(0.1763269807084649734710903868);
+pub const TAN_PIDIV18: Decimal = dec!(0.1763269807084649734710903869);
 pub const TAN_PIDIV36: Decimal = dec!(0.0874886635259240052220186694);
 
 //##########################################################################################################################
@@ -43,6 +47,7 @@ const D239: Decimal = dec!(239);
 //##########################################################################################################################
 
 /// pi_term(x) = sum(n=1; -1^(n + 1) * x^(2n - 1) / (2n - 1))
+#[inline]
 fn pi_term(
     value: Decimal,
     terms: usize

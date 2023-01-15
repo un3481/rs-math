@@ -30,28 +30,23 @@ const PI3DIV2_PAIR: Pair = (dec!(0), dec!(-1));
 
 //##########################################################################################################################
 
+#[inline]
 fn trig_prepare(
     value: Decimal
 ) -> Decimal {
     let mut rem: Decimal = value;
-    if rem > PI {
-        rem = rem - (
-            (rem / PI2).floor() * PI2
-        )
-    }
-    else if rem < -PI {
-        rem = rem - (
-            (rem / PI2).floor() * PI2
-        )
-    }
-         if rem >  PI { rem = rem - PI2 }
-    else if rem < -PI { rem = rem + PI2 };
+    if (rem < -PI) || (PI < rem) {
+        rem = rem - ((rem / PI2).floor() * PI2);
+    };
+         if rem >  PI { rem = rem - PI2; }
+    else if rem < -PI { rem = rem + PI2; };
     rem
 }
 
 //##########################################################################################################################
 
 /// sin(x) = sum(n=0; -1^n * (x^2n / 2n!))
+#[inline]
 fn cos_series(
     value: Decimal,
     terms: usize
@@ -74,6 +69,7 @@ fn cos_series(
 //##########################################################################################################################
 
 /// sin(x) = sum(n=0; -1^n * (x^(2n + 1) / (2n + 1)!))
+#[inline]
 fn sin_series(
     value: Decimal,
     terms: usize
@@ -165,6 +161,7 @@ fn tan_sub(arg: Decimal, sub: Decimal) -> Decimal {
 
 //##########################################################################################################################
 
+#[inline]
 fn tan_lower(
     itan: Decimal,
     offset: Decimal
@@ -219,6 +216,7 @@ fn tan2_prepare(
 //##########################################################################################################################
 
 /// atan(x) = sum(n=1; -1^n * (x^(2n + 1) / (2n + 1)))
+#[inline]
 fn atan_series(
     value: Decimal,
     terms: usize
@@ -266,10 +264,10 @@ pub fn atan2(
 ) -> Result<Decimal, Error> {
     if !is_valid_pair(icos, isin) { return Err(Error::InvalidSineCosinePair) };
     Ok(
-             if (isin == D0) && (icos > D0) {D0}
-        else if (icos == D0) && (isin > D0) {PIDIV2}
-        else if (isin == D0) && (icos < D0) {PI}
-        else if (icos == D0) && (isin < D0) {-PIDIV2}
+             if (icos >  D0) && (isin == D0) {D0}
+        else if (icos == D0) && (isin >  D0) {PIDIV2}
+        else if (icos <  D0) && (isin == D0) {PI}
+        else if (icos == D0) && (isin <  D0) {-PIDIV2}
         else {
             let (tan, rem) = tan2_prepare(icos, isin);
             let arg = rem + atan_series(tan, terms)?;

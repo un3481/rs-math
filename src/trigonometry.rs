@@ -21,13 +21,12 @@ type Pair = (Decimal, Decimal);
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
+const DN1: Decimal = dec!(-1);
 const D1DIV5: Decimal = dec!(0.2);
 const D2DIV5: Decimal = dec!(0.4);
-const TRIG_LOWER: Decimal = dec!(0.999);
-const TRIG_UPPER: Decimal = dec!(1.001);
-const PI_PAIR: Pair = (dec!(-1), dec!(0));
-const PIDIV2_PAIR: Pair = (dec!(0), dec!(1));
-const PI3DIV2_PAIR: Pair = (dec!(0), dec!(-1));
+const PI_PAIR: Pair = (DN1, D0);
+const PIDIV2_PAIR: Pair = (D0, D1);
+const PI3DIV2_PAIR: Pair = (D0, DN1);
 
 //##########################################################################################################################
 
@@ -130,34 +129,37 @@ pub fn sin(
 
 //##########################################################################################################################
 
-#[inline]
-fn is_valid_pair(icos: Decimal, isin: Decimal) -> bool {
-    let module = (icos * icos) + (isin * isin);
-    (TRIG_LOWER < module) && (module < TRIG_UPPER)
-}
-
 /// cos(a - b) = (cos(a) * cos(b)) + (sin(a) * sin(b))
 #[inline]
-fn cos_sub2(arg: Pair, sub: Pair) -> Decimal {
-    (arg.0 * sub.0) + (arg.1 * sub.1)
+fn cos_sub2(val: Pair, sub: Pair) -> Decimal {
+    (val.0 * sub.0) + (val.1 * sub.1)
 }
 
 /// sin(a - b) = (sin(a) * cos(b)) - (sin(b) * cos(a))
 #[inline]
-fn sin_sub2(arg: Pair, sub: Pair) -> Decimal {
-    (arg.1 * sub.0) - (sub.1 * arg.0)
+fn sin_sub2(val: Pair, sub: Pair) -> Decimal {
+    (val.1 * sub.0) - (sub.1 * val.0)
 }
 
 /// tan(a - b) = sin(a - b) / cos(a - b)
 #[inline]
-fn tan_sub2(arg: Pair, sub: Pair) -> Decimal {
-    sin_sub2(arg, sub) / cos_sub2(arg, sub)
+fn tan_sub2(val: Pair, sub: Pair) -> Decimal {
+    sin_sub2(val, sub) / cos_sub2(val, sub)
 }
 
 /// tan(a - b) = (tan(a) - tan(b)) / (1 + (tan(a) * tan(b)))
 #[inline]
-fn tan_sub(arg: Decimal, sub: Decimal) -> Decimal {
-    (arg - sub) / (D1 + (arg * sub))
+fn tan_sub(val: Decimal, sub: Decimal) -> Decimal {
+    (val - sub) / (D1 + (val * sub))
+}
+
+//##########################################################################################################################
+
+#[inline]
+fn is_valid_pair(_cos: Decimal, _sin: Decimal, terms: usize) -> bool {
+    let digits = if terms > 32 {16} else {terms / 2} as u32;
+    let module = (_cos * _cos) + (_sin * _sin);
+    D1 == module.round_dp(digits)
 }
 
 //##########################################################################################################################
@@ -186,7 +188,8 @@ fn tan_prepare(
 ) -> (Decimal, Decimal) {
     let mut rem: Decimal = value;
     let mut base: Decimal = D0;
-         if rem >  -D1 { base = -PIDIV4; rem = tan_sub(rem, -D1);               }
+         if rem >=  D0 {                                                        }
+    else if rem >  -D1 { base = -PIDIV4; rem = tan_sub(rem, -D1);               }
     else if rem <= -D1 { base = -PIDIV2; rem = tan_sub(tan_sub(rem, -D1), -D1); };
     tan_lower(rem, base)
 }
@@ -200,16 +203,15 @@ fn tan2_prepare(
 ) -> (Decimal, Decimal) {
     let mut rem: Decimal = _sin / _cos;
     let mut base: Decimal = D0;
-    let pair: (Decimal, Decimal) = (_cos, _sin);
-         if (_sin <  D0) && (_cos >  D0) { base = PI3DIV2; rem = tan_sub2(pair, PI3DIV2_PAIR); }
-    else if (_sin <  D0) && (_cos <= D0) { base = PI;      rem = tan_sub2(pair, PI_PAIR);      }
-    else if (_sin >= D0) && (_cos >  D0) { base = PIDIV2;  rem = tan_sub2(pair, PIDIV2_PAIR);  };
+         if (_sin >  D0) && (_cos <= D0) { base = PIDIV2;  rem = tan_sub2((_cos, _sin), PIDIV2_PAIR);  }
+    else if (_sin <= D0) && (_cos <  D0) { base = PI;      rem = tan_sub2((_cos, _sin), PI_PAIR);      }
+    else if (_sin <  D0) && (_cos >= D0) { base = PI3DIV2; rem = tan_sub2((_cos, _sin), PI3DIV2_PAIR); };
     tan_lower(rem, base)
 }
 
 //##########################################################################################################################
 
-/// atan(x) = sum(n=1; -1^n * (x^(2n + 1) / (2n + 1)))
+/// atan(x) = sum(n=0; -1^n * (x^(2n + 1) / (2n + 1)))
 #[inline]
 fn atan_series(
     value: Decimal,
@@ -218,7 +220,7 @@ fn atan_series(
     let mut acc1: (Decimal, usize) = (D1, 0);
     let mut acc2: (Multiplex, usize) = (Multiplex::new(), 0);
     // Iterate over Series
-    (1..terms).into_iter()
+    (0..terms).into_iter()
         .map(|n| Ok(
             a_pow(-D1, n, &mut acc1)? * (
                 am_pow(value, (2 * n) + 1, &mut acc2)? / ((D2 * dec(n)) + D1)
@@ -256,7 +258,7 @@ pub fn atan2(
     _sin: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
-    if !is_valid_pair(_cos, _sin) { Err(Error::InputOutOfRange)? };
+    if !is_valid_pair(_cos, _sin, terms) { Err(Error::InputOutOfRange)? };
     Ok(
              if (_cos >  D0) && (_sin == D0) {D0}
         else if (_cos == D0) && (_sin >  D0) {PIDIV2}

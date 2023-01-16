@@ -20,11 +20,6 @@ pub fn dec(value: usize) -> Decimal {
     Decimal::new(value as i64, 0)
 }
 
-#[inline]
-pub fn pos(value: Decimal) -> Decimal {
-    if value < D0 {-value} else {value}
-}
-
 //##########################################################################################################################
 
 #[inline]

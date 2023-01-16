@@ -12,8 +12,8 @@ use crate::error::Error;
 
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
-const C0: Complex = Complex{ re: D0, im: D0 };
-const C1: Complex = Complex{ re: D1, im: D0 };
+const C0: Complex = Complex::new(D0, D0);
+const C1: Complex = Complex::new(D1, D0);
 
 //##########################################################################################################################
 
@@ -50,7 +50,7 @@ pub fn c_pow(
 /// z^w = e^(ln(z) * w)
 #[inline]
 pub fn cc_pow(
-    value: Complex,
+    value: &mut Complex,
     power: Complex,
     terms: usize
 ) -> Result<Complex, Error> {

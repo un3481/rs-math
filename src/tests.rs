@@ -28,14 +28,14 @@ const D7: Decimal = dec!(7);
 const D24: Decimal = dec!(24);
 const D1DIV2: Decimal = dec!(0.5);
 
-const C1: Complex = Complex{ re: D1, im: D0 };
-const C2: Complex = Complex{ re: D2, im: D0 };
-const C4: Complex = Complex{ re: D4, im: D0 };
-const CI1: Complex = Complex{ re: D0, im: D1 };
-const CN1I2: Complex = Complex{ re: DN1, im: D2 };
-const C4I3: Complex = Complex{ re: D4, im: D3 };
-const C7I24: Complex = Complex{ re: D7, im: D24 };
-const C1DIV2: Complex = Complex{ re: D1DIV2, im: D0 };
+const C1: Complex = Complex::new(D1, D0);
+const C2: Complex = Complex::new(D2, D0);
+const C4: Complex = Complex::new(D4, D0);
+const CI1: Complex = Complex::new(D0, D1);
+const CN1I2: Complex = Complex::new(DN1, D2);
+const C4I3: Complex = Complex::new(D4, D3);
+const C7I24: Complex = Complex::new(D7, D24);
+const C1DIV2: Complex = Complex::new(D1DIV2, D0);
 
 const SIN1: Decimal = dec!(0.8414709848078965066525023216);
 const COS1: Decimal = dec!(0.5403023058681397174009366074);
@@ -43,7 +43,7 @@ const TAN1: Decimal = dec!(1.5574077246549022305069748075);
 
 const CC_POW_TEST_RE: Decimal = dec!(-0.0466016701047362131681326903);
 const CC_POW_TEST_IM: Decimal = dec!(0.0296221438823630242149182959);
-const CC_POW_TEST: Complex = Complex{ re: CC_POW_TEST_RE, im: CC_POW_TEST_IM };
+const CC_POW_TEST: Complex = Complex::new(CC_POW_TEST_RE, CC_POW_TEST_IM);
 
 // Decimal Precision
 const STD_DIG: u32 = 16;
@@ -114,25 +114,22 @@ fn test_trigonometry() -> Result<(), Error> {
 
 #[test]
 fn test_complex() -> Result<(), Error> {
-    // cc_pow(4, 1/2) == 2
-    let mut res1 = cc_pow(C4, C1DIV2, STD_ITER)?;
-    res1.re = res1.re.round_dp(STD_DIG);
-    assert_eq!(res1, C2);
     // cc_pow(-1, 1/2) == i
-    let res2 = cc_pow(-C1, C1DIV2, STD_ITER)?;
-    assert_eq!(res2, CI1);
+    let mut _cn1 = -C1;
+    let res1 = cc_pow(&mut _cn1, C1DIV2, STD_ITER)?;
+    assert_eq!(res1, CI1);
+    // cc_pow(4, 1/2) == 2
+    let mut _c4 = C4;
+    let res2 = cc_pow(&mut _c4, C1DIV2, STD_ITER)?.round_dp(STD_DIG);
+    assert_eq!(res2, C2);
     // cc_pow(7 + 24i, 1/2) == 4 + 3i
-    let mut res3 = cc_pow(C7I24, C1DIV2, STD_ITER_LONG)?;
-    res3.re = res3.re.round_dp(STD_DIG);
-    res3.im = res3.im.round_dp(STD_DIG);
+    let mut _c7i24 = C7I24;
+    let res3 = cc_pow(&mut _c7i24, C1DIV2, STD_ITER_LONG)?.round_dp(STD_DIG);
     assert_eq!(res3, C4I3);
     // cc_pow(4 + 3i, -1 + 2i) == (4 + 3i) ^ (-1 + 2i)
-    let mut res4 = cc_pow(C4I3, CN1I2, STD_ITER_DOUBLE)?;
-    res4.re = res4.re.round_dp(STD_DIG);
-    res4.im = res4.im.round_dp(STD_DIG);
-    let mut cc_pow_test_std = CC_POW_TEST;
-    cc_pow_test_std.re = cc_pow_test_std.re.round_dp(STD_DIG);
-    cc_pow_test_std.im = cc_pow_test_std.im.round_dp(STD_DIG);
+    let mut _c4i3 = C4I3;
+    let res4 = cc_pow(&mut _c4i3, CN1I2, STD_ITER_DOUBLE)?.round_dp(STD_DIG);
+    let cc_pow_test_std = CC_POW_TEST.round_dp(STD_DIG);
     assert_eq!(res4, cc_pow_test_std);
     // Return Ok
     Ok(())

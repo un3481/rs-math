@@ -13,10 +13,10 @@ use crate::error::Error;
 const D0: Decimal = dec!(0);
 const D1: Decimal = dec!(1);
 const D2: Decimal = dec!(2);
-const C1: Complex = Complex{ re: D1, im: D0 };
-const C2: Complex = Complex{ re: D2, im: D0 };
-const CI: Complex = Complex{ re: D0, im: D1 };
-const CI2: Complex = Complex{ re: D0, im: D2 };
+const C1: Complex = Complex::new(D1, D0);
+const C2: Complex = Complex::new(D2, D0);
+const CI: Complex = Complex::new(D0, D1);
+const CI2: Complex = Complex::new(D0, D2);
 
 //##########################################################################################################################
 
@@ -70,7 +70,7 @@ pub fn c_atan(
 ) -> Result<Complex, Error> {
     let term1 = C1 + (CI * value);
     let term2 = C1 - (CI * value);
-    let ln_term = c_ln(term1 / term2, terms)?;
+    let ln_term = c_ln(&mut (term1 / term2), terms)?;
     Ok(ln_term / CI2)
 }
 

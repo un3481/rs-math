@@ -5,4 +5,5 @@ pub enum Error {
     MultiplyOverflow,
     InputOutOfRange,
     IteratorError,
+    OptionInvalid,
 }

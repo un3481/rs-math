@@ -63,11 +63,8 @@ impl PartialEq for Polar {
 
 impl PartialEq<Complex> for Polar {
     fn eq(&self, other: &Complex) -> bool {
-        let terms = match &self._cartesian {
-            None => STD_ITER,
-            Some(v) => v.0,
-        };
-        &self.clone().to_cartesian(terms).unwrap() == other
+        let terms = match &self._cartesian { None => STD_ITER, Some(v) => v.0, };
+        other == &self.clone().to_cartesian(terms).unwrap()
     }
 }
 
@@ -174,16 +171,10 @@ impl PartialEq for Complex {
 
 impl PartialEq<Polar> for Complex {
     fn eq(&self, other: &Polar) -> bool {
-        let norm_terms = match &self._norm {
-            None => STD_ITER,
-            Some(v) => v.0,
-        };
-        let arg_terms = match &self._arg {
-            None => STD_ITER,
-            Some(v) => v.0,
-        };
-        let terms = if norm_terms > arg_terms {norm_terms} else {arg_terms};
-        &self.clone().to_polar(terms).unwrap() == other
+        let norm_terms = match &self._norm { None => STD_ITER, Some(v) => v.0, };
+        let arg_terms  = match &self._arg  { None => STD_ITER, Some(v) => v.0, };
+        let terms = if norm_terms < arg_terms {norm_terms} else {arg_terms};
+        other == &self.clone().to_polar(terms).unwrap()
     }
 }
 

@@ -54,6 +54,51 @@ impl Polar {
 
 //##########################################################################################################################
 
+impl Polar {
+    /// Create a new Complex in Polar form
+    #[inline]
+    pub const fn new(radius: Decimal, theta: Decimal) -> Polar {
+        Polar { _radius: radius, _theta: theta, _cartesian: None }
+    }
+
+    /// Create a new Complex from Polar form
+    #[inline]
+    fn new_cartesian(&self, re: Decimal, im: Decimal, terms: usize) -> Complex {
+        Complex { _re: re, _im: im, _norm: Some((terms, self.radius())), _arg: Some((terms, self.theta())) }
+    }
+
+    #[inline]
+    fn to_cartesian_helper(&self, terms: usize) -> Result<Complex, Error> {
+        // Execute Parallel
+        let p_theta = self._theta.clone();
+        let p_cost = spawn(move || cos(p_theta, terms));
+        let r_sint = sin(self._theta, terms);
+        // Extract Variables
+        let cost = p_cost.join().unwrap()?;
+        let sint = r_sint?;
+        // Calculate Result
+        let re = self._radius.checked_mul(cost).ok_or(Error::MultiplyOverflow)?;
+        let im = self._radius.checked_mul(sint).ok_or(Error::MultiplyOverflow)?;
+        Ok(self.new_cartesian(re, im, terms))
+    }
+
+    /// Convert a polar representation into a complex number.
+    #[inline]
+    pub fn to_cartesian(&mut self, terms: usize) -> Result<Complex, Error> {
+        match &self._cartesian {
+            None => {
+                self._cartesian = Some((terms, self.to_cartesian_helper(terms)?));
+            },
+            Some(val) => if terms > val.0 {
+                self._cartesian = Some((terms, self.to_cartesian_helper(terms)?));
+            },
+        };
+        Ok(self._cartesian.ok_or(Error::OptionInvalid)?.1.clone())
+    }
+}
+
+//##########################################################################################################################
+
 impl PartialEq for Polar {
     fn eq(&self, other: &Self) -> bool {
         ( self._radius == other.radius() ) &&
@@ -81,51 +126,6 @@ impl PartialEq<Polar> for Decimal {
         let theta = if self >= &D0 {D0} else {PI};
         ( self.abs() == other.radius() ) &&
         ( theta      == other.theta()  )
-    }
-}
-
-//##########################################################################################################################
-
-impl Polar {
-    /// Create a new Complex in Polar form
-    #[inline]
-    pub const fn new(radius: Decimal, theta: Decimal) -> Polar {
-        Polar { _radius: radius, _theta: theta, _cartesian: None }
-    }
-
-    /// Create a new Complex in Polar form from Cartesian
-    #[inline]
-    pub const fn from_cartesian(radius: Decimal, theta: Decimal, cartesian: (usize, Complex)) -> Polar {
-        Polar { _radius: radius, _theta: theta, _cartesian: Some(cartesian) }
-    }
-
-    #[inline]
-    fn to_cartesian_helper(&self, terms: usize) -> Result<Complex, Error> {
-        // Execute Parallel
-        let p_theta = self._theta.clone();
-        let p_cost = spawn(move || cos(p_theta, terms));
-        let r_sint = sin(self._theta, terms);
-        // Extract Variables
-        let cost = p_cost.join().unwrap()?;
-        let sint = r_sint?;
-        // Calculate Result
-        let re = self._radius.checked_mul(cost).ok_or(Error::MultiplyOverflow)?;
-        let im = self._radius.checked_mul(sint).ok_or(Error::MultiplyOverflow)?;
-        Ok(Complex::from_polar(re, im, (terms, self.clone())))
-    }
-
-    /// Convert a polar representation into a complex number.
-    #[inline]
-    pub fn to_cartesian(&mut self, terms: usize) -> Result<Complex, Error> {
-        match &self._cartesian {
-            None => {
-                self._cartesian = Some((terms, self.to_cartesian_helper(terms)?));
-            },
-            Some(val) => if terms > val.0 {
-                self._cartesian = Some((terms, self.to_cartesian_helper(terms)?));
-            },
-        };
-        Ok(self._cartesian.ok_or(Error::OptionInvalid)?.1.clone())
     }
 }
 
@@ -162,38 +162,6 @@ impl Complex {
 
 //##########################################################################################################################
 
-impl PartialEq for Complex {
-    fn eq(&self, other: &Self) -> bool {
-        ( self._re == other.re() ) &&
-        ( self._im == other.im() )
-    }
-}
-
-impl PartialEq<Polar> for Complex {
-    fn eq(&self, other: &Polar) -> bool {
-        let norm_terms = match &self._norm { None => STD_ITER, Some(v) => v.0, };
-        let arg_terms  = match &self._arg  { None => STD_ITER, Some(v) => v.0, };
-        let terms = if norm_terms < arg_terms {norm_terms} else {arg_terms};
-        other == &self.clone().to_polar(terms).unwrap()
-    }
-}
-
-impl PartialEq<Decimal> for Complex {
-    fn eq(&self, other: &Decimal) -> bool {
-        ( &self._re == other ) &&
-        ( self._im  == D0    )
-    }
-}
-
-impl PartialEq<Complex> for Decimal {
-    fn eq(&self, other: &Complex) -> bool {
-        ( self == &other.re() ) &&
-        ( D0   == other.im()  )
-    }
-}
-
-//##########################################################################################################################
-
 impl Complex {
     /// Create a new Complex
     #[inline]
@@ -201,10 +169,10 @@ impl Complex {
         Complex { _re: re, _im: im, _norm: None, _arg: None }
     }
 
-    /// Create a new Complex from Polar form
+    /// Create a new Complex in Polar form
     #[inline]
-    pub const fn from_polar(re: Decimal, im: Decimal, polar: (usize, Polar)) -> Complex {
-        Complex { _re: re, _im: im, _norm: Some((polar.0, polar.1.radius())), _arg: Some((polar.0, polar.1.theta())) }
+    fn new_polar(&self, radius: Decimal, theta: Decimal, terms: usize) -> Polar {
+        Polar { _radius: radius, _theta: theta, _cartesian: Some((terms, self.clone())) }
     }
 
     /// Convert to polar form (r, theta)
@@ -214,7 +182,7 @@ impl Complex {
         let theta  = self.arg(terms)?;
         let radius = self.norm(terms)?;
         // Calculate Result
-        Ok(Polar::from_cartesian(radius, theta, (terms, self.clone())))
+        Ok(self.new_polar(radius, theta, terms))
     }
 }
 
@@ -223,35 +191,43 @@ impl Complex {
 impl Complex {
     /// Returns imaginary unit
     #[inline]
-    pub fn i() -> Complex {
+    pub const fn i() -> Complex {
         Complex::new(D0, D1)
     }
 
     /// Multiplies `self` by the scalar `t`.
     #[inline]
     pub fn scale(&self, value: Decimal) -> Complex {
-        Complex::new(
-            self._re * value,
-            self._im * value
-        )
+        (*self) * value
     }
 
     /// Divides `self` by the scalar `t`.
     #[inline]
     pub fn unscale(&self, value: Decimal) -> Complex {
-        Complex::new(
-            self._re / value,
-            self._im / value
-        )
+        (*self) / value
+    }
+
+    /// Returns the complex conjugate. 
+    /// conj(a + bi) = a - bi
+    #[inline]
+    pub fn conj(&self) -> Complex {
+        let re = self._re;
+        let im = -self._im;
+        Complex::new(re, im)
+    }
+
+    /// Returns `1/self`
+    #[inline]
+    pub fn inv(&self) -> Complex {
+        D1 / (*self)
     }
 
     /// Returns the square of the norm (since `T` doesn't necessarily
     /// have a sqrt function), i.e. `re^2 + im^2`.
     #[inline]
-    pub fn norm_sqr(&self) -> Result<Decimal, Error> {
-        let re_sqr = self._re.checked_mul(self._re).ok_or(Error::MultiplyOverflow)?;
-        let im_sqr = self._im.checked_mul(self._im).ok_or(Error::MultiplyOverflow)?;
-        re_sqr.checked_add(im_sqr).ok_or(Error::AddOverflow)
+    pub fn norm_sqr(&self) -> Decimal {
+        (self._re * self._re) +
+        (self._im * self._im)
     }
 }
 
@@ -262,11 +238,11 @@ impl Complex {
     #[inline]
     fn norm_helper(&self, terms: usize) -> Result<Decimal, Error> {
         Ok(
-                 if self.is_zero() {D0}
+                 if self.is_zero() { D0             }
             else if self._im == D0 { self._re.abs() }
             else if self._re == D0 { self._im.abs() }
             else {
-                let _sqr = self.norm_sqr()?;
+                let _sqr = self.norm_sqr();
                 sqrt(_sqr, terms)?
             }
         )
@@ -294,7 +270,7 @@ impl Complex {
     #[inline]
     fn arg_helper(&mut self, terms: usize) -> Result<Decimal, Error> {
         Ok(
-            if self.is_zero() {D0}
+            if self.is_zero() { D0 }
             else {
                 let _norm = self.norm(terms)?;
                 let _cos = self._re / _norm;
@@ -304,7 +280,7 @@ impl Complex {
         )
     }
 
-    /// Calculate the principal Arg of self.
+    /// Calculate the Angle of complex number.
     #[inline]
     pub fn arg(&mut self, terms: usize) -> Result<Decimal, Error> {
         match &self._arg {
@@ -322,35 +298,20 @@ impl Complex {
 //##########################################################################################################################
 
 impl Complex {
-    /// Returns the complex conjugate. i.e. `re - i im`
-    #[inline]
-    pub fn conj(&self) -> Complex {
-        Complex::new(self._re, -self._im)
-    }
-
-    /// Returns `1/self`
-    #[inline]
-    pub fn inv(&self) -> Result<Complex, Error> {
-        let norm_sqr = self.norm_sqr()?;
-        let re = self._re / norm_sqr;
-        let im = -self._im / norm_sqr;
-        Ok(Complex::new(re, im))
-    }
-
+    /// Round complex terms to integer.
     #[inline]
     pub fn round(&self) -> Complex {
-        Complex::new(
-            self._re.round(),
-            self._im.round()
-        )
+        let re = self._re.round();
+        let im = self._im.round();
+        Complex::new(re, im)
     }
 
+    /// Round complex terms to specified precision.
     #[inline]
     pub fn round_dp(&self, dp: u32) -> Complex {
-        Complex::new(
-            self._re.round_dp(dp),
-            self._im.round_dp(dp)
-        )
+        let re = self._re.round_dp(dp);
+        let im = self._im.round_dp(dp);
+        Complex::new(re, im)
     }
 }
 
@@ -386,12 +347,46 @@ impl Complex {
 
 //##########################################################################################################################
 
+impl PartialEq for Complex {
+    fn eq(&self, other: &Self) -> bool {
+        ( self._re == other.re() ) &&
+        ( self._im == other.im() )
+    }
+}
+
+impl PartialEq<Polar> for Complex {
+    fn eq(&self, other: &Polar) -> bool {
+        let norm_terms = match &self._norm { None => STD_ITER, Some(v) => v.0, };
+        let arg_terms  = match &self._arg  { None => STD_ITER, Some(v) => v.0, };
+        let terms = if norm_terms < arg_terms {norm_terms} else {arg_terms};
+        other == &self.clone().to_polar(terms).unwrap()
+    }
+}
+
+impl PartialEq<Decimal> for Complex {
+    fn eq(&self, other: &Decimal) -> bool {
+        ( &self._re == other ) &&
+        ( self._im  == D0    )
+    }
+}
+
+impl PartialEq<Complex> for Decimal {
+    fn eq(&self, other: &Complex) -> bool {
+        ( self == &other.re() ) &&
+        ( D0   == other.im()  )
+    }
+}
+
+//##########################################################################################################################
+
 impl Neg for Complex {
     type Output = Complex;
 
     #[inline]
     fn neg(self) -> Complex {
-        Complex::new(-self._re, -self._im)
+        let re = -self._re;
+        let im = -self._im;
+        Complex::new(re, im)
     }
 }
 
@@ -412,7 +407,9 @@ impl Add<Complex> for Complex {
 
     #[inline]
     fn add(self, other: Complex) -> Complex {
-        Complex::new(self._re + other.re(), self._im + other.im())
+        let re = self._re + other.re();
+        let im = self._im + other.im();
+        Complex::new(re, im)
     }
 }
 
@@ -421,7 +418,7 @@ impl Add<Decimal> for Complex {
 
     #[inline]
     fn add(self, other: Decimal) -> Complex {
-        Complex::new(self._re + other, self._im)
+        self + Complex::new(other, D0)
     }
 }
 
@@ -430,7 +427,7 @@ impl Add<Complex> for Decimal {
 
     #[inline]
     fn add(self, other: Complex) -> Complex {
-        Complex::new(other.re() + self, other.im())
+        Complex::new(self, D0) + other
     }
 }
 
@@ -442,7 +439,9 @@ impl Sub<Complex> for Complex {
 
     #[inline]
     fn sub(self, other: Complex) -> Complex {
-        Complex::new(self._re - other.re(), self._im - other.im())
+        let re = self._re - other.re();
+        let im = self._im - other.im();
+        Complex::new(re, im)
     }
 }
 
@@ -451,7 +450,7 @@ impl Sub<Decimal> for Complex {
 
     #[inline]
     fn sub(self, other: Decimal) -> Complex {
-        Complex::new(self._re - other, self._im)
+        self - Complex::new(other, D0)
     }
 }
 
@@ -460,7 +459,7 @@ impl Sub<Complex> for Decimal {
 
     #[inline]
     fn sub(self, other: Complex) -> Complex {
-        Complex::new(other.re() - self, other.im())
+        Complex::new(self, D0) - other
     }
 }
 
@@ -472,8 +471,8 @@ impl Mul<Complex> for Complex {
 
     #[inline]
     fn mul(self, other: Complex) -> Complex {
-        let re = self._re * other.re() - self._im * other.im();
-        let im = self._re * other.im() + self._im * other.re();
+        let re = (self._re * other.re()) - (self._im * other.im());
+        let im = (self._re * other.im()) + (self._im * other.re());
         Complex::new(re, im)
     }
 }
@@ -483,9 +482,7 @@ impl Mul<Decimal> for Complex {
 
     #[inline]
     fn mul(self, other: Decimal) -> Complex {
-        let re = self._re * other;
-        let im = self._im * other;
-        Complex::new(re, im)
+        self * Complex::new(other, D0)
     }
 }
 
@@ -494,9 +491,7 @@ impl Mul<Complex> for Decimal {
 
     #[inline]
     fn mul(self, other: Complex) -> Complex {
-        let re = other.re() * self;
-        let im = other.im() * self;
-        Complex::new(re, im)
+        Complex::new(self, D0) * other
     }
 }
 
@@ -509,10 +504,10 @@ impl Div<Complex> for Complex {
 
     #[inline]
     fn div(self, other: Complex) -> Complex {
-        let norm_sqr = other.norm_sqr().unwrap();
-        let re = self._re * other.re() + self._im * other.im();
-        let im = self._im * other.re() - self._re * other.im();
-        Complex::new(re / norm_sqr, im / norm_sqr)
+        let norm_sqr = other.norm_sqr();
+        let re = ((self._re * other.re()) + (self._im * other.im())) / norm_sqr;
+        let im = ((self._im * other.re()) - (self._re * other.im())) / norm_sqr;
+        Complex::new(re, im)
     }
 }
 
@@ -521,9 +516,7 @@ impl Div<Decimal> for Complex {
 
     #[inline]
     fn div(self, other: Decimal) -> Complex {
-        let re = self._re / other;
-        let im = self._im / other;
-        Complex::new(re, im)
+        self / Complex::new(other, D0)
     }
 }
 
@@ -532,9 +525,7 @@ impl Div<Complex> for Decimal {
 
     #[inline]
     fn div(self, other: Complex) -> Complex {
-        let re = other.re() / self;
-        let im = other.im() / self;
-        Complex::new(re, im)
+        Complex::new(self, D0) / other
     }
 }
 

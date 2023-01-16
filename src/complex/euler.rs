@@ -36,6 +36,7 @@ pub fn c_exp(
     // Calculate Complex
     let re = exp_re * cos_im;
     let im = exp_re * sin_im;
+    // Return Result
     Ok(Complex::new(re, im))
 }
 
@@ -48,12 +49,12 @@ pub fn c_ln(
 ) -> Result<Complex, Error> {
     // Execute Parallel
     let p_value = value.clone();
-    let p_ln_norm = spawn(move || Ok(ln(p_value.norm_sqr()?, terms)? / D2));
-    let val_arg = value.arg(terms);
+    let p_ln_norm = spawn(move || Ok(ln(p_value.norm_sqr(), terms)? / D2));
+    let r_val_arg = value.arg(terms);
     // Extract Variables
     let re = p_ln_norm.join().unwrap()?;
-    let im = val_arg?;
-    // Calculate Complex
+    let im = r_val_arg?;
+    // Return Result
     Ok(Complex::new(re, im))
 }
 

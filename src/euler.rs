@@ -50,9 +50,9 @@ pub fn exp(
     terms: usize
 ) -> Result<Decimal, Error> {
     Ok(
-             if value == D0  {D1}
-        else if value == D1  {E}
-        else if value == -D1 {D1DIVE}
+             if value ==  D0 { D1     }
+        else if value ==  D1 { E      }
+        else if value == -D1 { D1DIVE }
         else
             { power_series(value, terms)? }
     )
@@ -128,9 +128,9 @@ pub fn ln(
 ) -> Result<Decimal, Error> {
     if value <= D0 { Err(Error::InputOutOfRange)? };
     Ok(
-             if value == D1     {D0}
-        else if value == E      {D1}
-        else if value == D1DIVE {-D1}
+             if value == D1     {  D0 }
+        else if value == E      {  D1 }
+        else if value == D1DIVE { -D1 }
         else {
             let (rem, base) = ln_prepare(value);
             base + ln_series(rem, terms)?

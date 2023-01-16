@@ -23,9 +23,7 @@ fn c_pow_series(
 ) -> Result<Complex, Error> {
     (1..=power).into_iter()
         .map(|_| Ok(value))
-        .reduce(|u, d| Ok(
-            u? * d?
-        ))
+        .reduce(|u, d| Ok(u? * d?))
         .unwrap_or(Err(Error::IteratorError))
 }
 

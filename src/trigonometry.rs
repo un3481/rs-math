@@ -98,11 +98,11 @@ pub fn cos(
 ) -> Result<Decimal, Error> {
     let rem: Decimal = trig_prepare(value);
     Ok(
-             if rem == PI      {-D1}
-        else if rem == PIDIV2  {D0}
-        else if rem == D0      {D1}
-        else if rem == -PIDIV2 {D0}
-        else if rem == -PI     {-D1}
+             if rem ==  PI     { -D1 }
+        else if rem ==  PIDIV2 {  D0 }
+        else if rem ==  D0     {  D1 }
+        else if rem == -PIDIV2 {  D0 }
+        else if rem == -PI     { -D1 }
         else
             { cos_series(rem, terms)? }
     )
@@ -117,11 +117,11 @@ pub fn sin(
 ) -> Result<Decimal, Error> {
     let rem: Decimal = trig_prepare(value);
     Ok(
-             if rem == PI      {D0}
-        else if rem == PIDIV2  {D1}
-        else if rem == D0      {D0}
-        else if rem == -PIDIV2 {-D1}
-        else if rem == -PI     {D0}
+             if rem ==  PI     {  D0 }
+        else if rem ==  PIDIV2 {  D1 }
+        else if rem ==  D0     {  D0 }
+        else if rem == -PIDIV2 { -D1 }
+        else if rem == -PI     {  D0 }
         else
             { sin_series(rem, terms)? }
     )
@@ -240,9 +240,9 @@ pub fn atan(
     terms: usize
 ) -> Result<Decimal, Error> {
     Ok(
-             if value == D0  {D0}
-        else if value == D1  {PIDIV4}
-        else if value == -D1 {-PIDIV4}
+             if value ==  D0 {  D0     }
+        else if value ==  D1 {  PIDIV4 }
+        else if value == -D1 { -PIDIV4 }
         else {
             let (rem, base) = tan_prepare(value);
             base + atan_series(rem, terms)?
@@ -260,10 +260,10 @@ pub fn atan2(
 ) -> Result<Decimal, Error> {
     if !is_valid_pair(_cos, _sin, terms) { Err(Error::InputOutOfRange)? };
     Ok(
-             if (_cos >  D0) && (_sin == D0) {D0}
-        else if (_cos == D0) && (_sin >  D0) {PIDIV2}
-        else if (_cos <  D0) && (_sin == D0) {PI}
-        else if (_cos == D0) && (_sin <  D0) {-PIDIV2}
+             if (_cos >  D0) && (_sin == D0) {  D0     }
+        else if (_cos == D0) && (_sin >  D0) {  PIDIV2 }
+        else if (_cos <  D0) && (_sin == D0) {  PI     }
+        else if (_cos == D0) && (_sin <  D0) { -PIDIV2 }
         else {
             let (rem, base) = tan2_prepare(_cos, _sin);
             let arg = base + atan_series(rem, terms)?;

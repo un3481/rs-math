@@ -32,7 +32,7 @@ pub struct Polar {
     _radius: Decimal,
     /// Angle of complex number
     _theta: Decimal,
-    // Cartesian form of complex number
+    /// Cartesian form of complex number
     _cartesian: Option<(usize, Complex)>,
 }
 

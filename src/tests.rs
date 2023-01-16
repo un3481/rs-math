@@ -34,9 +34,9 @@ const C1: Complex = Complex::ONE;
 const C2: Complex = Complex::TWO;
 
 const C4: Complex = Complex::new(D4, D0);
-const CN1I2: Complex = Complex::new(DN1, D2);
 const C4I3: Complex = Complex::new(D4, D3);
 const C7I24: Complex = Complex::new(D7, D24);
+const CN1I2: Complex = Complex::new(DN1, D2);
 const C1DIV2: Complex = Complex::new(D1DIV2, D0);
 
 const SIN1: Decimal = dec!(0.8414709848078965066525023216);

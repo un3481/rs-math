@@ -68,7 +68,7 @@ impl Polar {
     }
 
     #[inline]
-    fn to_cartesian_helper(&self, terms: usize) -> Result<Complex, Error> {
+    fn calc_cartesian(&self, terms: usize) -> Result<Complex, Error> {
         // Execute Parallel
         let p_theta = self._theta.clone();
         let p_cost = spawn(move || cos(p_theta, terms));
@@ -87,10 +87,10 @@ impl Polar {
     pub fn to_cartesian(&mut self, terms: usize) -> Result<Complex, Error> {
         match &self._cartesian {
             None => {
-                self._cartesian = Some((terms, self.to_cartesian_helper(terms)?));
+                self._cartesian = Some((terms, self.calc_cartesian(terms)?));
             },
             Some(val) => if terms > val.0 {
-                self._cartesian = Some((terms, self.to_cartesian_helper(terms)?));
+                self._cartesian = Some((terms, self.calc_cartesian(terms)?));
             },
         };
         Ok(self._cartesian.ok_or(Error::OptionInvalid)?.1.clone())
@@ -236,7 +236,7 @@ impl Complex {
 impl Complex {
 
     #[inline]
-    fn norm_helper(&self, terms: usize) -> Result<Decimal, Error> {
+    fn calc_norm(&self, terms: usize) -> Result<Decimal, Error> {
         Ok(
                  if self.is_zero() { D0             }
             else if self._im == D0 { self._re.abs() }
@@ -253,10 +253,10 @@ impl Complex {
     pub fn norm(&mut self, terms: usize) -> Result<Decimal, Error> {
         match &self._norm {
             None => {
-                self._norm = Some((terms, self.norm_helper(terms)?));
+                self._norm = Some((terms, self.calc_norm(terms)?));
             },
             Some(val) => if terms > val.0 {
-                self._norm = Some((terms, self.norm_helper(terms)?));
+                self._norm = Some((terms, self.calc_norm(terms)?));
             },
         };
         Ok(self._norm.ok_or(Error::OptionInvalid)?.1.clone())
@@ -268,7 +268,7 @@ impl Complex {
 impl Complex {
 
     #[inline]
-    fn arg_helper(&mut self, terms: usize) -> Result<Decimal, Error> {
+    fn calc_arg(&mut self, terms: usize) -> Result<Decimal, Error> {
         Ok(
             if self.is_zero() { D0 }
             else {
@@ -285,10 +285,10 @@ impl Complex {
     pub fn arg(&mut self, terms: usize) -> Result<Decimal, Error> {
         match &self._arg {
             None => {
-                self._norm = Some((terms, self.arg_helper(terms)?));
+                self._norm = Some((terms, self.calc_arg(terms)?));
             },
             Some(val) => if terms > val.0 {
-                self._norm = Some((terms, self.arg_helper(terms)?));
+                self._norm = Some((terms, self.calc_arg(terms)?));
             },
         };
         Ok(self._norm.ok_or(Error::OptionInvalid)?.1.clone())

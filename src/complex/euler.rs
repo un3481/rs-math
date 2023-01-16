@@ -1,19 +1,20 @@
 
 // Imports
-use rust_decimal_macros::dec;
-use rust_decimal::prelude::*;
 use std::thread::{ spawn };
 
+use rust_decimal::prelude::*;
+
 // Modules
-use crate::complex::types::{ Complex };
+use crate::error::Error;
 use crate::trigonometry::{ cos, sin };
 use crate::euler::{ exp, ln };
-use crate::error::Error;
+
+use crate::complex::types::{ Complex };
 
 //##########################################################################################################################
 
 // Constants
-const D2: Decimal = dec!(2);
+const D2: Decimal = Decimal::TWO;
 
 //##########################################################################################################################
 

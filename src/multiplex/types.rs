@@ -1,10 +1,9 @@
 
 // Imports
-use rust_decimal_macros::dec;
-use rust_decimal::prelude::*;
-
-use std::fmt;
 use std::ops::{ Mul, Div, Neg };
+use std::fmt;
+
+use rust_decimal::prelude::*;
 
 // Modules
 use crate::error::Error;
@@ -12,7 +11,7 @@ use crate::error::Error;
 //##########################################################################################################################
 
 // Constants
-const D1: Decimal = dec!(1);
+const D1: Decimal = Decimal::ONE;
 
 //##########################################################################################################################
 

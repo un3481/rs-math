@@ -1,7 +1,7 @@
 
 // Imports
-use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
+use rust_decimal_macros::dec;
 
 // Modules
 use crate::constants::{ E_SQR };
@@ -18,20 +18,22 @@ use crate::complex::basic::{ cc_pow };
 //##########################################################################################################################
 
 // Constants
-const DN1: Decimal = dec!(-1);
-const D0: Decimal = dec!(0);
-const D1: Decimal = dec!(1);
-const D2: Decimal = dec!(2);
+const DN1: Decimal = Decimal::NEGATIVE_ONE;
+const D0: Decimal = Decimal::ZERO;
+const D1: Decimal = Decimal::ONE;
+const D2: Decimal = Decimal::TWO;
+
 const D3: Decimal = dec!(3);
 const D4: Decimal = dec!(4);
 const D7: Decimal = dec!(7);
 const D24: Decimal = dec!(24);
 const D1DIV2: Decimal = dec!(0.5);
 
-const C1: Complex = Complex::new(D1, D0);
-const C2: Complex = Complex::new(D2, D0);
+const CI: Complex = Complex::I;
+const C1: Complex = Complex::ONE;
+const C2: Complex = Complex::TWO;
+
 const C4: Complex = Complex::new(D4, D0);
-const CI1: Complex = Complex::new(D0, D1);
 const CN1I2: Complex = Complex::new(DN1, D2);
 const C4I3: Complex = Complex::new(D4, D3);
 const C7I24: Complex = Complex::new(D7, D24);
@@ -117,7 +119,7 @@ fn test_complex() -> Result<(), Error> {
     // cc_pow(-1, 1/2) == i
     let mut _cn1 = -C1;
     let res1 = cc_pow(&mut _cn1, C1DIV2, STD_ITER)?;
-    assert_eq!(res1, CI1);
+    assert_eq!(res1, CI);
     // cc_pow(4, 1/2) == 2
     let mut _c4 = C4;
     let res2 = cc_pow(&mut _c4, C1DIV2, STD_ITER)?.round_dp(STD_DIG);

@@ -1,11 +1,11 @@
 
 // Imports
-use rust_decimal_macros::dec;
-use rust_decimal::prelude::*;
-use std::thread::{ spawn };
-
-use std::fmt;
 use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::thread::{ spawn };
+use std::fmt;
+
+use rust_decimal::prelude::*;
+use rust_decimal_macros::dec;
 
 // Modules
 use crate::constants::{ PI };
@@ -17,8 +17,8 @@ use crate::trigonometry::{ cos, sin, atan2 };
 //##########################################################################################################################
 
 // Constants
-const D0: Decimal = dec!(0);
-const D1: Decimal = dec!(1);
+const D0: Decimal = Decimal::ZERO;
+const D1: Decimal = Decimal::ONE;
 
 // Standard Iterations
 const STD_ITER: usize = 32;
@@ -80,6 +80,7 @@ impl Polar {
         // Calculate Result
         let re = self._radius.checked_mul(cost).ok_or(Error::MultiplyOverflow)?;
         let im = self._radius.checked_mul(sint).ok_or(Error::MultiplyOverflow)?;
+        // Return Result
         Ok(self.new_cartesian(re, im, terms))
     }
 
@@ -353,17 +354,22 @@ impl Complex {
 //##########################################################################################################################
 
 impl Complex {
-    /// Returns imaginary unit
-    #[inline]
-    pub const fn i() -> Complex {
-        Complex::new(D0, D1)
-    }
-
-    /// Returns Zero
-    #[inline]
-    pub const fn zero() -> Complex {
-        Complex::new(D0, D0)
-    }
+    /// A constant representing the Imaginary unit - sqrt(-1).
+    pub const I: Complex = Complex::new(D0, dec!(1));
+    /// A constant representing 0.
+    pub const ZERO: Complex = Complex::new(D0, D0);
+    /// A constant representing 1.
+    pub const ONE: Complex = Complex::new(dec!(1), D0);
+    /// A constant representing -1.
+    pub const NEGATIVE_ONE: Complex = Complex::new(dec!(-1), D0);
+    /// A constant representing 2.
+    pub const TWO: Complex = Complex::new(dec!(2), D0);
+    /// A constant representing 10.
+    pub const TEN: Complex = Complex::new(dec!(10), D0);
+    /// A constant representing 100.
+    pub const ONE_HUNDRED: Complex = Complex::new(dec!(100), D0);
+    /// A constant representing 1000.
+    pub const ONE_THOUSAND: Complex = Complex::new(dec!(1000), D0);
 }
 
 //##########################################################################################################################
@@ -372,7 +378,7 @@ impl Zero for Complex {
     /// Returns Zero
     #[inline]
     fn zero() -> Complex {
-        Complex::zero()
+        Complex::ZERO
     }
 
     /// Check if value is Zero

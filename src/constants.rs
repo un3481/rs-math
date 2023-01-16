@@ -1,7 +1,7 @@
 
 // Imports
-use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
+use rust_decimal_macros::dec;
 
 // Modules
 use crate::error::Error;
@@ -40,9 +40,10 @@ pub const TAN_PIDIV36: Decimal = dec!(0.0874886635259240052220186694);
 
 //##########################################################################################################################
 
-const D0: Decimal = dec!(0);
-const D1: Decimal = dec!(1);
-const D2: Decimal = dec!(2);
+const D0: Decimal = Decimal::ZERO;
+const D1: Decimal = Decimal::ONE;
+const D2: Decimal = Decimal::TWO;
+
 const D4: Decimal = dec!(4);
 const D5: Decimal = dec!(5);
 const D239: Decimal = dec!(239);

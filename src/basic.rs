@@ -1,6 +1,5 @@
 
 // Imports
-use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
@@ -10,8 +9,8 @@ use crate::euler::{ exp, ln };
 
 //##########################################################################################################################
 
-const D0: Decimal = dec!(0);
-const D1: Decimal = dec!(1);
+const D0: Decimal = Decimal::ZERO;
+const D1: Decimal = Decimal::ONE;
 
 //##########################################################################################################################
 

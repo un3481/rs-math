@@ -1,7 +1,7 @@
 
 // Imports
-use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
+use rust_decimal_macros::dec;
 
 // Modules
 use crate::constants::{ SQRT_UPPER_BD, SQRT_UPPER_VAL, SQRT_LOWER_BD, SQRT_LOWER_VAL };
@@ -14,9 +14,12 @@ use crate::basic::{ m_pow, am_pow };
 //##########################################################################################################################
 
 // Constants
-const D0: Decimal = dec!(0);
-const D1: Decimal = dec!(1);
-const D2: Decimal = dec!(2);
+const D0: Decimal = Decimal::ZERO;
+const D1: Decimal = Decimal::ONE;
+const D2: Decimal = Decimal::TWO;
+const D10: Decimal = Decimal::TEN;
+const D100: Decimal = Decimal::ONE_HUNDRED;
+
 const D3: Decimal = dec!(3);
 const D4: Decimal = dec!(4);
 const D5: Decimal = dec!(5);
@@ -24,8 +27,6 @@ const D6: Decimal = dec!(6);
 const D7: Decimal = dec!(7);
 const D8: Decimal = dec!(8);
 const D9: Decimal = dec!(9);
-const D10: Decimal = dec!(10);
-const D100: Decimal = dec!(100);
 const D1DIV4: Decimal = dec!(0.25);
 
 //##########################################################################################################################

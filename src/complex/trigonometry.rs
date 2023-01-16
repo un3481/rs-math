@@ -1,19 +1,20 @@
 
 // Imports
-use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
 
 // Modules
+use crate::error::Error;
+
 use crate::complex::types::{ Complex };
 use crate::complex::euler::{ c_exp, c_ln };
-use crate::error::Error;
 
 //##########################################################################################################################
 
-const D0: Decimal = dec!(0);
-const D1: Decimal = dec!(1);
-const D2: Decimal = dec!(2);
-const CI: Complex = Complex::new(D0, D1);
+const D0: Decimal = Decimal::ZERO;
+const D1: Decimal = Decimal::ONE;
+const D2: Decimal = Decimal::TWO;
+
+const CI: Complex = Complex::I;
 const CI2: Complex = Complex::new(D0, D2);
 
 //##########################################################################################################################

@@ -1,7 +1,7 @@
 
 // Imports
-use rust_decimal_macros::dec;
 use rust_decimal::prelude::*;
+use rust_decimal_macros::dec;
 
 // Modules
 use crate::constants::{ PI, PIDIV2, PI3DIV2, PI2 };
@@ -18,12 +18,14 @@ use crate::basic::{ dec, a_pow, am_pow };
 type Pair = (Decimal, Decimal);
 
 // Constants
-const D0: Decimal = dec!(0);
-const D1: Decimal = dec!(1);
-const D2: Decimal = dec!(2);
-const DN1: Decimal = dec!(-1);
+const DN1: Decimal = Decimal::NEGATIVE_ONE;
+const D0: Decimal = Decimal::ZERO;
+const D1: Decimal = Decimal::ONE;
+const D2: Decimal = Decimal::TWO;
+
 const D1DIV5: Decimal = dec!(0.2);
 const D2DIV5: Decimal = dec!(0.4);
+
 const PI_PAIR: Pair = (DN1, D0);
 const PIDIV2_PAIR: Pair = (D0, D1);
 const PI3DIV2_PAIR: Pair = (D0, DN1);

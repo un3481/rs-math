@@ -39,6 +39,12 @@ pub struct Polar {
 //##########################################################################################################################
 
 impl Polar {
+    /// Create a new Complex in Polar form
+    #[inline]
+    pub const fn new(radius: Decimal, theta: Decimal) -> Polar {
+        Polar { _radius: radius, _theta: theta, _cartesian: None }
+    }
+
     /// Get radius property
     #[inline]
     pub const fn radius(&self) -> Decimal {
@@ -55,12 +61,6 @@ impl Polar {
 //##########################################################################################################################
 
 impl Polar {
-    /// Create a new Complex in Polar form
-    #[inline]
-    pub const fn new(radius: Decimal, theta: Decimal) -> Polar {
-        Polar { _radius: radius, _theta: theta, _cartesian: None }
-    }
-
     /// Create a new Complex from Polar form
     #[inline]
     fn new_cartesian(&self, re: Decimal, im: Decimal, terms: usize) -> Complex {
@@ -89,7 +89,7 @@ impl Polar {
             None => {
                 self._cartesian = Some((terms, self.calc_cartesian(terms)?));
             },
-            Some(val) => if terms > val.0 {
+            Some(v) => if terms > v.0 {
                 self._cartesian = Some((terms, self.calc_cartesian(terms)?));
             },
         };
@@ -147,6 +147,12 @@ pub struct Complex {
 //##########################################################################################################################
 
 impl Complex {
+    /// Create a new Complex
+    #[inline]
+    pub const fn new(re: Decimal, im: Decimal) -> Complex {
+        Complex { _re: re, _im: im, _norm: None, _arg: None }
+    }
+
     /// Get re property
     #[inline]
     pub const fn re(&self) -> Decimal {
@@ -163,12 +169,6 @@ impl Complex {
 //##########################################################################################################################
 
 impl Complex {
-    /// Create a new Complex
-    #[inline]
-    pub const fn new(re: Decimal, im: Decimal) -> Complex {
-        Complex { _re: re, _im: im, _norm: None, _arg: None }
-    }
-
     /// Create a new Complex in Polar form
     #[inline]
     fn new_polar(&self, radius: Decimal, theta: Decimal, terms: usize) -> Polar {
@@ -255,7 +255,7 @@ impl Complex {
             None => {
                 self._norm = Some((terms, self.calc_norm(terms)?));
             },
-            Some(val) => if terms > val.0 {
+            Some(v) => if terms > v.0 {
                 self._norm = Some((terms, self.calc_norm(terms)?));
             },
         };
@@ -287,7 +287,7 @@ impl Complex {
             None => {
                 self._norm = Some((terms, self.calc_arg(terms)?));
             },
-            Some(val) => if terms > val.0 {
+            Some(v) => if terms > v.0 {
                 self._norm = Some((terms, self.calc_arg(terms)?));
             },
         };

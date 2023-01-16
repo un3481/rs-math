@@ -61,12 +61,13 @@ impl Polar {
 //##########################################################################################################################
 
 impl Polar {
-    /// Create a new Complex from Polar form
+    /// Create a new Complex from Polar form.
     #[inline]
     fn new_cartesian(&self, re: Decimal, im: Decimal, terms: usize) -> Complex {
         Complex { _re: re, _im: im, _norm: Some((terms, self.radius())), _arg: Some((terms, self.theta())) }
     }
 
+    /// Calculate Cartesian form of complex number.
     #[inline]
     fn calc_cartesian(&self, terms: usize) -> Result<Complex, Error> {
         // Execute Parallel
@@ -82,7 +83,7 @@ impl Polar {
         Ok(self.new_cartesian(re, im, terms))
     }
 
-    /// Convert a polar representation into a complex number.
+    /// Convert a Polar form number into Cartesian form.
     #[inline]
     pub fn to_cartesian(&mut self, terms: usize) -> Result<Complex, Error> {
         match &self._cartesian {
@@ -106,13 +107,6 @@ impl PartialEq for Polar {
     }
 }
 
-impl PartialEq<Complex> for Polar {
-    fn eq(&self, other: &Complex) -> bool {
-        let terms = match &self._cartesian { None => STD_ITER, Some(v) => v.0, };
-        other == &self.clone().to_cartesian(terms).unwrap()
-    }
-}
-
 impl PartialEq<Decimal> for Polar {
     fn eq(&self, other: &Decimal) -> bool {
         let theta = if other >= &D0 {D0} else {PI};
@@ -126,6 +120,13 @@ impl PartialEq<Polar> for Decimal {
         let theta = if self >= &D0 {D0} else {PI};
         ( self.abs() == other.radius() ) &&
         ( theta      == other.theta()  )
+    }
+}
+
+impl PartialEq<Complex> for Polar {
+    fn eq(&self, other: &Complex) -> bool {
+        let terms = match &self._cartesian { None => STD_ITER, Some(v) => v.0, };
+        other == &self.clone().to_cartesian(terms).unwrap()
     }
 }
 
@@ -181,7 +182,7 @@ impl Complex {
         // Extract Variables
         let theta  = self.arg(terms)?;
         let radius = self.norm(terms)?;
-        // Calculate Result
+        // Return Result
         Ok(self.new_polar(radius, theta, terms))
     }
 }
@@ -234,7 +235,7 @@ impl Complex {
 //##########################################################################################################################
 
 impl Complex {
-
+    /// Calculate Radius of Complex number.
     #[inline]
     fn calc_norm(&self, terms: usize) -> Result<Decimal, Error> {
         Ok(
@@ -248,7 +249,7 @@ impl Complex {
         )
     }
 
-    /// Calculate |self|
+    /// Get Radius of Complex number.
     #[inline]
     pub fn norm(&mut self, terms: usize) -> Result<Decimal, Error> {
         match &self._norm {
@@ -266,7 +267,7 @@ impl Complex {
 //##########################################################################################################################
 
 impl Complex {
-
+    // Calculate Angle of Complex number.
     #[inline]
     fn calc_arg(&mut self, terms: usize) -> Result<Decimal, Error> {
         Ok(
@@ -280,7 +281,7 @@ impl Complex {
         )
     }
 
-    /// Calculate the Angle of complex number.
+    /// Get Angle of complex number.
     #[inline]
     pub fn arg(&mut self, terms: usize) -> Result<Decimal, Error> {
         match &self._arg {
@@ -354,15 +355,6 @@ impl PartialEq for Complex {
     }
 }
 
-impl PartialEq<Polar> for Complex {
-    fn eq(&self, other: &Polar) -> bool {
-        let norm_terms = match &self._norm { None => STD_ITER, Some(v) => v.0, };
-        let arg_terms  = match &self._arg  { None => STD_ITER, Some(v) => v.0, };
-        let terms = if norm_terms < arg_terms {norm_terms} else {arg_terms};
-        other == &self.clone().to_polar(terms).unwrap()
-    }
-}
-
 impl PartialEq<Decimal> for Complex {
     fn eq(&self, other: &Decimal) -> bool {
         ( &self._re == other ) &&
@@ -374,6 +366,15 @@ impl PartialEq<Complex> for Decimal {
     fn eq(&self, other: &Complex) -> bool {
         ( self == &other.re() ) &&
         ( D0   == other.im()  )
+    }
+}
+
+impl PartialEq<Polar> for Complex {
+    fn eq(&self, other: &Polar) -> bool {
+        let t_norm = match &self._norm { None => STD_ITER, Some(v) => v.0, };
+        let t_arg  = match &self._arg  { None => STD_ITER, Some(v) => v.0, };
+        let terms = if t_norm < t_arg {t_norm} else {t_arg};
+        other == &self.clone().to_polar(terms).unwrap()
     }
 }
 

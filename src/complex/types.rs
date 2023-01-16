@@ -100,6 +100,16 @@ impl Polar {
 
 //##########################################################################################################################
 
+impl fmt::Display for Polar {
+    /// Format string
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "r={};arg={}", self._radius, self._theta)
+    }
+}
+
+//##########################################################################################################################
+
 impl PartialEq for Polar {
     fn eq(&self, other: &Self) -> bool {
         ( self._radius == other.radius() ) &&
@@ -190,12 +200,6 @@ impl Complex {
 //##########################################################################################################################
 
 impl Complex {
-    /// Returns imaginary unit
-    #[inline]
-    pub const fn i() -> Complex {
-        Complex::new(D0, D1)
-    }
-
     /// Multiplies `self` by the scalar `t`.
     #[inline]
     pub fn scale(&self, value: Decimal) -> Complex {
@@ -345,6 +349,50 @@ impl Complex {
 }
 
 */
+
+//##########################################################################################################################
+
+impl Complex {
+    /// Returns imaginary unit
+    #[inline]
+    pub const fn i() -> Complex {
+        Complex::new(D0, D1)
+    }
+
+    /// Returns Zero
+    #[inline]
+    pub const fn zero() -> Complex {
+        Complex::new(D0, D0)
+    }
+}
+
+//##########################################################################################################################
+
+impl Zero for Complex {
+    /// Returns Zero
+    #[inline]
+    fn zero() -> Complex {
+        Complex::zero()
+    }
+
+    /// Check if value is Zero
+    #[inline]
+    fn is_zero(&self) -> bool {
+        (self._re == D0) && (self._im == D0)
+    }
+}
+
+//##########################################################################################################################
+
+impl fmt::Display for Complex {
+    /// Format string
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+             if self._im >  D0 { write!(f, "{}+{}i", self._re, self._im)  }
+        else if self._im <  D0 { write!(f, "{}-{}i", self._re, -self._im) }
+        else                   { write!(f, "{}", self._re)                }
+    }
+}
 
 //##########################################################################################################################
 
@@ -527,33 +575,6 @@ impl Div<Complex> for Decimal {
     #[inline]
     fn div(self, other: Complex) -> Complex {
         Complex::new(self, D0) / other
-    }
-}
-
-//##########################################################################################################################
-
-/* constants */
-impl Zero for Complex {
-    #[inline]
-    fn zero() -> Complex {
-        Complex::new(D0, D0)
-    }
-
-    #[inline]
-    fn is_zero(&self) -> bool {
-        (self._re == D0) && (self._im == D0)
-    }
-}
-
-/* string conversions */
-impl fmt::Display for Complex {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        if self._im < Zero::zero() {
-            write!(f, "{}-{}i", self._re, D0 - self._im)
-        } else {
-            write!(f, "{}+{}i", self._re, self._im)
-        }
     }
 }
 

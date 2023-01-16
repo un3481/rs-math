@@ -386,6 +386,26 @@ impl Complex {
 
 //##########################################################################################################################
 
+impl Neg for Complex {
+    type Output = Complex;
+
+    #[inline]
+    fn neg(self) -> Complex {
+        Complex::new(-self._re, -self._im)
+    }
+}
+
+impl<'a> Neg for &'a Complex {
+    type Output = Complex;
+
+    #[inline]
+    fn neg(self) -> Complex {
+        -self.clone()
+    }
+}
+
+//##########################################################################################################################
+
 // (a + i b) + (c + i d) == (a + c) + i (b + d)
 impl Add<Complex> for Complex {
     type Output = Complex;
@@ -393,6 +413,24 @@ impl Add<Complex> for Complex {
     #[inline]
     fn add(self, other: Complex) -> Complex {
         Complex::new(self._re + other.re(), self._im + other.im())
+    }
+}
+
+impl Add<Decimal> for Complex {
+    type Output = Complex;
+
+    #[inline]
+    fn add(self, other: Decimal) -> Complex {
+        Complex::new(self._re + other, self._im)
+    }
+}
+
+impl Add<Complex> for Decimal {
+    type Output = Complex;
+
+    #[inline]
+    fn add(self, other: Complex) -> Complex {
+        Complex::new(other.re() + self, other.im())
     }
 }
 
@@ -408,6 +446,24 @@ impl Sub<Complex> for Complex {
     }
 }
 
+impl Sub<Decimal> for Complex {
+    type Output = Complex;
+
+    #[inline]
+    fn sub(self, other: Decimal) -> Complex {
+        Complex::new(self._re - other, self._im)
+    }
+}
+
+impl Sub<Complex> for Decimal {
+    type Output = Complex;
+
+    #[inline]
+    fn sub(self, other: Complex) -> Complex {
+        Complex::new(other.re() - self, other.im())
+    }
+}
+
 //##########################################################################################################################
 
 // (a + i b) * (c + i d) == (a*c - b*d) + i (a*d + b*c)
@@ -418,6 +474,28 @@ impl Mul<Complex> for Complex {
     fn mul(self, other: Complex) -> Complex {
         let re = self._re * other.re() - self._im * other.im();
         let im = self._re * other.im() + self._im * other.re();
+        Complex::new(re, im)
+    }
+}
+
+impl Mul<Decimal> for Complex {
+    type Output = Complex;
+
+    #[inline]
+    fn mul(self, other: Decimal) -> Complex {
+        let re = self._re * other;
+        let im = self._im * other;
+        Complex::new(re, im)
+    }
+}
+
+impl Mul<Complex> for Decimal {
+    type Output = Complex;
+
+    #[inline]
+    fn mul(self, other: Complex) -> Complex {
+        let re = other.re() * self;
+        let im = other.im() * self;
         Complex::new(re, im)
     }
 }
@@ -438,23 +516,25 @@ impl Div<Complex> for Complex {
     }
 }
 
-//##########################################################################################################################
-
-impl Neg for Complex {
+impl Div<Decimal> for Complex {
     type Output = Complex;
 
     #[inline]
-    fn neg(self) -> Complex {
-        Complex::new(-self._re, -self._im)
+    fn div(self, other: Decimal) -> Complex {
+        let re = self._re / other;
+        let im = self._im / other;
+        Complex::new(re, im)
     }
 }
 
-impl<'a> Neg for &'a Complex {
+impl Div<Complex> for Decimal {
     type Output = Complex;
 
     #[inline]
-    fn neg(self) -> Complex {
-        -self.clone()
+    fn div(self, other: Complex) -> Complex {
+        let re = other.re() / self;
+        let im = other.im() / self;
+        Complex::new(re, im)
     }
 }
 

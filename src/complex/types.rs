@@ -6,7 +6,7 @@ use std::fmt;
 use rust_decimal::prelude::*;
 
 // Modules
-use crate::constants::{ PI, PI2, PIDIV2 };
+use crate::constants::{ PI, PI2, PIDIV2, PI3DIV2 };
 
 use crate::error::Error;
 use crate::sqrt::{ sqrt };
@@ -512,10 +512,11 @@ impl Polar {
     #[inline]
     fn calc_re(&self, terms: usize) -> Result<Decimal, Error> {
         Ok(
-            if (self._arg == D0) || (self._arg == PI) { D0 }
+            if (self._arg == PIDIV2) || (self._arg == PI3DIV2) { D0 }
             else {
-                let sin_arg = cos(self._arg, terms)?;
-                self._radius.checked_mul(sin_arg).ok_or(Error::MultiplyOverflow)?
+                cos(self._arg, terms)?
+                    .checked_mul(self._radius)
+                    .ok_or(Error::MultiplyOverflow)?
             }
         )
     }
@@ -544,8 +545,9 @@ impl Polar {
         Ok(
             if (self._arg == D0) || (self._arg == PI) { D0 }
             else {
-                let sin_arg = sin(self._arg, terms)?;
-                self._radius.checked_mul(sin_arg).ok_or(Error::MultiplyOverflow)?
+                sin(self._arg, terms)?;
+                    .checked_mul(self._radius)
+                    .ok_or(Error::MultiplyOverflow)?
             }
         )
     }

@@ -51,7 +51,7 @@ const CC_POW_TEST: Complex = Complex::new(CC_POW_TEST_RE, CC_POW_TEST_IM);
 const STD_DIG: u32 = 16;
 
 // Iteration Terms
-const STD_ITER: usize = 16;
+const STD_ITER: usize = 24;
 
 //##########################################################################################################################
 

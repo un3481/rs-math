@@ -5,10 +5,9 @@ use std::thread::{ spawn };
 use std::fmt;
 
 use rust_decimal::prelude::*;
-use rust_decimal_macros::dec;
 
 // Modules
-use crate::constants::{ PI };
+use crate::constants::{ PI, PI2, PIDIV2 };
 
 use crate::error::Error;
 use crate::sqrt::{ sqrt };
@@ -19,6 +18,11 @@ use crate::trigonometry::{ cos, sin, atan2 };
 // Constants
 const D0: Decimal = Decimal::ZERO;
 const D1: Decimal = Decimal::ONE;
+const D2: Decimal = Decimal::TWO;
+const D10: Decimal = Decimal::TEN;
+const D100: Decimal = Decimal::ONE_HUNDRED;
+const D1000: Decimal = Decimal::ONE_THOUSAND;
+const DN1: Decimal = Decimal::NEGATIVE_ONE;
 
 // Standard Iterations
 const STD_ITER: usize = 32;
@@ -42,7 +46,11 @@ impl Polar {
     /// Create a new Complex in Polar form
     #[inline]
     pub const fn new(radius: Decimal, theta: Decimal) -> Polar {
-        Polar { _radius: radius, _theta: theta, _cartesian: None }
+        Polar {
+            _radius: radius,
+            _theta: theta,
+            _cartesian: None
+        }
     }
 
     /// Get radius property
@@ -106,6 +114,48 @@ impl Polar {
 
 //##########################################################################################################################
 
+impl Polar {
+    /// Format Polar complex number into standard form
+    #[inline]
+    pub fn to_std(&self) -> Polar {
+        let radius = self._radius.abs();
+        let mut theta = self._theta + if self._radius < D0 {PI} else {D0};
+        if (theta < -PI) || (PI < theta) {
+            theta = theta - ((theta / PI2).floor() * PI2);
+        };
+             if theta >  PI { theta = theta - PI2; }
+        else if theta < -PI { theta = theta + PI2; };
+        Polar {
+            _radius: radius,
+            _theta: theta,
+            _cartesian: self._cartesian.clone()
+        }
+    }
+}
+
+//##########################################################################################################################
+
+impl Polar {
+    /// A constant representing the Imaginary unit - sqrt(-1).
+    pub const I: Polar = Polar::new(D1, PIDIV2);
+    /// A constant representing 0.
+    pub const ZERO: Polar = Polar::new(D0, D0);
+    /// A constant representing 1.
+    pub const ONE: Polar = Polar::new(D1, D0);
+    /// A constant representing -1.
+    pub const NEGATIVE_ONE: Polar = Polar::new(D1, PI);
+    /// A constant representing 2.
+    pub const TWO: Polar = Polar::new(D2, D0);
+    /// A constant representing 10.
+    pub const TEN: Polar = Polar::new(D10, D0);
+    /// A constant representing 100.
+    pub const ONE_HUNDRED: Polar = Polar::new(D100, D0);
+    /// A constant representing 1000.
+    pub const ONE_THOUSAND: Polar = Polar::new(D1000, D0);
+}
+
+//##########################################################################################################################
+
 impl fmt::Display for Polar {
     /// Format string
     #[inline]
@@ -116,26 +166,43 @@ impl fmt::Display for Polar {
 
 //##########################################################################################################################
 
+impl Zero for Polar {
+    /// Returns Zero
+    #[inline]
+    fn zero() -> Polar {
+        Polar::ZERO
+    }
+
+    /// Check if value is Zero
+    #[inline]
+    fn is_zero(&self) -> bool {
+        self._radius == D0
+    }
+}
+
+//##########################################################################################################################
+
 impl PartialEq for Polar {
     fn eq(&self, other: &Self) -> bool {
-        ( self._radius == other.radius() ) &&
-        ( self._theta  == other.theta()  )
+        if self._radius == D0 { other.radius() == D0 }
+        else {
+            ( self._radius == other.radius() ) &&
+            ( self._theta  == other.theta()  )
+        }
     }
 }
 
 impl PartialEq<Decimal> for Polar {
     fn eq(&self, other: &Decimal) -> bool {
         let theta = if other >= &D0 {D0} else {PI};
-        ( self._radius == other.abs() ) &&
-        ( self._theta  == theta       )
+        (*self) == Polar::new(other.abs(), theta)
     }
 }
 
 impl PartialEq<Polar> for Decimal {
     fn eq(&self, other: &Polar) -> bool {
         let theta = if self >= &D0 {D0} else {PI};
-        ( self.abs() == other.radius() ) &&
-        ( theta      == other.theta()  )
+        Polar::new(self.abs(), theta) == (*other)
     }
 }
 
@@ -143,6 +210,167 @@ impl PartialEq<Complex> for Polar {
     fn eq(&self, other: &Complex) -> bool {
         let terms = match &self._cartesian { None => STD_ITER, Some(v) => v.0, };
         other == &self.clone().to_cartesian(terms).unwrap()
+    }
+}
+
+//##########################################################################################################################
+
+impl Neg for Polar {
+    type Output = Polar;
+
+    #[inline]
+    fn neg(self) -> Polar {
+        let radius = self._radius;
+        let theta = self._theta + PI;
+        Polar::new(radius, theta).to_std()
+    }
+}
+
+impl<'a> Neg for &'a Polar {
+    type Output = Polar;
+
+    #[inline]
+    fn neg(self) -> Polar {
+        -self.clone()
+    }
+}
+
+//##########################################################################################################################
+
+/// r1(cos(θ1) + i sin(θ1)) + r2(cos(θ2) + i sin(θ2)) =
+///      r1*r2 (cos(θ1 + θ2) + i sin(θ1 + θ2))
+impl Add<Polar> for Polar {
+    type Output = Polar;
+
+    #[inline]
+    fn add(self, other: Polar) -> Polar {
+        let c_self  = match &self._cartesian  { None => STD_ITER, Some(v) => v.0, };
+        let c_other = match &other._cartesian { None => STD_ITER, Some(v) => v.0, };
+        let terms = if c_self < c_other {c_self} else {c_other};
+        (
+             self.clone().to_cartesian(terms).unwrap() +
+            other.clone().to_cartesian(terms).unwrap()
+        ).to_polar(terms).unwrap()
+    }
+}
+
+impl Add<Decimal> for Polar {
+    type Output = Polar;
+
+    #[inline]
+    fn add(self, other: Decimal) -> Polar {
+        self + Polar::new(other, D0)
+    }
+}
+
+impl Add<Polar> for Decimal {
+    type Output = Polar;
+
+    #[inline]
+    fn add(self, other: Polar) -> Polar {
+        Polar::new(self, D0) + other
+    }
+}
+
+//##########################################################################################################################
+
+// (a + i b) - (c + i d) == (a - c) + i (b - d)
+impl Sub<Polar> for Polar {
+    type Output = Polar;
+
+    #[inline]
+    fn sub(self, other: Polar) -> Polar {
+        let c_self  = match &self._cartesian  { None => STD_ITER, Some(v) => v.0, };
+        let c_other = match &other._cartesian { None => STD_ITER, Some(v) => v.0, };
+        let terms = if c_self < c_other {c_self} else {c_other};
+        (
+             self.clone().to_cartesian(terms).unwrap() -
+            other.clone().to_cartesian(terms).unwrap()
+        ).to_polar(terms).unwrap()
+    }
+}
+
+impl Sub<Decimal> for Polar {
+    type Output = Polar;
+
+    #[inline]
+    fn sub(self, other: Decimal) -> Polar {
+        self - Polar::new(other, D0)
+    }
+}
+
+impl Sub<Polar> for Decimal {
+    type Output = Polar;
+
+    #[inline]
+    fn sub(self, other: Polar) -> Polar {
+        Polar::new(self, D0) - other
+    }
+}
+
+//##########################################################################################################################
+
+/// r1(cos(θ1) + i sin(θ1)) * r2(cos(θ2) + i sin(θ2)) =
+///      r1*r2 (cos(θ1 + θ2) + i sin(θ1 + θ2))
+impl Mul<Polar> for Polar {
+    type Output = Polar;
+
+    #[inline]
+    fn mul(self, other: Polar) -> Polar {
+        let radius = self._radius * other.radius();
+        let theta  = self._theta  + other.theta();
+        Polar::new(radius, theta).to_std()
+    }
+}
+
+impl Mul<Decimal> for Polar {
+    type Output = Polar;
+
+    #[inline]
+    fn mul(self, other: Decimal) -> Polar {
+        self * Polar::new(other, D0)
+    }
+}
+
+impl Mul<Polar> for Decimal {
+    type Output = Polar;
+
+    #[inline]
+    fn mul(self, other: Polar) -> Polar {
+        Polar::new(self, D0) * other
+    }
+}
+
+//##########################################################################################################################
+
+/// r1(cos(θ1) + i sin(θ1)) / r2(cos(θ2) + i sin(θ2)) =
+///      r1/r2 (cos(θ1 - θ2) + i sin(θ1 - θ2))
+impl Div<Polar> for Polar {
+    type Output = Polar;
+
+    #[inline]
+    fn div(self, other: Polar) -> Polar {
+        let radius = self._radius / other.radius();
+        let theta  = self._theta  - other.theta();
+        Polar::new(radius, theta).to_std()
+    }
+}
+
+impl Div<Decimal> for Polar {
+    type Output = Polar;
+
+    #[inline]
+    fn div(self, other: Decimal) -> Polar {
+        self / Polar::new(other, D0)
+    }
+}
+
+impl Div<Polar> for Decimal {
+    type Output = Polar;
+
+    #[inline]
+    fn div(self, other: Polar) -> Polar {
+        Polar::new(self, D0) / other
     }
 }
 
@@ -167,7 +395,12 @@ impl Complex {
     /// Create a new Complex
     #[inline]
     pub const fn new(re: Decimal, im: Decimal) -> Complex {
-        Complex { _re: re, _im: im, _norm: None, _arg: None }
+        Complex {
+            _re: re,
+            _im: im,
+            _norm: None,
+            _arg: None
+        }
     }
 
     /// Get re property
@@ -193,7 +426,7 @@ impl Complex {
             _radius: radius,
             _theta: theta,
             _cartesian: Some((terms, self.clone()))
-        }
+        }.to_std()
     }
 
     /// Convert to polar form (r, theta)
@@ -364,21 +597,33 @@ impl Complex {
 
 impl Complex {
     /// A constant representing the Imaginary unit - sqrt(-1).
-    pub const I: Complex = Complex::new(D0, dec!(1));
+    pub const I: Complex = Complex::new(D0, D1);
     /// A constant representing 0.
     pub const ZERO: Complex = Complex::new(D0, D0);
     /// A constant representing 1.
-    pub const ONE: Complex = Complex::new(dec!(1), D0);
+    pub const ONE: Complex = Complex::new(D1, D0);
     /// A constant representing -1.
-    pub const NEGATIVE_ONE: Complex = Complex::new(dec!(-1), D0);
+    pub const NEGATIVE_ONE: Complex = Complex::new(DN1, D0);
     /// A constant representing 2.
-    pub const TWO: Complex = Complex::new(dec!(2), D0);
+    pub const TWO: Complex = Complex::new(D2, D0);
     /// A constant representing 10.
-    pub const TEN: Complex = Complex::new(dec!(10), D0);
+    pub const TEN: Complex = Complex::new(D10, D0);
     /// A constant representing 100.
-    pub const ONE_HUNDRED: Complex = Complex::new(dec!(100), D0);
+    pub const ONE_HUNDRED: Complex = Complex::new(D100, D0);
     /// A constant representing 1000.
-    pub const ONE_THOUSAND: Complex = Complex::new(dec!(1000), D0);
+    pub const ONE_THOUSAND: Complex = Complex::new(D1000, D0);
+}
+
+//##########################################################################################################################
+
+impl fmt::Display for Complex {
+    /// Format string
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+             if self._im > D0 { write!(f, "{}+{}i", self._re, self._im)  }
+        else if self._im < D0 { write!(f, "{}-{}i", self._re, -self._im) }
+        else                  { write!(f, "{}", self._re)                }
+    }
 }
 
 //##########################################################################################################################
@@ -394,18 +639,6 @@ impl Zero for Complex {
     #[inline]
     fn is_zero(&self) -> bool {
         (self._re == D0) && (self._im == D0)
-    }
-}
-
-//##########################################################################################################################
-
-impl fmt::Display for Complex {
-    /// Format string
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-             if self._im > D0 { write!(f, "{}+{}i", self._re, self._im)  }
-        else if self._im < D0 { write!(f, "{}-{}i", self._re, -self._im) }
-        else                  { write!(f, "{}", self._re)                }
     }
 }
 

@@ -545,7 +545,7 @@ impl Polar {
         Ok(
             if (self._arg == D0) || (self._arg == PI) { D0 }
             else {
-                sin(self._arg, terms)?;
+                sin(self._arg, terms)?
                     .checked_mul(self._radius)
                     .ok_or(Error::MultiplyOverflow)?
             }

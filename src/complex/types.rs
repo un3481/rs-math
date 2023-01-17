@@ -291,13 +291,13 @@ impl Complex {
     pub fn arg(&mut self, terms: usize) -> Result<Decimal, Error> {
         match &self._arg {
             None => {
-                self._norm = Some((terms, self.calc_arg(terms)?));
+                self._arg = Some((terms, self.calc_arg(terms)?));
             },
             Some(v) => if terms > v.0 {
-                self._norm = Some((terms, self.calc_arg(terms)?));
+                self._arg = Some((terms, self.calc_arg(terms)?));
             },
         };
-        Ok(self._norm.ok_or(Error::OptionInvalid)?.1.clone())
+        Ok(self._arg.ok_or(Error::OptionInvalid)?.1.clone())
     }
 }
 

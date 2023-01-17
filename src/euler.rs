@@ -9,13 +9,26 @@ use crate::constants::{ LN_UPPER_BD, LN_LOWER_BD, LN_UPPER_VAL, LN_LOWER_VAL };
 use crate::error::Error;
 use crate::multiplex::types::{ Multiplex };
 use crate::factorial::{ m_fac };
-use crate::basic::{ dec, a_pow, am_pow };
+use crate::basic::{ dec, pow, a_pow, am_pow };
 
 //##########################################################################################################################
 
 // Constants
 const D0: Decimal = Decimal::ZERO;
 const D1: Decimal = Decimal::ONE;
+
+
+//##########################################################################################################################
+
+#[inline]
+fn exp_prepare(
+    value: Decimal
+) -> Result<(Decimal, Decimal), Error> {
+    let rem: Decimal = value.abs().fract();
+    let int_pow: usize = value.abs().floor().to_usize().ok_or(Error::OptionInvalid)?;
+    let base: Decimal = pow(E, int_pow)?;
+    Ok((rem, base))
+}
 
 //##########################################################################################################################
 
@@ -52,8 +65,11 @@ pub fn exp(
              if value ==  D0 { D1     }
         else if value ==  D1 { E      }
         else if value == -D1 { D1DIVE }
-        else
-            { power_series(value, terms)? }
+        else {
+            let (rem, base) = exp_prepare(value)?;
+            let res = base * if rem == D0 {D1} else { power_series(rem, terms)? };
+            if value.is_sign_negative() {D1 / res} else {res}
+        }
     )
 }
 

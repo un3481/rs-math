@@ -52,8 +52,6 @@ const STD_DIG: u32 = 16;
 
 // Iteration Terms
 const STD_ITER: usize = 16;
-const STD_ITER_LONG: usize = 24;
-const STD_ITER_DOUBLE: usize = 32;
 
 //##########################################################################################################################
 
@@ -79,7 +77,7 @@ fn test_euler() -> Result<(), Error> {
     // Set Variables
     let e_sqr_std = E_SQR.round_dp(STD_DIG);
     // exp(2) == e^2
-    let res1 = exp(D2, STD_ITER_LONG)?.round_dp(STD_DIG);
+    let res1 = exp(D2, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res1, e_sqr_std);
     // ln(e ^ 2) == 2
     let res2 = ln(E_SQR, STD_ITER)?.round_dp(STD_DIG);
@@ -128,13 +126,13 @@ fn test_complex() -> Result<(), Error> {
     let res2 = cc_pow(&mut _c4, C1DIV2, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res2, C2);
     // cc_pow(7 + 24i, 1/2) == 4 + 3i
-    let res3 = cc_pow(&mut _c7i24, C1DIV2, STD_ITER_LONG)?.round_dp(STD_DIG);
+    let res3 = cc_pow(&mut _c7i24, C1DIV2, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res3, C4I3);
     // cc_pow(7 + 24i, 1/2) == 4 + 3i
-    let res4 = cc_pow(&mut _c4i3, C2, STD_ITER_DOUBLE)?.round_dp(STD_DIG);
+    let res4 = cc_pow(&mut _c4i3, C2, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res4, C7I24);
     // cc_pow(4 + 3i, -1 + 2i) == (4 + 3i) ^ (-1 + 2i)
-    let res5 = cc_pow(&mut _c4i3, CN1I2, STD_ITER_DOUBLE)?.round_dp(STD_DIG);
+    let res5 = cc_pow(&mut _c4i3, CN1I2, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res5, cc_pow_test_std);
     // Return Ok
     Ok(())

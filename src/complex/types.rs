@@ -629,8 +629,10 @@ impl PartialEq for Polar {
     fn eq(&self, other: &Self) -> bool {
         if self._radius == D0 { other.radius() == D0 }
         else {
-            ( self._radius == other.radius() ) &&
-            ( self._arg    == other.arg()    )
+            let _self  =  self.clone().to_std();
+            let _other = other.clone().to_std();
+            ( _self.radius() == _other.radius() ) &&
+            ( _self.arg()    == _other.arg()    )
         }
     }
 }

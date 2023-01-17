@@ -88,14 +88,8 @@ impl Complex {
     /// Get Radius of Complex number.
     #[inline]
     pub fn radius(&mut self, terms: usize) -> Result<Decimal, Error> {
-        match &self._radius {
-            None => {
-                self._radius = Some((terms, self.calc_radius(terms)?));
-            },
-            Some(v) => if terms > v.0 {
-                self._radius = Some((terms, self.calc_radius(terms)?));
-            },
-        };
+        let cond: bool = match &self._radius { None => true, Some(v) => terms > v.0, };
+        if cond { self._radius = Some((terms, self.calc_radius(terms)?)) };
         Ok(self._radius.ok_or(Error::OptionInvalid)?.1.clone())
     }
 }
@@ -109,10 +103,10 @@ impl Complex {
         Ok(
             if self.is_zero() { self.radius(terms)? }
             else {
-                let _radius = self.radius(terms)?;
-                let _cos = self._re / _radius;
-                let _sin = self._im / _radius;
-                atan2(_cos, _sin, terms)?
+                let radius  = self.radius(terms)?;
+                let cos_arg = self._re / radius;
+                let sin_arg = self._im / radius;
+                atan2(cos_arg, sin_arg, terms)?
             }
         )
     }
@@ -120,14 +114,8 @@ impl Complex {
     /// Get Angle of complex number.
     #[inline]
     pub fn arg(&mut self, terms: usize) -> Result<Decimal, Error> {
-        match &self._arg {
-            None => {
-                self._arg = Some((terms, self.calc_arg(terms)?));
-            },
-            Some(v) => if terms > v.0 {
-                self._arg = Some((terms, self.calc_arg(terms)?));
-            },
-        };
+        let cond: bool = match &self._arg { None => true, Some(v) => terms > v.0, };
+        if cond { self._arg = Some((terms, self.calc_arg(terms)?)) };
         Ok(self._arg.ok_or(Error::OptionInvalid)?.1.clone())
     }
 }
@@ -512,27 +500,17 @@ impl Polar {
     #[inline]
     fn calc_re(&self, terms: usize) -> Result<Decimal, Error> {
         Ok(
-                 if self._arg ==  PIDIV2 { D0 }
-            else if self._arg == -PIDIV2 { D0 }
-            else {
-                cos(self._arg, terms)?
-                    .checked_mul(self._radius)
-                    .ok_or(Error::MultiplyOverflow)?
-            }
+            cos(self._arg, terms)?
+                .checked_mul(self._radius)
+                .ok_or(Error::MultiplyOverflow)?
         )
     }
 
     /// Get Real part of Complex number.
     #[inline]
     pub fn re(&mut self, terms: usize) -> Result<Decimal, Error> {
-        match &self._re {
-            None => {
-                self._re = Some((terms, self.calc_re(terms)?));
-            },
-            Some(v) => if terms > v.0 {
-                self._re = Some((terms, self.calc_re(terms)?));
-            },
-        };
+        let cond: bool = match &self._re { None => true, Some(v) => terms > v.0, };
+        if cond { self._re = Some((terms, self.calc_re(terms)?)) };
         Ok(self._re.ok_or(Error::OptionInvalid)?.1.clone())
     }
 }
@@ -544,27 +522,17 @@ impl Polar {
     #[inline]
     fn calc_im(&self, terms: usize) -> Result<Decimal, Error> {
         Ok(
-                 if self._arg == D0 { D0 }
-            else if self._arg == PI { D0 }
-            else {
-                sin(self._arg, terms)?
-                    .checked_mul(self._radius)
-                    .ok_or(Error::MultiplyOverflow)?
-            }
+            sin(self._arg, terms)?
+                .checked_mul(self._radius)
+                .ok_or(Error::MultiplyOverflow)?
         )
     }
 
     /// Get Imaginary part of Complex number.
     #[inline]
     pub fn im(&mut self, terms: usize) -> Result<Decimal, Error> {
-        match &self._im {
-            None => {
-                self._im = Some((terms, self.calc_im(terms)?));
-            },
-            Some(v) => if terms > v.0 {
-                self._im = Some((terms, self.calc_im(terms)?));
-            },
-        };
+        let cond: bool = match &self._im { None => true, Some(v) => terms > v.0, };
+        if cond { self._im = Some((terms, self.calc_im(terms)?)) };
         Ok(self._im.ok_or(Error::OptionInvalid)?.1.clone())
     }
 }

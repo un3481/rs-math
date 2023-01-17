@@ -50,7 +50,7 @@ pub fn c_ln(
 ) -> Result<Complex, Error> {
     // Execute Parallel
     let p_value = value.clone();
-    let p_ln_norm = spawn(move || Ok(ln(p_value.norm_sqr(), terms)? / D2));
+    let p_ln_norm = spawn(move || Ok(ln(p_value.radius_sqr(), terms)? / D2));
     let r_val_arg = value.arg(terms);
     // Extract Variables
     let re = p_ln_norm.join().unwrap()?;

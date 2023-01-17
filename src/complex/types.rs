@@ -1,7 +1,6 @@
 
 // Imports
 use std::ops::{Add, Div, Mul, Neg, Sub};
-use std::thread::{ spawn };
 use std::fmt;
 
 use rust_decimal::prelude::*;
@@ -37,7 +36,7 @@ pub struct Complex {
     /// Imaginary portion of the complex number
     _im: Decimal,
     // Radius of complex number |self|
-    _norm: Option<(usize, Decimal)>,
+    _radius: Option<(usize, Decimal)>,
     /// Angle of complex number
     _arg: Option<(usize, Decimal)>
 }
@@ -51,7 +50,7 @@ impl Complex {
         Complex {
             _re: re,
             _im: im,
-            _norm: None,
+            _radius: None,
             _arg: None
         }
     }
@@ -72,24 +71,81 @@ impl Complex {
 //##########################################################################################################################
 
 impl Complex {
-    /// Create a new Complex in Polar form
+    /// Calculate Radius of Complex number.
     #[inline]
-    fn new_polar(&self, radius: Decimal, theta: Decimal, terms: usize) -> Polar {
-        Polar {
-            _radius: radius,
-            _theta: theta,
-            _cartesian: Some((terms, self.clone()))
-        }
+    fn calc_radius(&self, terms: usize) -> Result<Decimal, Error> {
+        Ok(
+                 if self.is_zero() { D0             }
+            else if self._im == D0 { self._re.abs() }
+            else if self._re == D0 { self._im.abs() }
+            else {
+                let _sqr = self.radius_sqr();
+                sqrt(_sqr, terms)?
+            }
+        )
     }
 
-    /// Convert to polar form (r, theta)
+    /// Get Radius of Complex number.
+    #[inline]
+    pub fn radius(&mut self, terms: usize) -> Result<Decimal, Error> {
+        match &self._radius {
+            None => {
+                self._radius = Some((terms, self.calc_radius(terms)?));
+            },
+            Some(v) => if terms > v.0 {
+                self._radius = Some((terms, self.calc_radius(terms)?));
+            },
+        };
+        Ok(self._radius.ok_or(Error::OptionInvalid)?.1.clone())
+    }
+}
+
+//##########################################################################################################################
+
+impl Complex {
+    // Calculate Angle of Complex number.
+    #[inline]
+    fn calc_arg(&mut self, terms: usize) -> Result<Decimal, Error> {
+        Ok(
+            if self.is_zero() { self.radius(terms)? }
+            else {
+                let _radius = self.radius(terms)?;
+                let _cos = self._re / _radius;
+                let _sin = self._im / _radius;
+                atan2(_cos, _sin, terms)?
+            }
+        )
+    }
+
+    /// Get Angle of complex number.
+    #[inline]
+    pub fn arg(&mut self, terms: usize) -> Result<Decimal, Error> {
+        match &self._arg {
+            None => {
+                self._arg = Some((terms, self.calc_arg(terms)?));
+            },
+            Some(v) => if terms > v.0 {
+                self._arg = Some((terms, self.calc_arg(terms)?));
+            },
+        };
+        Ok(self._arg.ok_or(Error::OptionInvalid)?.1.clone())
+    }
+}
+
+//##########################################################################################################################
+
+impl Complex {
+    /// Convert to polar form radius (cos(arg) + i sin(arg))
     #[inline]
     pub fn to_polar(&mut self, terms: usize) -> Result<Polar, Error> {
-        // Extract Variables
-        let theta  = self.arg(terms)?;
-        let radius = self.norm(terms)?;
-        // Return Result
-        Ok(self.new_polar(radius, theta, terms))
+        Ok(
+            Polar {
+                _radius: self.radius(terms)?,
+                _arg:    self.arg(terms)?,
+                _re:     Some((terms, self.re())),
+                _im:     Some((terms, self.im()))
+            }
+        )
     }
 }
 
@@ -123,82 +179,6 @@ impl Complex {
         D1 / (*self)
     }
 
-    /// Returns the square of the norm (since `T` doesn't necessarily
-    /// have a sqrt function), i.e. `re^2 + im^2`.
-    #[inline]
-    pub fn norm_sqr(&self) -> Decimal {
-        (self._re * self._re) +
-        (self._im * self._im)
-    }
-}
-
-//##########################################################################################################################
-
-impl Complex {
-    /// Calculate Radius of Complex number.
-    #[inline]
-    fn calc_norm(&self, terms: usize) -> Result<Decimal, Error> {
-        Ok(
-                 if self.is_zero() { D0             }
-            else if self._im == D0 { self._re.abs() }
-            else if self._re == D0 { self._im.abs() }
-            else {
-                let _sqr = self.norm_sqr();
-                sqrt(_sqr, terms)?
-            }
-        )
-    }
-
-    /// Get Radius of Complex number.
-    #[inline]
-    pub fn norm(&mut self, terms: usize) -> Result<Decimal, Error> {
-        match &self._norm {
-            None => {
-                self._norm = Some((terms, self.calc_norm(terms)?));
-            },
-            Some(v) => if terms > v.0 {
-                self._norm = Some((terms, self.calc_norm(terms)?));
-            },
-        };
-        Ok(self._norm.ok_or(Error::OptionInvalid)?.1.clone())
-    }
-}
-
-//##########################################################################################################################
-
-impl Complex {
-    // Calculate Angle of Complex number.
-    #[inline]
-    fn calc_arg(&mut self, terms: usize) -> Result<Decimal, Error> {
-        Ok(
-            if self.is_zero() { self.norm(terms)? }
-            else {
-                let _norm = self.norm(terms)?;
-                let _cos = self._re / _norm;
-                let _sin = self._im / _norm;
-                atan2(_cos, _sin, terms)?
-            }
-        )
-    }
-
-    /// Get Angle of complex number.
-    #[inline]
-    pub fn arg(&mut self, terms: usize) -> Result<Decimal, Error> {
-        match &self._arg {
-            None => {
-                self._arg = Some((terms, self.calc_arg(terms)?));
-            },
-            Some(v) => if terms > v.0 {
-                self._arg = Some((terms, self.calc_arg(terms)?));
-            },
-        };
-        Ok(self._arg.ok_or(Error::OptionInvalid)?.1.clone())
-    }
-}
-
-//##########################################################################################################################
-
-impl Complex {
     /// Round complex terms to integer.
     #[inline]
     pub fn round(&self) -> Complex {
@@ -214,11 +194,16 @@ impl Complex {
         let im = self._im.round_dp(dp);
         Complex::new(re, im)
     }
-}
 
-/*
+    /// Returns the square of the radius (since `T` doesn't necessarily
+    /// have a sqrt function), i.e. `re^2 + im^2`.
+    #[inline]
+    pub fn radius_sqr(&self) -> Decimal {
+        (self._re * self._re) +
+        (self._im * self._im)
+    }
 
-impl Complex {
+    /*
     /// Checks if the given complex number is NaN
     #[inline]
     pub fn is_nan(self) -> bool {
@@ -239,12 +224,11 @@ impl Complex {
 
     /// Checks if the given complex number is normal
     #[inline]
-   pub fn is_normal(self) -> bool {
+    pub fn is_normal(self) -> bool {
         self._re.is_normal() && self._im.is_normal()
     }
+    */
 }
-
-*/
 
 //##########################################################################################################################
 
@@ -320,9 +304,9 @@ impl PartialEq<Complex> for Decimal {
 
 impl PartialEq<Polar> for Complex {
     fn eq(&self, other: &Polar) -> bool {
-        let t_norm = match &self._norm { None => STD_ITER, Some(v) => v.0, };
-        let t_arg  = match &self._arg  { None => STD_ITER, Some(v) => v.0, };
-        let terms = if t_norm < t_arg {t_norm} else {t_arg};
+        let t_radius = match &self._radius { None => STD_ITER, Some(v) => v.0, };
+        let t_arg    = match &self._arg    { None => STD_ITER, Some(v) => v.0, };
+        let terms = if t_radius < t_arg {t_radius} else {t_arg};
         other == &self.clone().to_polar(terms).unwrap()
     }
 }
@@ -454,9 +438,9 @@ impl Div<Complex> for Complex {
 
     #[inline]
     fn div(self, other: Complex) -> Complex {
-        let norm_sqr = other.norm_sqr();
-        let re = ((self._re * other.re()) + (self._im * other.im())) / norm_sqr;
-        let im = ((self._im * other.re()) - (self._re * other.im())) / norm_sqr;
+        let radius_sqr = other.radius_sqr();
+        let re = ((self._re * other.re()) + (self._im * other.im())) / radius_sqr;
+        let im = ((self._im * other.re()) - (self._re * other.im())) / radius_sqr;
         Complex::new(re, im)
     }
 }
@@ -481,15 +465,17 @@ impl Div<Complex> for Decimal {
 
 //##########################################################################################################################
 
-/// A complex number in Polar form. `z = r * exp(i * theta)`
+/// A complex number in Polar form. `z = |z| * (cos(arg) + i sin(arg))`
 #[derive(Copy, Clone, Hash, Debug)]
 pub struct Polar {
     /// Radius of complex number |self|
     _radius: Decimal,
     /// Angle of complex number
-    _theta: Decimal,
-    /// Cartesian form of complex number
-    _cartesian: Option<(usize, Complex)>,
+    _arg: Decimal,
+    /// Real portion of the complex number
+    _re: Option<(usize, Decimal)>,
+    /// Imaginary portion of the complex number
+    _im: Option<(usize, Decimal)>,
 }
 
 //##########################################################################################################################
@@ -497,11 +483,12 @@ pub struct Polar {
 impl Polar {
     /// Create a new Complex in Polar form
     #[inline]
-    pub const fn new(radius: Decimal, theta: Decimal) -> Polar {
+    pub const fn new(radius: Decimal, arg: Decimal) -> Polar {
         Polar {
             _radius: radius,
-            _theta: theta,
-            _cartesian: None
+            _arg: arg,
+            _re: None,
+            _im: None,
         }
     }
 
@@ -511,56 +498,87 @@ impl Polar {
         self._radius
     }
 
-    /// Get theta property
+    /// Get arg property
     #[inline]
-    pub const fn theta(&self) -> Decimal {
-        self._theta
+    pub const fn arg(&self) -> Decimal {
+        self._arg
     }
 }
 
 //##########################################################################################################################
 
 impl Polar {
-    /// Create a new Complex from Polar form.
+    /// Calculate Real part of Complex number.
     #[inline]
-    fn new_cartesian(&self, re: Decimal, im: Decimal, terms: usize) -> Complex {
-        Complex {
-            _re: re,
-            _im: im,
-            _norm: Some((terms, self._radius.clone())),
-            _arg: Some((terms, self._theta.clone()))
-        }
+    fn calc_re(&self, terms: usize) -> Result<Decimal, Error> {
+        Ok(
+            if (self._arg == D0) || (self._arg == PI) { D0 }
+            else {
+                let sin_arg = cos(self._arg, terms)?;
+                self._radius.checked_mul(sin_arg).ok_or(Error::MultiplyOverflow)?
+            }
+        )
     }
 
-    /// Calculate Cartesian form of complex number.
+    /// Get Real part of Complex number.
     #[inline]
-    fn calc_cartesian(&self, terms: usize) -> Result<Complex, Error> {
-        // Execute Parallel
-        let p_theta = self._theta.clone();
-        let p_cost = spawn(move || cos(p_theta, terms));
-        let r_sint = sin(self._theta, terms);
-        // Extract Variables
-        let cost = p_cost.join().unwrap()?;
-        let sint = r_sint?;
-        // Calculate Result
-        let re = self._radius.checked_mul(cost).ok_or(Error::MultiplyOverflow)?;
-        let im = self._radius.checked_mul(sint).ok_or(Error::MultiplyOverflow)?;
-        // Return Result
-        Ok(self.new_cartesian(re, im, terms))
+    pub fn re(&mut self, terms: usize) -> Result<Decimal, Error> {
+        match &self._re {
+            None => {
+                self._re = Some((terms, self.calc_re(terms)?));
+            },
+            Some(v) => if terms > v.0 {
+                self._re = Some((terms, self.calc_re(terms)?));
+            },
+        };
+        Ok(self._re.ok_or(Error::OptionInvalid)?.1.clone())
+    }
+}
+
+//##########################################################################################################################
+
+impl Polar {
+    // Calculate Imaginary part of Complex number.
+    #[inline]
+    fn calc_im(&self, terms: usize) -> Result<Decimal, Error> {
+        Ok(
+            if (self._arg == D0) || (self._arg == PI) { D0 }
+            else {
+                let sin_arg = sin(self._arg, terms)?;
+                self._radius.checked_mul(sin_arg).ok_or(Error::MultiplyOverflow)?
+            }
+        )
     }
 
+    /// Get Imaginary part of Complex number.
+    #[inline]
+    pub fn im(&mut self, terms: usize) -> Result<Decimal, Error> {
+        match &self._im {
+            None => {
+                self._im = Some((terms, self.calc_im(terms)?));
+            },
+            Some(v) => if terms > v.0 {
+                self._im = Some((terms, self.calc_im(terms)?));
+            },
+        };
+        Ok(self._im.ok_or(Error::OptionInvalid)?.1.clone())
+    }
+}
+
+//##########################################################################################################################
+
+impl Polar {
     /// Convert a Polar form number into Cartesian form.
     #[inline]
     pub fn to_cartesian(&mut self, terms: usize) -> Result<Complex, Error> {
-        match &self._cartesian {
-            None => {
-                self._cartesian = Some((terms, self.calc_cartesian(terms)?));
-            },
-            Some(v) => if terms > v.0 {
-                self._cartesian = Some((terms, self.calc_cartesian(terms)?));
-            },
-        };
-        Ok(self._cartesian.ok_or(Error::OptionInvalid)?.1.clone())
+        Ok(
+            Complex {
+                _re:     self.re(terms)?,
+                _im:     self.im(terms)?,
+                _radius: Some((terms, self.radius())),
+                _arg:    Some((terms, self.arg()))
+            }
+        )
     }
 }
 
@@ -571,16 +589,17 @@ impl Polar {
     #[inline]
     pub fn to_std(&self) -> Polar {
         let radius = self._radius.abs();
-        let mut theta = self._theta + if self._radius < D0 {PI} else {D0};
-        if (theta < -PI) || (PI < theta) {
-            theta = theta - ((theta / PI2).floor() * PI2);
+        let mut arg = self._arg + if self._radius < D0 {PI} else {D0};
+        if (arg < -PI) || (PI < arg) {
+            arg = arg - ((arg / PI2).floor() * PI2);
         };
-             if theta >  PI { theta = theta - PI2; }
-        else if theta < -PI { theta = theta + PI2; };
+             if arg >  PI { arg = arg - PI2; }
+        else if arg < -PI { arg = arg + PI2; };
         Polar {
             _radius: radius,
-            _theta: theta,
-            _cartesian: self._cartesian.clone()
+            _arg: arg,
+            _re: self._re.clone(),
+            _im: self._im.clone()
         }
     }
 }
@@ -612,7 +631,7 @@ impl fmt::Display for Polar {
     /// Format string
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "r={};arg={}", self._radius, self._theta)
+        write!(f, "r={};arg={}", self._radius, self._arg)
     }
 }
 
@@ -639,28 +658,30 @@ impl PartialEq for Polar {
         if self._radius == D0 { other.radius() == D0 }
         else {
             ( self._radius == other.radius() ) &&
-            ( self._theta  == other.theta()  )
+            ( self._arg  == other.arg()  )
         }
     }
 }
 
 impl PartialEq<Decimal> for Polar {
     fn eq(&self, other: &Decimal) -> bool {
-        let theta = if other >= &D0 {D0} else {PI};
-        (*self) == Polar::new(other.abs(), theta)
+        let arg = if other >= &D0 {D0} else {PI};
+        (*self) == Polar::new(other.abs(), arg)
     }
 }
 
 impl PartialEq<Polar> for Decimal {
     fn eq(&self, other: &Polar) -> bool {
-        let theta = if self >= &D0 {D0} else {PI};
-        Polar::new(self.abs(), theta) == (*other)
+        let arg = if self >= &D0 {D0} else {PI};
+        Polar::new(self.abs(), arg) == (*other)
     }
 }
 
 impl PartialEq<Complex> for Polar {
     fn eq(&self, other: &Complex) -> bool {
-        let terms = match &self._cartesian { None => STD_ITER, Some(v) => v.0, };
+        let t_re = match &self._re { None => STD_ITER, Some(v) => v.0, };
+        let t_im = match &self._im { None => STD_ITER, Some(v) => v.0, };
+        let terms = if t_re < t_im {t_re} else {t_im};
         other == &self.clone().to_cartesian(terms).unwrap()
     }
 }
@@ -673,8 +694,8 @@ impl Neg for Polar {
     #[inline]
     fn neg(self) -> Polar {
         let radius = self._radius;
-        let theta = self._theta + PI;
-        Polar::new(radius, theta).to_std()
+        let arg = self._arg + PI;
+        Polar::new(radius, arg).to_std()
     }
 }
 
@@ -696,12 +717,19 @@ impl Add<Polar> for Polar {
 
     #[inline]
     fn add(self, other: Polar) -> Polar {
-        let c_self  = match &self._cartesian  { None => STD_ITER, Some(v) => v.0, };
-        let c_other = match &other._cartesian { None => STD_ITER, Some(v) => v.0, };
-        let terms = if c_self < c_other {c_self} else {c_other};
+        // Choose Smaller Iteration from self
+        let t_re1 = match &self._re { None => STD_ITER, Some(v) => v.0, };
+        let t_im1 = match &self._im { None => STD_ITER, Some(v) => v.0, };
+        let terms1 = if t_re1 < t_im1 {t_re1} else {t_im1};
+        // Choose Smaller Iteration from other
+        let t_re2 = match other._re { None => STD_ITER, Some(v) => v.0, };
+        let t_im2 = match other._im { None => STD_ITER, Some(v) => v.0, };
+        let terms2 = if t_re2 < t_im2 {t_re2} else {t_im2};
+        // Choose Smaller Iteration from both
+        let terms = if terms1 < terms2 {terms1} else {terms2};
         (
-             self.clone().to_cartesian(terms).unwrap() +
-            other.clone().to_cartesian(terms).unwrap()
+             self.clone().to_cartesian(terms1).unwrap() +
+            other.clone().to_cartesian(terms2).unwrap()
         ).to_polar(terms).unwrap()
     }
 }
@@ -732,12 +760,19 @@ impl Sub<Polar> for Polar {
 
     #[inline]
     fn sub(self, other: Polar) -> Polar {
-        let c_self  = match &self._cartesian  { None => STD_ITER, Some(v) => v.0, };
-        let c_other = match &other._cartesian { None => STD_ITER, Some(v) => v.0, };
-        let terms = if c_self < c_other {c_self} else {c_other};
+        // Choose Smaller Iteration from self
+        let t_re1 = match &self._re { None => STD_ITER, Some(v) => v.0, };
+        let t_im1 = match &self._im { None => STD_ITER, Some(v) => v.0, };
+        let terms1 = if t_re1 < t_im1 {t_re1} else {t_im1};
+        // Choose Smaller Iteration from other
+        let t_re2 = match other._re { None => STD_ITER, Some(v) => v.0, };
+        let t_im2 = match other._im { None => STD_ITER, Some(v) => v.0, };
+        let terms2 = if t_re2 < t_im2 {t_re2} else {t_im2};
+        // Choose Smaller Iteration from both
+        let terms = if terms1 < terms2 {terms1} else {terms2};
         (
-             self.clone().to_cartesian(terms).unwrap() -
-            other.clone().to_cartesian(terms).unwrap()
+             self.clone().to_cartesian(terms1).unwrap() -
+            other.clone().to_cartesian(terms2).unwrap()
         ).to_polar(terms).unwrap()
     }
 }
@@ -770,8 +805,8 @@ impl Mul<Polar> for Polar {
     #[inline]
     fn mul(self, other: Polar) -> Polar {
         let radius = self._radius * other.radius();
-        let theta  = self._theta  + other.theta();
-        Polar::new(radius, theta).to_std()
+        let arg  = self._arg  + other.arg();
+        Polar::new(radius, arg).to_std()
     }
 }
 
@@ -803,8 +838,8 @@ impl Div<Polar> for Polar {
     #[inline]
     fn div(self, other: Polar) -> Polar {
         let radius = self._radius / other.radius();
-        let theta  = self._theta  - other.theta();
-        Polar::new(radius, theta).to_std()
+        let arg  = self._arg  - other.arg();
+        Polar::new(radius, arg).to_std()
     }
 }
 

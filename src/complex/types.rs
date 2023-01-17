@@ -79,7 +79,7 @@ impl Complex {
             _radius: radius,
             _theta: theta,
             _cartesian: Some((terms, self.clone()))
-        }.to_std()
+        }
     }
 
     /// Convert to polar form (r, theta)

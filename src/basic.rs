@@ -118,6 +118,10 @@ pub fn am_pow(
         Err(_) => result.mul.append(&mut dif.mul),
         Ok(v) => result.mul.push(v),
     };
+    match result.squash() {
+        Err(_) => {},
+        Ok(v) => { result = Multiplex::new() * v },
+    };
     // Update Base
     base.0 = result.clone();
     base.1 = power;

@@ -64,7 +64,12 @@ impl Polar {
     /// Create a new Complex from Polar form.
     #[inline]
     fn new_cartesian(&self, re: Decimal, im: Decimal, terms: usize) -> Complex {
-        Complex { _re: re, _im: im, _norm: Some((terms, self.radius())), _arg: Some((terms, self.theta())) }
+        Complex {
+            _re: re,
+            _im: im,
+            _norm: Some((terms, self._radius.clone())),
+            _arg: Some((terms, self._theta.clone()))
+        }
     }
 
     /// Calculate Cartesian form of complex number.
@@ -184,7 +189,11 @@ impl Complex {
     /// Create a new Complex in Polar form
     #[inline]
     fn new_polar(&self, radius: Decimal, theta: Decimal, terms: usize) -> Polar {
-        Polar { _radius: radius, _theta: theta, _cartesian: Some((terms, self.clone())) }
+        Polar {
+            _radius: radius,
+            _theta: theta,
+            _cartesian: Some((terms, self.clone()))
+        }
     }
 
     /// Convert to polar form (r, theta)
@@ -276,7 +285,7 @@ impl Complex {
     #[inline]
     fn calc_arg(&mut self, terms: usize) -> Result<Decimal, Error> {
         Ok(
-            if self.is_zero() { D0 }
+            if self.is_zero() { self.norm(terms)? }
             else {
                 let _norm = self.norm(terms)?;
                 let _cos = self._re / _norm;
@@ -394,9 +403,9 @@ impl fmt::Display for Complex {
     /// Format string
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-             if self._im >  D0 { write!(f, "{}+{}i", self._re, self._im)  }
-        else if self._im <  D0 { write!(f, "{}-{}i", self._re, -self._im) }
-        else                   { write!(f, "{}", self._re)                }
+             if self._im > D0 { write!(f, "{}+{}i", self._re, self._im)  }
+        else if self._im < D0 { write!(f, "{}-{}i", self._re, -self._im) }
+        else                  { write!(f, "{}", self._re)                }
     }
 }
 

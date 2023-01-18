@@ -109,7 +109,7 @@ fn test_trigonometry() -> Result<(), Error> {
     let res3 = atan(TAN_1, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res3, D1);
     // atan2(cos(1), sin(1)) == 1
-    let res4 = atan2(COS1, SIN1, STD_ITER)?.round_dp(STD_DIG);
+    let res4 = atan2(COS_1, SIN_1, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res4, D1);
     // Return Ok
     Ok(())

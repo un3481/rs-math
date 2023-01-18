@@ -14,7 +14,7 @@ use crate::trigonometry::{ cos, sin, atan, atan2 };
 
 use crate::complex::types::{ Complex };
 use crate::complex::basic::{ cc_pow };
-use crate::complex::trigonometry::{ c_cos, c_sin, c_tan, atan };
+use crate::complex::trigonometry::{ c_cos, c_sin, c_tan, c_atan };
 
 //##########################################################################################################################
 
@@ -159,16 +159,16 @@ fn test_complex_trigonometry() -> Result<(), Error> {
     let _c3i1 = D3 + CI;
     let _c1in3 = D1 - (D3 * CI);
     // cc_sin(asin(2)) == 2
-    let res1 = cc_sin(_asin_2_std, STD_ITER)?.round_dp(STD_DIG);
+    let res1 = c_sin(_asin_2_std, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res1, _c2);
     // cc_cos(asin(3 + i)) == 3 + i
-    let res2 = cc_cos(_acos_3i1_std, STD_ITER)?.round_dp(STD_DIG);
+    let res2 = c_cos(_acos_3i1_std, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res2, _c3i1);
     // cc_tan(atan(1 - 3i)) == 1 - 3i
-    let res3 = cc_tan(_atan_1in3_std, STD_ITER)?.round_dp(STD_DIG);
+    let res3 = c_tan(_atan_1in3_std, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res3, _c1in3);
     // cc_atan(1 - 3i) == atan(1 - 3i)
-    let res4 = cc_atan(_c1in3, STD_ITER)?.round_dp(STD_DIG);
+    let res4 = c_atan(_c1in3, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res4, _atan_1in3_std);
     // Return Ok
     Ok(())

@@ -169,6 +169,7 @@ pub fn int_sqrt(
     value: Decimal
 ) -> Result<Decimal, Error> {
     if value.fract() != D0 { Err(Error::InputOutOfRange)? };
+    if value < D0 { Err(Error::InputOutOfRange)? };
     if value <= D100 { int_sqrt_100(value) }
     else { int_sqrt_helper(value) }
 }

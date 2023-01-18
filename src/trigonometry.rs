@@ -32,6 +32,35 @@ const PI3DIV2_PAIR: Pair = (D0, DN1);
 
 //##########################################################################################################################
 
+/// cos(a + b) = (cos(a) * cos(b)) - (sin(a) * sin(b))
+/// cos(a - b) = (cos(a) * cos(b)) + (sin(a) * sin(b))
+#[inline]
+fn cos_sub2(value: Pair, other: Pair) -> Decimal {
+    (value.0 * other.0) + (value.1 * other.1)
+}
+
+/// sin(a + b) = (sin(a) * cos(b)) + (sin(b) * cos(a))
+/// sin(a - b) = (sin(a) * cos(b)) - (sin(b) * cos(a))
+#[inline]
+fn sin_sub2(value: Pair, other: Pair) -> Decimal {
+    (value.1 * other.0) - (other.1 * value.0)
+}
+
+/// tan(a + b) = sin(a + b) / cos(a + b)
+/// tan(a - b) = sin(a - b) / cos(a - b)
+#[inline]
+fn tan_sub2(value: Pair, other: Pair) -> Decimal {
+    sin_sub2(value, other) / cos_sub2(value, other)
+}
+
+/// tan(a - b) = (tan(a) - tan(b)) / (1 + (tan(a) * tan(b)))
+#[inline]
+fn tan_sub(value: Decimal, other: Decimal) -> Decimal {
+    (value - other) / (D1 + (value * other))
+}
+
+//##########################################################################################################################
+
 #[inline]
 fn trig_prepare(
     value: Decimal
@@ -94,6 +123,46 @@ fn sin_series(
 //##########################################################################################################################
 
 #[inline]
+fn cos_prepare(
+    value: Decimal
+) -> (bool, bool, Decimal) {
+    // Set Variables
+    let mut sel: bool = false;
+    let mut inv: bool = false;
+    let mut rem: Decimal = value;
+    // Fix Trigonometric period
+         if rem >=  PIDIV2 { inv = !inv; rem = rem - PI }
+    else if rem <  -PIDIV2 { inv = !inv; rem = rem + PI };
+    // Redirect value into right series
+         if rem >=  PIDIV4 { inv = !inv; rem = rem - PIDIV2; sel = true; }
+    else if rem <  -PIDIV4 { inv =  inv; rem = rem + PIDIV2; sel = true; };
+    // Return result
+    (sel, inv, rem)
+}
+
+//##########################################################################################################################
+
+#[inline]
+fn sin_prepare(
+    value: Decimal
+) -> (bool, bool, Decimal) {
+    // Set Variables
+    let mut sel: bool = true;
+    let mut inv: bool = false;
+    let mut rem: Decimal = value;
+    // Fix Trigonometric period
+         if rem >=  PIDIV2 { inv = !inv; rem = rem - PI }
+    else if rem <  -PIDIV2 { inv = !inv; rem = rem + PI };
+    // Redirect value into right series
+         if rem >=  PIDIV4 { inv =  inv; rem = rem - PIDIV2; sel = false; }
+    else if rem <  -PIDIV4 { inv = !inv; rem = rem + PIDIV2; sel = false; };
+    // Return result
+    (sel, inv, rem)
+}
+
+//##########################################################################################################################
+
+#[inline]
 pub fn cos(
     value: Decimal,
     terms: usize
@@ -105,8 +174,13 @@ pub fn cos(
         else if rem ==  D0     {  D1 }
         else if rem == -PIDIV2 {  D0 }
         else if rem == -PI     { -D1 }
-        else
-            { cos_series(rem, terms)? }
+        else {
+            let (sel, inv, rem) = cos_prepare(rem);
+            let res =
+                if sel { sin_series(rem, terms)? }
+                else   { cos_series(rem, terms)? };
+            res * if inv {-D1} else {D1}
+        }
     )
 }
 
@@ -124,35 +198,14 @@ pub fn sin(
         else if rem ==  D0     {  D0 }
         else if rem == -PIDIV2 { -D1 }
         else if rem == -PI     {  D0 }
-        else
-            { sin_series(rem, terms)? }
+        else {
+            let (sel, inv, rem) = sin_prepare(rem);
+            let res =
+                if sel { sin_series(rem, terms)? }
+                else   { cos_series(rem, terms)? };
+            res * if inv {-D1} else {D1}
+        }
     )
-}
-
-//##########################################################################################################################
-
-/// cos(a - b) = (cos(a) * cos(b)) + (sin(a) * sin(b))
-#[inline]
-fn cos_sub2(val: Pair, sub: Pair) -> Decimal {
-    (val.0 * sub.0) + (val.1 * sub.1)
-}
-
-/// sin(a - b) = (sin(a) * cos(b)) - (sin(b) * cos(a))
-#[inline]
-fn sin_sub2(val: Pair, sub: Pair) -> Decimal {
-    (val.1 * sub.0) - (sub.1 * val.0)
-}
-
-/// tan(a - b) = sin(a - b) / cos(a - b)
-#[inline]
-fn tan_sub2(val: Pair, sub: Pair) -> Decimal {
-    sin_sub2(val, sub) / cos_sub2(val, sub)
-}
-
-/// tan(a - b) = (tan(a) - tan(b)) / (1 + (tan(a) * tan(b)))
-#[inline]
-fn tan_sub(val: Decimal, sub: Decimal) -> Decimal {
-    (val - sub) / (D1 + (val * sub))
 }
 
 //##########################################################################################################################

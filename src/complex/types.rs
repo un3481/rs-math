@@ -618,22 +618,6 @@ impl fmt::Display for Polar {
 
 //##########################################################################################################################
 
-impl Zero for Polar {
-    /// Returns Zero
-    #[inline]
-    fn zero() -> Self {
-        Self::ZERO
-    }
-
-    /// Check if value is Zero
-    #[inline]
-    fn is_zero(&self) -> bool {
-        self._radius == D0
-    }
-}
-
-//##########################################################################################################################
-
 impl PartialEq for Polar {
     fn eq(&self, other: &Self) -> bool {
         if self._radius == D0 { other.radius() == D0 }
@@ -685,73 +669,6 @@ impl<'a> Neg for &'a Polar {
     #[inline]
     fn neg(self) -> Polar {
         -self.clone()
-    }
-}
-
-//##########################################################################################################################
-
-/// r1(cos(θ1) + i sin(θ1)) + r2(cos(θ2) + i sin(θ2)) =
-///      r1*r2 (cos(θ1 + θ2) + i sin(θ1 + θ2))
-impl Add<Polar> for Polar {
-    type Output = Self;
-
-    #[inline]
-    fn add(self, other: Self) -> Self {
-        (
-             self.clone().to_cartesian(STD_ITER).unwrap() +
-            other.clone().to_cartesian(STD_ITER).unwrap()
-        ).to_polar(STD_ITER).unwrap()
-    }
-}
-
-impl Add<Decimal> for Polar {
-    type Output = Self;
-
-    #[inline]
-    fn add(self, other: Decimal) -> Self {
-        self + Self::new(other, D0)
-    }
-}
-
-impl Add<Polar> for Decimal {
-    type Output = Polar;
-
-    #[inline]
-    fn add(self, other: Polar) -> Polar {
-        Polar::new(self, D0) + other
-    }
-}
-
-//##########################################################################################################################
-
-// (a + i b) - (c + i d) == (a - c) + i (b - d)
-impl Sub<Polar> for Polar {
-    type Output = Self;
-
-    #[inline]
-    fn sub(self, other: Self) -> Self {
-        (
-             self.clone().to_cartesian(STD_ITER).unwrap() -
-            other.clone().to_cartesian(STD_ITER).unwrap()
-        ).to_polar(STD_ITER).unwrap()
-    }
-}
-
-impl Sub<Decimal> for Polar {
-    type Output = Self;
-
-    #[inline]
-    fn sub(self, other: Decimal) -> Self {
-        self - Self::new(other, D0)
-    }
-}
-
-impl Sub<Polar> for Decimal {
-    type Output = Polar;
-
-    #[inline]
-    fn sub(self, other: Polar) -> Polar {
-        Polar::new(self, D0) - other
     }
 }
 

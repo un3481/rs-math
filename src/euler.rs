@@ -1,9 +1,10 @@
 
 // Imports
 use rust_decimal::prelude::*;
+use rust_decimal_macros::dec;
 
 // Modules
-use crate::constants::{ E, D1DIVE, E_SQR };
+use crate::constants::{ E, D1DIVE, E_SQR, E_POW1DIV5, };
 use crate::constants::{ LN_UPPER_BD, LN_LOWER_BD, LN_UPPER_VAL, LN_LOWER_VAL };
 
 use crate::error::Error;
@@ -17,6 +18,8 @@ use crate::basic::{ dec, pow, a_pow, am_pow };
 const D0: Decimal = Decimal::ZERO;
 const D1: Decimal = Decimal::ONE;
 
+const D5: Decimal = dec!(5);
+const D1DIV5: Decimal = dec!(0.2);
 
 //##########################################################################################################################
 
@@ -24,9 +27,11 @@ const D1: Decimal = Decimal::ONE;
 fn exp_prepare(
     value: Decimal
 ) -> Result<(Decimal, Decimal), Error> {
-    let rem: Decimal = value.abs().fract();
+    let mut rem: Decimal = value.abs().fract();
+    let fract_pow: usize = (rem * D5).floor().to_usize().ok_or(Error::OptionInvalid)?;
     let int_pow: usize = value.abs().floor().to_usize().ok_or(Error::OptionInvalid)?;
-    let base: Decimal = pow(E, int_pow)?;
+    let base: Decimal = pow(E, int_pow)? * pow(E_POW1DIV5, fract_pow)?;
+    rem = rem - (D1DIV5 * dec(fract_pow));
     Ok((rem, base))
 }
 

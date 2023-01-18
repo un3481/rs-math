@@ -13,6 +13,7 @@ use crate::basic::{ dec, a_pow, am_pow };
 pub const E: Decimal = dec!(2.7182818284590452353602874714); // (e)
 pub const D1DIVE: Decimal = dec!(0.3678794411714423215955237702); // (1 / e)
 pub const E_SQR: Decimal = dec!(7.3890560989306502272304274606); // (e ^ 2)
+pub const E_POW1DIV5: Decimal = dec!(1.2214027581601698339210719946); // (e ^ (1 / 4))
 
 pub const SQRT_UPPER_BD: Decimal = dec!(1.21); // (1.1 ^ 2)
 pub const SQRT_LOWER_BD: Decimal = dec!(0.81); // (0.9 ^ 2)

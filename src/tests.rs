@@ -160,7 +160,7 @@ fn test_complex_trigonometry() -> Result<(), Error> {
     let res1 = c_sin(ASIN_2, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res1, _c2);
     // cc_cos(asin(3 + i)) == 3 + i
-    let res2 = c_cos(ACOS_3I1, STD_ITER + 2)?.round_dp(STD_DIG);
+    let res2 = c_cos(ACOS_3I1, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res2, _c3i1);
     // cc_tan(atan(1 - 3i)) == 1 - 3i
     let res3 = c_tan(ATAN_1IN3, STD_ITER)?.round_dp(STD_DIG);

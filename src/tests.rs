@@ -51,12 +51,14 @@ const ATAN_1IN3_RE: Decimal = dec!(1.4614618538579256382102348165);
 const ATAN_1IN3_IM: Decimal = dec!(-0.3059438579055289264121938212);
 const ATAN_1IN3: Complex = Complex::new(ATAN_1IN3_RE, ATAN_1IN3_IM);
 
+//##########################################################################################################################
+
 // Decimal Precision
 const STD_DIG: u32 = 16;
 
 // Iteration Terms
 const STD_ITER: usize = 16;
-const STD_ITER_LONG: usize = 24
+const STD_ITER_LONG: usize = 24;
 
 //##########################################################################################################################
 

@@ -31,6 +31,10 @@ const D1DIV2: Decimal = dec!(0.5);
 const CI: Complex = Complex::I;
 const C1: Complex = Complex::ONE;
 
+//##########################################################################################################################
+
+const SQRT_2: Decimal = dec!(1.4142135623730950488016887242);
+
 const SIN_1: Decimal = dec!(0.8414709848078965066525023216);
 const COS_1: Decimal = dec!(0.5403023058681397174009366074);
 const TAN_1: Decimal = dec!(1.5574077246549022305069748075);
@@ -63,15 +67,23 @@ const STD_DIG: u32 = 24;
 
 #[test]
 fn test_sqrt() -> Result<(), Error> {
+    // Set Variables
+    let sqrt_2_std = SQRT_2.round_dp(STD_DIG);
     // int_sqrt(4) == 2
     let res1 = int_sqrt(D4)?;
     assert_eq!(res1, D2);
     // sqrt(4) == 2
     let res2 = sqrt(D4, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res2, D2);
+    // sqrt(2) == sqrt(2)
+    let res3 = sqrt(D2, STD_ITER)?.round_dp(STD_DIG);
+    assert_eq!(res3, sqrt_2_std);
     // pow(4, 1/2) == 2
-    let res3 = d_pow(D4, D1DIV2, STD_ITER)?.round_dp(STD_DIG);
-    assert_eq!(res3, D2);
+    let res4 = d_pow(D4, D1DIV2, STD_ITER)?.round_dp(STD_DIG);
+    assert_eq!(res4, D2);
+    // pow(2, 1/2) == sqrt(2)
+    let res5 = d_pow(D2, D1DIV2, STD_ITER)?.round_dp(STD_DIG);
+    assert_eq!(res5, sqrt_2_std);
     // Return Ok
     Ok(())
 }

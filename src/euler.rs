@@ -5,7 +5,10 @@ use rust_decimal_macros::dec;
 
 // Modules
 use crate::constants::{ E, D1DIVE, E_SQR, E_POW1DIV5, };
-use crate::constants::{ LN_UPPER_BD, LN_LOWER_BD, LN_UPPER_VAL, LN_LOWER_VAL };
+use crate::constants::{ LN_UPPER_BD, LN_UPPER_MUL, LN_UPPER_VAL };
+use crate::constants::{ LN_LOWER_BD, LN_LOWER_MUL, LN_LOWER_VAL };
+use crate::constants::{ LN_UPPER_BD_P, LN_UPPER_MUL_P, LN_UPPER_VAL_P };
+use crate::constants::{ LN_LOWER_BD_P, LN_LOWER_MUL_P, LN_LOWER_VAL_P };
 
 use crate::error::Error;
 use crate::multiplex::types::{ Multiplex };
@@ -99,12 +102,23 @@ fn ln_prepare(
     };
     loop {
         if rem > LN_UPPER_BD {
-            rem = rem / LN_UPPER_BD;
+            rem = rem / LN_UPPER_MUL;
             base = base + LN_UPPER_VAL;
         }
         else if rem < LN_LOWER_BD {
-            rem = rem * LN_LOWER_BD;
-            base = base - LN_LOWER_VAL;
+            rem = rem / LN_LOWER_MUL;
+            base = base + LN_LOWER_VAL;
+        }
+        else {break}
+    };
+    loop {
+        if rem > LN_UPPER_BD_P {
+            rem = rem / LN_UPPER_MUL_P;
+            base = base + LN_UPPER_VAL_P;
+        }
+        else if rem < LN_LOWER_BD_P {
+            rem = rem / LN_LOWER_MUL_P;
+            base = base + LN_LOWER_VAL_P;
         }
         else {break}
     };

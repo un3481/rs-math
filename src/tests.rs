@@ -57,7 +57,7 @@ const ATAN_1IN3: Complex = Complex::new(ATAN_1IN3_RE, ATAN_1IN3_IM);
 const STD_ITER: usize = 16;
 
 // Decimal Precision
-const STD_DIG: u32 = 20;
+const STD_DIG: u32 = 24;
 
 //##########################################################################################################################
 

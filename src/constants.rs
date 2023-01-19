@@ -56,6 +56,11 @@ pub const SQRT_LOWER_BD: Decimal = dec!(0.81); // (0.9 ^ 2)
 pub const SQRT_UPPER_VAL: Decimal = dec!(1.1); // sqrt(1.1 ^ 2)
 pub const SQRT_LOWER_VAL: Decimal = dec!(0.9); // sqrt(0.9 ^ 2)
 
+pub const SQRT_UPPER_BD_P: Decimal = dec!(1.050625); // (1.025 ^ 2)
+pub const SQRT_LOWER_BD_P: Decimal = dec!(0.950625); // (0.975 ^ 2)
+pub const SQRT_UPPER_VAL_P: Decimal = dec!(1.025); // sqrt(1.025 ^ 2)
+pub const SQRT_LOWER_VAL_P: Decimal = dec!(0.975); // sqrt(0.975 ^ 2)
+
 //##########################################################################################################################
 
 const D0: Decimal = Decimal::ZERO;

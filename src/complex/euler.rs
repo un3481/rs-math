@@ -1,7 +1,5 @@
 
 // Imports
-use std::thread::{ spawn };
-
 use rust_decimal::prelude::*;
 
 // Modules
@@ -23,17 +21,10 @@ pub fn c_exp(
     value: Complex,
     terms: usize
 ) -> Result<Complex, Error> {
-    // Execute Parallel
-    let p_cos_im = spawn(move || cos(value.im(), terms));
-    let p_sin_im = spawn(move || sin(value.im(), terms));
-    let r_exp_re = exp(value.re(), terms);
-    // Join Threads
-    let j_cos_im = p_cos_im.join();
-    let j_sin_im = p_sin_im.join();
-    // Extract Variables
-    let cos_im = j_cos_im.unwrap()?;
-    let sin_im = j_sin_im.unwrap()?;
-    let exp_re = r_exp_re?;
+    // Calculate Variables
+    let cos_im = cos(value.im(), terms)?;
+    let sin_im = sin(value.im(), terms)?;
+    let exp_re = exp(value.re(), terms)?;
     // Calculate Complex
     let re = exp_re * cos_im;
     let im = exp_re * sin_im;
@@ -48,13 +39,9 @@ pub fn c_ln(
     value: &mut Complex,
     terms: usize
 ) -> Result<Complex, Error> {
-    // Execute Parallel
-    let p_value = value.clone();
-    let p_ln_norm = spawn(move || Ok(ln(p_value.radius_sqr(), terms)? / D2));
-    let r_val_arg = value.arg(terms);
-    // Extract Variables
-    let re = p_ln_norm.join().unwrap()?;
-    let im = r_val_arg?;
+    // Calculate Complex
+    let re = ln(value.radius_sqr(), terms)? / D2;
+    let im = value.arg(terms)?;
     // Return Result
     Ok(Complex::new(re, im))
 }

@@ -1,6 +1,10 @@
 
+// Imports
+use rust_decimal::prelude::*;
+
 // Modules
 use crate::error::Error;
+use crate::basic::{ dec };
 
 use crate::complex::types::{ Complex };
 use crate::complex::euler::{ c_exp, c_ln };
@@ -8,8 +12,17 @@ use crate::complex::euler::{ c_exp, c_ln };
 //##########################################################################################################################
 
 // Constants
+const D0: Decimal = Decimal::ZERO;
+
 const C0: Complex = Complex::ZERO;
 const C1: Complex = Complex::ONE;
+
+//##########################################################################################################################
+
+#[inline]
+pub fn cpx(value: usize) -> Complex {
+    Complex::new(dec(value), D0)
+}
 
 //##########################################################################################################################
 

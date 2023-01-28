@@ -4,7 +4,7 @@ use rust_decimal::prelude::*;
 use rust_decimal_macros::dec;
 
 // Modules
-use crate::constants::{ E_SQR };
+use crate::constants::{ E_SQR, PI };
 
 use crate::error::Error;
 use crate::sqrt::{ sqrt, int_sqrt };
@@ -15,6 +15,7 @@ use crate::trigonometry::{ cos, sin, atan, atan2 };
 use crate::complex::types::{ Complex };
 use crate::complex::basic::{ cc_pow };
 use crate::complex::trigonometry::{ c_cos, c_sin, c_tan, c_atan };
+use crate::complex::riemann::{ zeta };
 
 //##########################################################################################################################
 
@@ -24,6 +25,7 @@ const D2: Decimal = Decimal::TWO;
 
 const D3: Decimal = dec!(3);
 const D4: Decimal = dec!(4);
+const D6: Decimal = dec!(6);
 const D7: Decimal = dec!(7);
 const D24: Decimal = dec!(24);
 const D1DIV2: Decimal = dec!(0.5);
@@ -68,7 +70,7 @@ const STD_DIG: u32 = 24;
 #[test]
 fn test_sqrt() -> Result<(), Error> {
     // Set Variables
-    let sqrt_2_std = SQRT_2.round_dp(STD_DIG);
+    let _sqrt_2_std = SQRT_2.round_dp(STD_DIG);
     // int_sqrt(4) == 2
     let res1 = int_sqrt(D4)?;
     assert_eq!(res1, D2);
@@ -77,13 +79,13 @@ fn test_sqrt() -> Result<(), Error> {
     assert_eq!(res2, D2);
     // sqrt(2) == sqrt(2)
     let res3 = sqrt(D2, STD_ITER)?.round_dp(STD_DIG);
-    assert_eq!(res3, sqrt_2_std);
+    assert_eq!(res3, _sqrt_2_std);
     // pow(4, 1/2) == 2
     let res4 = d_pow(D4, D1DIV2, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res4, D2);
     // pow(2, 1/2) == sqrt(2)
     let res5 = d_pow(D2, D1DIV2, STD_ITER)?.round_dp(STD_DIG);
-    assert_eq!(res5, sqrt_2_std);
+    assert_eq!(res5, _sqrt_2_std);
     // Return Ok
     Ok(())
 }
@@ -93,10 +95,10 @@ fn test_sqrt() -> Result<(), Error> {
 #[test]
 fn test_euler() -> Result<(), Error> {
     // Set Variables
-    let e_sqr_std = E_SQR.round_dp(STD_DIG);
+    let _e_sqr_std = E_SQR.round_dp(STD_DIG);
     // exp(2) == e^2
     let res1 = exp(D2, STD_ITER)?.round_dp(STD_DIG);
-    assert_eq!(res1, e_sqr_std);
+    assert_eq!(res1, _e_sqr_std);
     // ln(e ^ 2) == 2
     let res2 = ln(E_SQR, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res2, D2);
@@ -109,14 +111,14 @@ fn test_euler() -> Result<(), Error> {
 #[test]
 fn test_trigonometry() -> Result<(), Error> {
     // Set Variables
-    let sin1_std = SIN_1.round_dp(STD_DIG);
-    let cos1_std = COS_1.round_dp(STD_DIG);
+    let _sin1_std = SIN_1.round_dp(STD_DIG);
+    let _cos1_std = COS_1.round_dp(STD_DIG);
     // sin(1) == sin(1)
     let res1 = sin(D1, STD_ITER)?.round_dp(STD_DIG);
-    assert_eq!(res1, sin1_std);
+    assert_eq!(res1, _sin1_std);
     // cos(1) == cos(1)
     let res2 = cos(D1, STD_ITER)?.round_dp(STD_DIG);
-    assert_eq!(res2, cos1_std);
+    assert_eq!(res2, _cos1_std);
     // atan(tan(1)) == 1
     let res3 = atan(TAN_1, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res3, D1);
@@ -141,7 +143,7 @@ fn test_complex() -> Result<(), Error> {
     let mut _c7i24 = D7 + (D24 * CI);
     let _cn1i2 = -D1 + (D2 * CI);
     // cc_pow(-1, 1/2) == i
-    let res1 = cc_pow(&mut _cn1, _c1div2, STD_ITER)?;
+    let res1 = cc_pow(&mut _cn1, _c1div2, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res1, CI);
     // cc_pow(4, 1/2) == 2
     let res2 = cc_pow(&mut _c4, _c1div2, STD_ITER)?.round_dp(STD_DIG);
@@ -180,6 +182,20 @@ fn test_complex_trigonometry() -> Result<(), Error> {
     // cc_atan(1 - 3i) == atan(1 - 3i)
     let res4 = c_atan(_c1in3, STD_ITER)?.round_dp(STD_DIG);
     assert_eq!(res4, _atan_1in3_std);
+    // Return Ok
+    Ok(())
+}
+
+//##########################################################################################################################
+
+#[test]
+fn test_complex_riemann() -> Result<(), Error> {
+    // Set Variables
+    let _c2 = C1 * D2;
+    let _pi_sqr_div6 = (C1 * ((PI * PI) / D6)).round_dp(3);
+    // cc_sin(asin(2)) == 2
+    let res1 = zeta(_c2, 10_000, STD_ITER)?.round_dp(3);
+    assert_eq!(res1, _pi_sqr_div6);
     // Return Ok
     Ok(())
 }

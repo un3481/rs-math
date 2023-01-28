@@ -293,7 +293,7 @@ const LFAC: [Decimal; 274] = [
 //##########################################################################################################################
 
 #[inline]
-pub fn fac(value: usize) -> Result<Decimal, Error> {
+pub fn d_fac(value: usize) -> Result<Decimal, Error> {
     if value > 27 { Err(Error::InputOutOfRange)? };
     Ok(LFAC[value])
 }

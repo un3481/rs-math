@@ -5,8 +5,10 @@ use rust_decimal_macros::dec;
 
 // Modules
 use crate::error::Error;
+use crate::basic::{ dec, da_pow };
+
 use crate::multiplex::types::{ Multiplex };
-use crate::basic::{ dec, a_pow, am_pow };
+use crate::multiplex::basic::{ ma_pow };
 
 //##########################################################################################################################
 
@@ -75,7 +77,7 @@ const D239: Decimal = dec!(239);
 
 /// pi_term(x) = sum(n=1; -1^(n + 1) * x^(2n - 1) / (2n - 1))
 #[inline]
-fn pi_term(
+fn d_pi_term(
     value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
@@ -84,8 +86,8 @@ fn pi_term(
     // Iterate over Series
     (1..=terms).into_iter()
         .map(|n| Ok(
-            a_pow(-D1, n + 1, &mut acc1)? * (
-                am_pow(value, (2 * n) - 1, &mut acc2)? / ((D2 * dec(n)) - D1)
+            da_pow(-D1, n + 1, &mut acc1)? * (
+                ma_pow(value, (2 * n) - 1, &mut acc2)? / ((D2 * dec(n)) - D1)
             ).squash()?
         ))
         .reduce(|u, d| Ok(
@@ -96,11 +98,11 @@ fn pi_term(
 
 /// pi = 4 * ((4 * pi_term(1 / 5)) - pi_term(1 / 239))
 #[inline]
-pub fn pi(
+pub fn d_pi(
     terms: usize
 ) -> Result<Decimal, Error> {
-    let term1 = pi_term(D1 / D5, terms)?;
-    let term2 = pi_term(D1 / D239, terms)?;
+    let term1 = d_pi_term(D1 / D5, terms)?;
+    let term2 = d_pi_term(D1 / D239, terms)?;
     Ok(D4 * ((D4 * term1) - term2))
 }
 

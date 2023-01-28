@@ -9,8 +9,8 @@ use rust_decimal::prelude::*;
 use crate::constants::{ PI, PI2, PIDIV2 };
 
 use crate::error::Error;
-use crate::sqrt::{ sqrt };
-use crate::trigonometry::{ cos, sin, atan2 };
+use crate::sqrt::{ d_sqrt };
+use crate::trigonometry::{ d_cos, d_sin, d_atan2 };
 
 //##########################################################################################################################
 
@@ -88,7 +88,7 @@ impl Complex {
             else if self._re == D0 { self._im.abs() }
             else {
                 let _sqr = self.radius_sqr();
-                sqrt(_sqr, terms)?
+                d_sqrt(_sqr, terms)?
             }
         )
     }
@@ -113,7 +113,7 @@ impl Complex {
                 let radius  = self.radius(terms)?;
                 let cos_arg = self._re / radius;
                 let sin_arg = self._im / radius;
-                atan2(cos_arg, sin_arg, terms)?
+                d_atan2(cos_arg, sin_arg, terms)?
             }
         )
     }
@@ -190,7 +190,7 @@ impl Complex {
     }
 
     /// Returns the square of the radius (since `T` doesn't necessarily
-    /// have a sqrt function), i.e. `re^2 + im^2`.
+    /// have a d_sqrt function), i.e. `re^2 + im^2`.
     #[inline]
     pub fn radius_sqr(&self) -> Decimal {
         (self._re * self._re) +
@@ -511,7 +511,7 @@ impl Polar {
     #[inline]
     fn calc_re(&self, terms: usize) -> Result<Decimal, Error> {
         Ok(
-            cos(self._arg, terms)?
+            d_cos(self._arg, terms)?
                 .checked_mul(self._radius)
                 .ok_or(Error::MultiplyOverflow)?
         )
@@ -532,7 +532,7 @@ impl Polar {
     #[inline]
     fn calc_im(&self, terms: usize) -> Result<Decimal, Error> {
         Ok(
-            sin(self._arg, terms)?
+            d_sin(self._arg, terms)?
                 .checked_mul(self._radius)
                 .ok_or(Error::MultiplyOverflow)?
         )

@@ -10,9 +10,10 @@ use crate::constants::{ SQRT_UPPER_BD_P, SQRT_UPPER_VAL_P };
 use crate::constants::{ SQRT_LOWER_BD_P, SQRT_LOWER_VAL_P };
 
 use crate::error::Error;
-use crate::multiplex::types::{ Multiplex };
 use crate::factorial::{ m_fac };
-use crate::basic::{ m_pow, am_pow };
+
+use crate::multiplex::types::{ Multiplex };
+use crate::multiplex::basic::{ m_pow, ma_pow };
 
 //##########################################################################################################################
 
@@ -93,11 +94,11 @@ fn sqrt_series(
                 (
                     value *
                     m_fac(2 * (n - 1))? *
-                    am_pow(D1 - value, n - 1, &mut acc1)?
+                    ma_pow(D1 - value, n - 1, &mut acc1)?
                 ) /
                 m_pow(
                     m_fac(n - 1)? *
-                    am_pow(D2, n - 1, &mut acc2)?,
+                    ma_pow(D2, n - 1, &mut acc2)?,
                     2
                 )?
             ).squash()?
@@ -111,7 +112,7 @@ fn sqrt_series(
 //##########################################################################################################################
 
 #[inline]
-pub fn sqrt(
+pub fn d_sqrt(
     value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
@@ -129,7 +130,7 @@ pub fn sqrt(
 //##########################################################################################################################
 
 #[inline]
-fn int_sqrt_100(
+fn i_sqrt_100(
     value: Decimal
 ) -> Result<Decimal, Error> {
     let vu: u8 = value.to_u8().ok_or(Error::InputOutOfRange)?;
@@ -154,7 +155,7 @@ fn int_sqrt_100(
 //##########################################################################################################################
 
 #[inline]
-fn int_sqrt_helper(
+fn i_sqrt_helper(
     value: Decimal
 ) -> Result<Decimal, Error> {
     // Set Variables
@@ -179,13 +180,13 @@ fn int_sqrt_helper(
 
 // Find perfect square of integer.
 #[inline]
-pub fn int_sqrt(
+pub fn i_sqrt(
     value: Decimal
 ) -> Result<Decimal, Error> {
     if value.fract() != D0 { Err(Error::InputOutOfRange)? };
     if value < D0 { Err(Error::InputOutOfRange)? };
-    if value <= D100 { int_sqrt_100(value) }
-    else { int_sqrt_helper(value) }
+    if value <= D100 { i_sqrt_100(value) }
+    else { i_sqrt_helper(value) }
 }
 
 //##########################################################################################################################

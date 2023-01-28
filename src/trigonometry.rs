@@ -9,9 +9,11 @@ use crate::constants::{ PIDIV4, PIDIV6, PIDIV18, PIDIV36 };
 use crate::constants::{ TAN_PIDIV6, TAN_PIDIV18, TAN_PIDIV36 };
 
 use crate::error::Error;
-use crate::multiplex::types::{ Multiplex };
 use crate::factorial::{ m_fac };
-use crate::basic::{ dec, a_pow, am_pow };
+use crate::basic::{ dec, da_pow };
+
+use crate::multiplex::types::{ Multiplex };
+use crate::multiplex::basic::{ ma_pow };
 
 //##########################################################################################################################
 
@@ -87,8 +89,8 @@ fn cos_series(
     // Iterate over Series
     (0..terms).into_iter()
         .map(|n| Ok(
-            a_pow(-D1, n, &mut acc1)? * (
-                am_pow(value, 2 * n, &mut acc2)? / m_fac(2 * n)?
+            da_pow(-D1, n, &mut acc1)? * (
+                ma_pow(value, 2 * n, &mut acc2)? / m_fac(2 * n)?
             ).squash()?
         ))
         .reduce(|u, d| Ok(
@@ -110,8 +112,8 @@ fn sin_series(
     // Iterate over Series
     (0..terms).into_iter()
         .map(|n| Ok(
-            a_pow(-D1, n, &mut acc1)? * (
-                am_pow(value, (2 * n) + 1, &mut acc2)? / m_fac((2 * n) + 1)?
+            da_pow(-D1, n, &mut acc1)? * (
+                ma_pow(value, (2 * n) + 1, &mut acc2)? / m_fac((2 * n) + 1)?
             ).squash()?
         ))
         .reduce(|u, d| Ok(
@@ -163,7 +165,7 @@ fn sin_prepare(
 //##########################################################################################################################
 
 #[inline]
-pub fn cos(
+pub fn d_cos(
     value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
@@ -187,7 +189,7 @@ pub fn cos(
 //##########################################################################################################################
 
 #[inline]
-pub fn sin(
+pub fn d_sin(
     value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
@@ -277,8 +279,8 @@ fn atan_series(
     // Iterate over Series
     (0..terms).into_iter()
         .map(|n| Ok(
-            a_pow(-D1, n, &mut acc1)? * (
-                am_pow(value, (2 * n) + 1, &mut acc2)? / ((D2 * dec(n)) + D1)
+            da_pow(-D1, n, &mut acc1)? * (
+                ma_pow(value, (2 * n) + 1, &mut acc2)? / ((D2 * dec(n)) + D1)
             ).squash()?
         ))
         .reduce(|u, d| Ok(
@@ -290,7 +292,7 @@ fn atan_series(
 //##########################################################################################################################
 
 #[inline]
-pub fn atan(
+pub fn d_atan(
     value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
@@ -308,7 +310,7 @@ pub fn atan(
 //##########################################################################################################################
 
 #[inline]
-pub fn atan2(
+pub fn d_atan2(
     _cos: Decimal,
     _sin: Decimal,
     terms: usize

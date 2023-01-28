@@ -4,8 +4,8 @@ use rust_decimal::prelude::*;
 
 // Modules
 use crate::error::Error;
-use crate::trigonometry::{ cos, sin };
-use crate::euler::{ exp, ln };
+use crate::trigonometry::{ d_cos, d_sin };
+use crate::euler::{ d_exp, d_ln };
 
 use crate::complex::types::{ Complex };
 
@@ -22,9 +22,9 @@ pub fn c_exp(
     terms: usize
 ) -> Result<Complex, Error> {
     // Calculate Variables
-    let cos_im = cos(value.im(), terms)?;
-    let sin_im = sin(value.im(), terms)?;
-    let exp_re = exp(value.re(), terms)?;
+    let cos_im = d_cos(value.im(), terms)?;
+    let sin_im = d_sin(value.im(), terms)?;
+    let exp_re = d_exp(value.re(), terms)?;
     // Calculate Complex
     let re = exp_re * cos_im;
     let im = exp_re * sin_im;
@@ -40,7 +40,7 @@ pub fn c_ln(
     terms: usize
 ) -> Result<Complex, Error> {
     // Calculate Complex
-    let re = ln(value.radius_sqr(), terms)? / D2;
+    let re = d_ln(value.radius_sqr(), terms)? / D2;
     let im = value.arg(terms)?;
     // Return Result
     Ok(Complex::new(re, im))

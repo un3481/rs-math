@@ -11,9 +11,12 @@ use crate::constants::{ LN_UPPER_BD_P, LN_UPPER_MUL_P, LN_UPPER_VAL_P };
 use crate::constants::{ LN_LOWER_BD_P, LN_LOWER_MUL_P, LN_LOWER_VAL_P };
 
 use crate::error::Error;
-use crate::multiplex::types::{ Multiplex };
+
 use crate::factorial::{ m_fac };
-use crate::basic::{ dec, pow, a_pow, am_pow };
+use crate::basic::{ dec, d_pow, da_pow, };
+
+use crate::multiplex::types::{ Multiplex };
+use crate::multiplex::basic::{ ma_pow };
 
 //##########################################################################################################################
 
@@ -27,13 +30,13 @@ const D1DIV5: Decimal = dec!(0.2);
 //##########################################################################################################################
 
 #[inline]
-fn exp_prepare(
+fn d_exp_prepare(
     value: Decimal
 ) -> Result<(Decimal, Decimal), Error> {
     let mut rem: Decimal = value.abs().fract();
     let fract_pow: usize = (rem * D5).floor().to_usize().ok_or(Error::OptionInvalid)?;
     let int_pow: usize = value.abs().floor().to_usize().ok_or(Error::OptionInvalid)?;
-    let base: Decimal = pow(E, int_pow)? * pow(E_POW1DIV5, fract_pow)?;
+    let base: Decimal = d_pow(E, int_pow)? * d_pow(E_POW1DIV5, fract_pow)?;
     rem = rem - (D1DIV5 * dec(fract_pow));
     Ok((rem, base))
 }
@@ -42,7 +45,7 @@ fn exp_prepare(
 
 /// e^x = sum(n=0; x^n / n!)
 #[inline]
-fn power_series(
+fn d_exp_series(
     value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
@@ -52,7 +55,7 @@ fn power_series(
         D1 + (
             (1..=terms).into_iter()
                 .map(|n| Ok(
-                    (am_pow(value, n, &mut acc1)? / m_fac(n)?).squash()?
+                    (ma_pow(value, n, &mut acc1)? / m_fac(n)?).squash()?
                 ))
                 .reduce(|u, d| Ok(
                     u?.checked_add(d?).ok_or(Error::AddOverflow)?
@@ -65,7 +68,7 @@ fn power_series(
 //##########################################################################################################################
 
 #[inline]
-pub fn exp(
+pub fn d_exp(
     value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
@@ -74,8 +77,8 @@ pub fn exp(
         else if value ==  D1 { E      }
         else if value == -D1 { D1DIVE }
         else {
-            let (rem, base) = exp_prepare(value)?;
-            let res = base * if rem == D0 {D1} else { power_series(rem, terms)? };
+            let (rem, base) = d_exp_prepare(value)?;
+            let res = base * if rem == D0 {D1} else { d_exp_series(rem, terms)? };
             if value.is_sign_negative() {D1 / res} else {res}
         }
     )
@@ -84,7 +87,7 @@ pub fn exp(
 //##########################################################################################################################
 
 #[inline]
-fn ln_prepare(
+fn d_ln_prepare(
     value: Decimal
 ) -> (Decimal, Decimal) {
     let mut rem: Decimal = value;
@@ -129,7 +132,7 @@ fn ln_prepare(
 
 /// ln(x) = 1 + sum(n=0; -1^(n + 1) * ((x - e)^n / (n * e^n)))
 #[inline]
-fn ln_series(
+fn d_ln_series(
     value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
@@ -141,8 +144,8 @@ fn ln_series(
         D1 + (
             (1..=terms).into_iter()
                 .map(|n| Ok(
-                    a_pow(-D1, n + 1, &mut acc1)? * (
-                        am_pow(value - E, n, &mut acc2)? / (dec(n) * am_pow(E, n, &mut acc3)?)
+                    da_pow(-D1, n + 1, &mut acc1)? * (
+                        ma_pow(value - E, n, &mut acc2)? / (dec(n) * ma_pow(E, n, &mut acc3)?)
                     ).squash()?
                 ))
                 .reduce(|u, d| Ok(
@@ -156,7 +159,7 @@ fn ln_series(
 //##########################################################################################################################
 
 #[inline]
-pub fn ln(
+pub fn d_ln(
     value: Decimal,
     terms: usize
 ) -> Result<Decimal, Error> {
@@ -166,8 +169,8 @@ pub fn ln(
         else if value == E      {  D1 }
         else if value == D1DIVE { -D1 }
         else {
-            let (rem, base) = ln_prepare(value);
-            base + ln_series(rem, terms)?
+            let (rem, base) = d_ln_prepare(value);
+            base + d_ln_series(rem, terms)?
         }
     )
 }

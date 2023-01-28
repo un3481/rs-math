@@ -193,7 +193,7 @@ fn test_complex_riemann() -> Result<(), Error> {
     // Set Variables
     let _c2 = C1 * D2;
     let _pi_sqr_div6 = (C1 * ((PI * PI) / D6)).round_dp(3);
-    // cc_sin(asin(2)) == 2
+    // zeta(2) == (pi ^ 2) / 6
     let res1 = zeta(_c2, 10_000, STD_ITER)?.round_dp(3);
     assert_eq!(res1, _pi_sqr_div6);
     // Return Ok

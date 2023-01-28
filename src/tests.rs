@@ -40,6 +40,22 @@ const TEST_DIG: u32 = 24;
 //##########################################################################################################################
 
 #[test]
+fn basic() -> Result<(), Error> {
+    // Set Variables
+    let _sqrt_2_std = SQRT_2.round_dp(TEST_DIG);
+    // pow(4, 1/2) == 2
+    let res1 = dd_pow(D4, D1DIV2, TEST_ITER)?.round_dp(TEST_DIG);
+    assert_eq!(res1, D2);
+    // pow(2, 1/2) == sqrt(2)
+    let res2 = dd_pow(D2, D1DIV2, TEST_ITER)?.round_dp(TEST_DIG);
+    assert_eq!(res2, _sqrt_2_std);
+    // Return Ok
+    Ok(())
+}
+
+//##########################################################################################################################
+
+#[test]
 fn sqrt() -> Result<(), Error> {
     // Set Variables
     let _sqrt_2_std = SQRT_2.round_dp(TEST_DIG);
@@ -52,12 +68,6 @@ fn sqrt() -> Result<(), Error> {
     // sqrt(2) == sqrt(2)
     let res3 = d_sqrt(D2, TEST_ITER)?.round_dp(TEST_DIG);
     assert_eq!(res3, _sqrt_2_std);
-    // pow(4, 1/2) == 2
-    let res4 = dd_pow(D4, D1DIV2, TEST_ITER)?.round_dp(TEST_DIG);
-    assert_eq!(res4, D2);
-    // pow(2, 1/2) == sqrt(2)
-    let res5 = dd_pow(D2, D1DIV2, TEST_ITER)?.round_dp(TEST_DIG);
-    assert_eq!(res5, _sqrt_2_std);
     // Return Ok
     Ok(())
 }
